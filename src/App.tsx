@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { DiGithubBadge  } from 'react-icons/di';
 import './App.css'
 
 function App() {
@@ -15,6 +16,10 @@ function App() {
             <button onClick={() => setCount((count) => count + 1)}>
               count is {count}
             </button>
+        </div>
+
+        <div className="footer">
+            <DiGithubBadge /> <a href="https://github.com/smacdo/">smacdo</a>
         </div>
     </>
   )
