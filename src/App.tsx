@@ -1,8 +1,30 @@
 import {DiGithubBadge} from 'react-icons/di'
-import {MdOutlineLightMode} from "react-icons/md";
+import {MdOutlineDarkMode, MdOutlineLightMode} from "react-icons/md";
 
+import {useEffect, useState} from "react";
 
 import './App.css'
+
+const useIsDarkModeDetector = () => {
+    const getPrefersDarkMode = () => window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const [isDarkTheme, setIsDarkTheme] = useState(getPrefersDarkMode());
+    const onColorSchemeChanged = (e => {
+        setIsDarkTheme(e.matches);
+    });
+
+    useEffect(() => {
+        const darkThemeMediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+        darkThemeMediaQuery.addListener(onColorSchemeChanged);
+        return () => darkThemeMediaQuery.removeListener(onColorSchemeChanged);
+    }, []);
+
+    return isDarkTheme;
+}
+
+function CurrentThemeIcon() {
+    const isDarkTheme = useIsDarkModeDetector();
+    return isDarkTheme ? <MdOutlineDarkMode/> : <MdOutlineLightMode/>;
+}
 
 function App() {
     return (
@@ -32,7 +54,7 @@ function Header() {
                     <li>Contact</li>
                     <li>Projects</li>
                     <li>
-                        <MdOutlineLightMode/>
+                        <CurrentThemeIcon/>
                     </li>
                 </ul>
             </nav>
