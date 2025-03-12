@@ -1,10 +1,45 @@
-#root {
-    margin: 0 auto;
-    padding: 2rem;
+:root {
+    --gap: 24px;
+    --masthead-height: 60px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-    a:nth-of-type(2) .logo {
-        animation: logo-spin infinite 20s linear;
-    }
+.navbar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    line-height: calc(var(--masthead-height));
+    margin-inline-start: auto;
+    margin-inline-end: auto;
+}
+
+.navbar #logo {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.navbar #menu {
+    list-style: none;
+    display: flex;
+    margin: auto var(--gap)
+}
+
+.navbar #menu a {
+    font-size: 16px;
+}
+
+.navbar #menu li + li {
+    margin-inline-start: var(--gap)
+}
+
+.main-footer {
+    text-align: center;
+    margin-top: 40px;
+}
+
+.main-footer #badges {
+    line-height: normal;
+}
+
+.badgelink {
+    color: white;
 }
