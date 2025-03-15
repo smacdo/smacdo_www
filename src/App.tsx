@@ -5,17 +5,20 @@ import {useEffect, useState} from "react";
 
 import './App.css'
 
+type WatchMediaCallbackEvent = { matches: boolean | ((prevState: boolean) => boolean); };
+
 const useIsDarkModeDetector = () => {
     const getPrefersDarkMode = () => window.matchMedia("(prefers-color-scheme: dark)").matches;
     const [isDarkTheme, setIsDarkTheme] = useState(getPrefersDarkMode());
-    const onColorSchemeChanged = (e => {
+
+    const onColorSchemeChanged = ((e: WatchMediaCallbackEvent) => {
         setIsDarkTheme(e.matches);
     });
 
     useEffect(() => {
         const darkThemeMediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-        darkThemeMediaQuery.addListener(onColorSchemeChanged);
-        return () => darkThemeMediaQuery.removeListener(onColorSchemeChanged);
+        darkThemeMediaQuery.addEventListener("change", onColorSchemeChanged);
+        return () => darkThemeMediaQuery.removeEventListener("change", onColorSchemeChanged);
     }, []);
 
     return isDarkTheme;
