@@ -1,10 +1,11 @@
 import {DiGithubBadge} from 'react-icons/di'
 
+import './App.css'
+
+import Copyright from "./components/Copyright.tsx";
 import MastheadPageLink from "./components/MastheadPageLink.tsx";
 import Route from "./components/Route.tsx";
 import ThemeIcon from "./components/ThemeIcon";
-
-import './App.css'
 
 
 function App() {
@@ -64,9 +65,7 @@ function Footer() {
                     <DiGithubBadge size={32}/>
                 </a>
             </div>
-            <div>
-                Copyright &copy; 2025 Scott MacDonald
-            </div>
+            <Copyright name="Scott MacDonald"/>
         </footer>
     )
 }
