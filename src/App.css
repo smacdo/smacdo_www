@@ -41,5 +41,5 @@
 }
 
 .badgelink {
-    color: white;
+    color: calc(var(--text-color));
 }
