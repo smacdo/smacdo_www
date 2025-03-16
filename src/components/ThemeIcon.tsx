@@ -20,7 +20,7 @@ const useIsDarkModeDetector = () => {
     return isDarkTheme;
 }
 
-export function ThemeIcon() {
+export default function ThemeIcon() {
     const isDarkTheme = useIsDarkModeDetector();
     return isDarkTheme ? <MdOutlineDarkMode/> : <MdOutlineLightMode/>;
 }
