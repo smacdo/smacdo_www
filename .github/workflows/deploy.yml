@@ -59,7 +59,4 @@ jobs:
       - name: Deploy production files
         run: |
           rsync --recursive --verbose --archive --compress --delete-after --recursive --dry-run \
-             ./dist/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/smacdo.com/
-        env:
-          SSH_HOST: ${{ secrets.STAGING_SSH_HOST }}
-          SSH_USER: ${{ secrets.STAGING_SSH_USER }}
+             ./dist/ ${{ secrets.STAGING_SSH_USER }}@${{ secrets.STAGING_SSH_HOST }}:/home/${{ secrets.STAGING_SSH_USER }}/smacdo.com/
