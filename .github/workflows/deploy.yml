@@ -58,5 +58,5 @@ jobs:
           path: ./dist
       - name: Deploy production files
         run: |
-          rsync --recursive --verbose --archive --compress --delete-after --recursive --dry-run \
+          rsync --recursive --verbose --archive --compress --delay-updates --delete-after --recursive \
              ./dist/ ${{ secrets.STAGING_SSH_USER }}@staging:/home/${{ secrets.STAGING_SSH_USER }}/smacdo.com/
