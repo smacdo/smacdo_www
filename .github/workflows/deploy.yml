@@ -38,7 +38,7 @@ jobs:
       - name: Generate SSH keys
         run: |
           mkdir -p ~/.ssh/
-          echo "$SSK_KEY" > ~/.ssh/staging.key
+          echo "$SSH_KEY" > ~/.ssh/staging.key
           chmod 600 ~/.ssh/staging.key
           cat >> ~/.ssh/config <<END
           Host staging
