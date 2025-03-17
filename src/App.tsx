@@ -2,8 +2,8 @@ import {DiGithubBadge} from 'react-icons/di'
 
 import './App.css'
 
-import Copyright from "./components/Copyright.tsx";
-import MastheadPageLink from "./components/MastheadPageLink.tsx";
+import Copyright from "./components/Copyright";
+import MastheadPageLink from "./components/Masthead";
 import Route from "./components/Route.tsx";
 import ThemeIcon from "./components/ThemeIcon";
 

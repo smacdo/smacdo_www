@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import useWindowPath from "../hooks/UseWindowPath.ts";
+import useWindowPath from "../../hooks/UseWindowPath";
 
 /// Display a link to a route on the page masthead.
 export default function MastheadPageLink({name, path}: { name: string, path: string }) {

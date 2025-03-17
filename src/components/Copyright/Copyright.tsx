@@ -4,7 +4,7 @@ interface CopyrightProps {
 }
 
 export default function Copyright({year, name}: CopyrightProps) {
-    return (<div>
+    return (<div role="contentinfo">
         Copyright &copy; {year ?? new Date().getFullYear()} {name}
     </div>)
 }
