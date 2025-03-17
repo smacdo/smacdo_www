@@ -15,6 +15,7 @@
 .navbar #logo {
     font-size: 24px;
     font-weight: bold;
+    color: var(--text-color);
 }
 
 .navbar #menu {
