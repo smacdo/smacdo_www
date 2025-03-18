@@ -18,6 +18,7 @@ export function useCanvas(onDraw: DrawFn) {
         // and each time it is called will invoke the user specified `onRender` callback.
         let lastFrameTime = performance.now();
         let lastAnimationFrameId: number | null = null;
+        let resizeFirstTime = true;
 
         const render = (timestamp: DOMHighResTimeStamp) => {
             // Calculate the amount of time that has elapsed since the last draw call.
@@ -27,13 +28,14 @@ export function useCanvas(onDraw: DrawFn) {
             // Handle window resizing.
             const {width, height} = canvas.getBoundingClientRect();
 
-            if (canvas.width !== width || canvas.height !== height) {
+            if (resizeFirstTime || canvas.width !== width || canvas.height !== height) {
                 const {devicePixelRatio: ratio = 1} = window;
 
                 canvas.width = width * ratio;
                 canvas.height = height * ratio;
 
                 context.scale(ratio, ratio);
+                resizeFirstTime = false;
             }
 
             // Invoke the `onDraw` callback to let the user control what is drawn to the screen.
