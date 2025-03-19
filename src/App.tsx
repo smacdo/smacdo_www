@@ -16,12 +16,16 @@ function App() {
 
             <Route path="/">
                 <p>[stuff goes here...]</p>
-                <Canvas width={800} height={600} onDraw={(ctx, nowTime, _deltaTime) => {
+                <Canvas width={1280} height={1024} onDraw={(ctx, nowTime, _deltaTime) => {
                     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
                     ctx.fillStyle = '#A4DC7B'
                     ctx.beginPath()
                     ctx.arc(50, 100, 20 * Math.sin(nowTime / 250) ** 2, 0, 2 * Math.PI)
                     ctx.fill()
+
+                    ctx.font = "72pt Times New Roman";
+                    ctx.fillStyle = '#4A4A4A';
+                    ctx.fillText("Hello World", 100, 100);
                 }}/>
             </Route>
 

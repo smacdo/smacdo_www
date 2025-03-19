@@ -11,6 +11,28 @@ export function useCanvas(onDraw: DrawFn) {
         const canvas = not_null(canvasRef.current);
         const context = not_null(canvas.getContext('2d'), "canvas element does not support 2d mode or the mode was already set");
 
+        const {devicePixelRatio: ratio = 1} = window;
+
+        if (devicePixelRatio !== 1) {
+            const canvasRect = canvas.getBoundingClientRect();
+
+            canvas.width = Math.round(canvasRect.right * ratio) - Math.round(canvasRect.left * ratio);
+            canvas.height = Math.round(canvasRect.bottom * ratio) - Math.round(canvasRect.top * ratio);
+
+            context.scale(ratio, ratio);
+
+            canvas.style.width = canvasRect.width + 'px';
+            canvas.style.height = canvasRect.height + 'px';
+
+            console.info("dpi resize: dpr = " + devicePixelRatio + ", cw = " + canvas.width + ", csw = " + canvas.style.width + ", ch = " + canvas.height + ", csh = " + canvas.style.height);
+        }
+    });
+
+    useEffect(() => {
+        // Request a 2d canvas context from the HTML canvas element.
+        const canvas = not_null(canvasRef.current);
+        const context = not_null(canvas.getContext('2d'), "canvas element does not support 2d mode or the mode was already set");
+
         // Create a render lambda function that is invoked on regular cadence by the browser,
         // and each time it is called will invoke the user specified `onRender` callback.
         let lastFrameTime = performance.now();
