@@ -11,27 +11,27 @@ export function useCanvas(onDraw: DrawFn) {
         const canvas = not_null(canvasRef.current);
         const context = not_null(canvas.getContext('2d'), "canvas element does not support 2d mode or the mode was already set");
 
+        // Rescale the internal pixel buffer for this canvas element if the user has a high dpi
+        // display.
         const {devicePixelRatio: ratio = 1} = window;
 
         if (devicePixelRatio !== 1) {
             const canvasRect = canvas.getBoundingClientRect();
 
+            // Scale the internal pixel buffer up by the pixel ratio to ensure rendering is
+            // happening at the user's higher dpi setting.
             canvas.width = Math.round(canvasRect.right * ratio) - Math.round(canvasRect.left * ratio);
             canvas.height = Math.round(canvasRect.bottom * ratio) - Math.round(canvasRect.top * ratio);
 
             context.scale(ratio, ratio);
 
+            // Set the canvas element's CSS width and height to the _original_ size of the element.
+            //
+            // This is done because the CSS dimensions is physical (not logical pixels) and managed
+            // by the browser which is already accounting for high dpi measurements.
             canvas.style.width = canvasRect.width + 'px';
             canvas.style.height = canvasRect.height + 'px';
-
-            console.info("dpi resize: dpr = " + devicePixelRatio + ", cw = " + canvas.width + ", csw = " + canvas.style.width + ", ch = " + canvas.height + ", csh = " + canvas.style.height);
         }
-    });
-
-    useEffect(() => {
-        // Request a 2d canvas context from the HTML canvas element.
-        const canvas = not_null(canvasRef.current);
-        const context = not_null(canvas.getContext('2d'), "canvas element does not support 2d mode or the mode was already set");
 
         // Create a render lambda function that is invoked on regular cadence by the browser,
         // and each time it is called will invoke the user specified `onRender` callback.
@@ -47,8 +47,6 @@ export function useCanvas(onDraw: DrawFn) {
             const {width, height} = canvas.getBoundingClientRect();
 
             if (canvas.width !== width || canvas.height !== height) {
-                const {devicePixelRatio: ratio = 1} = window;
-
                 canvas.width = width * ratio;
                 canvas.height = height * ratio;
 
