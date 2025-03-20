@@ -7,7 +7,6 @@
     --background-color: #242424;
     --text-color: rgba(255, 255, 255, 0.87);
 
-
     font-synthesis: none;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
@@ -26,6 +25,7 @@ a:hover {
 
 body {
     background-color: var(--background-color);
+    margin: 0;
 }
 
 h1 {
@@ -57,7 +57,7 @@ button:focus-visible {
 @media (prefers-color-scheme: light) {
     :root {
         color: #213547;
-        --background-color: #faf8f1;
+        --background-color: #FFFFFF;
         --text-color: #000000;
     }
 

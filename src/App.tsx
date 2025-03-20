@@ -3,9 +3,7 @@ import {DiGithubBadge} from 'react-icons/di'
 import './App.css'
 
 import Copyright from "./components/Copyright";
-import MastheadPageLink from "./components/Masthead";
 import Route from "./components/Route.tsx";
-import ThemeIcon from "./components/ThemeIcon";
 import Canvas from "./components/Canvas";
 
 
@@ -23,7 +21,7 @@ function App() {
                     ctx.arc(50, 100, 20 * Math.sin(nowTime / 250) ** 2, 0, 2 * Math.PI)
                     ctx.fill()
 
-                    ctx.font = "72pt Times New Roman";
+                    ctx.font = "72px Georgia, Helvetica, Arial, sans-serif";
                     ctx.fillStyle = '#4A4A4A';
                     ctx.fillText("Hello World", 100, 100);
                 }}/>
@@ -54,16 +52,6 @@ function Header() {
                 <div id="logo">
                     <a href="/">smacdo.com</a>
                 </div>
-
-                <ul id="menu">
-                    <MastheadPageLink name="Home" path="/"/>
-                    <MastheadPageLink name="About" path="/about"/>
-                    <MastheadPageLink name="Contact" path="/contact"/>
-                    <MastheadPageLink name="Projects" path="/projects"/>
-                    <li>
-                        <ThemeIcon/>
-                    </li>
-                </ul>
             </nav>
         </header>
     )
