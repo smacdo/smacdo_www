@@ -4,9 +4,9 @@ import './App.css'
 
 import Copyright from "./components/Copyright";
 import Route from "./components/Route.tsx";
-import Canvas from "./components/Canvas";
 import {HTMLAttributes, useEffect, useRef} from "react";
 import {not_null} from "./utils.tsx";
+import {BlockBreaker} from "./games/blockbreaker";
 
 
 function App() {
@@ -15,18 +15,7 @@ function App() {
             <Header/>
 
             <Route path="/">
-                <p>[stuff goes here...]</p>
-                <Canvas width={800} height={600} onDraw={(ctx, nowTime, _deltaTime) => {
-                    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
-                    ctx.fillStyle = '#A4DC7B'
-                    ctx.beginPath()
-                    ctx.arc(50, 100, 20 * Math.sin(nowTime / 2500) ** 2, 0, 2 * Math.PI)
-                    ctx.fill()
-
-                    ctx.font = "72px Georgia, Helvetica, Arial, sans-serif";
-                    ctx.fillStyle = '#4A4A4A';
-                    ctx.fillText("Hello World", 100, 100);
-                }}/>
+                <BlockBreaker/>
             </Route>
 
             <Route path="/about">
