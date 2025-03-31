@@ -119,6 +119,8 @@ class BlockBreakerGame {
             [1, 1, 1, 1, 1, 1],
             [2, 2, 0, 0, 2, 2],
             [3, 3, 4, 4, 3, 3],
+            [0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0],
         ];
 
         this.currentLevel = new GameLevel(canvasWidth, canvasHeight / 2, blocks);
@@ -131,7 +133,7 @@ class BlockBreakerGame {
 
         // Draw the background.
         // TODO: Find a fancier background than just black or white.
-        ctx.fillStyle = '#FFFFFF';
+        ctx.fillStyle = '#F0F0F0';
         ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
         // Draw the blocks.
