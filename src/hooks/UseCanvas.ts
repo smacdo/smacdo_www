@@ -40,7 +40,7 @@ export function useCanvas(onDraw: DrawFn) {
 
         const render = (timestamp: DOMHighResTimeStamp) => {
             // Calculate the amount of time that has elapsed since the last draw call.
-            const deltaTime = timestamp - lastFrameTime;
+            const deltaTimeInMillisecs = timestamp - lastFrameTime;
             lastFrameTime = timestamp;
 
             // Handle window resizing.
@@ -54,7 +54,7 @@ export function useCanvas(onDraw: DrawFn) {
             }
 
             // Invoke the `onDraw` callback to let the user control what is drawn to the screen.
-            onDraw(context, timestamp, deltaTime);
+            onDraw(context, timestamp, deltaTimeInMillisecs / 1000);
             lastAnimationFrameId = requestAnimationFrame(render);
         }
 

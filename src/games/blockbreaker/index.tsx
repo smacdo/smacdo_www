@@ -1,9 +1,10 @@
 import Canvas from "../../components/Canvas";
-import {useRef} from "react";
+import {useEffect, useRef} from "react";
 import {not_null} from "../../utils.tsx";
 
 const PADDLE_WIDTH = 100.0;
 const PADDLE_HEIGHT = 20.0;
+const PADDLE_SPEED_X = 400;
 
 const PADDLE_COLOR = "#B0CAB0";
 
@@ -77,6 +78,13 @@ class Paddle implements GameObject {
         this.vel_x = 0;
         this.vel_y = 0;
     }
+
+    public move(x: number, y: number) {
+        this.left += x;
+        this.right += x;
+        this.top += y;
+        this.bottom += y;
+    }
 }
 
 // TODO: Don't store the width or height of the level here, calculate using canvas dims. Assume
@@ -126,6 +134,8 @@ class GameLevel {
 class BlockBreakerGame {
     private currentLevel?: GameLevel;
     private hasRunInit = false;
+    private moveLeftRequested = false;
+    private moveRightRequested = false;
 
     constructor() {
     }
@@ -136,6 +146,8 @@ class BlockBreakerGame {
             this.hasRunInit = true;
         }
 
+        // TODO: Proper game loop (fixed update steps, partial draws).
+        this.onUpdate(nowTime, deltaTime);
         this.onDraw(ctx, nowTime, deltaTime);
     }
 
@@ -149,6 +161,28 @@ class BlockBreakerGame {
         ];
 
         this.currentLevel = new GameLevel(canvasWidth, canvasHeight, blocks);
+    }
+
+    public onKeyDown(event: KeyboardEvent) {
+        switch (event.key) {
+            case 'a':
+                this.moveLeftRequested = true;
+                break;
+            case 'd':
+                this.moveRightRequested = true;
+                break;
+        }
+    }
+
+    public onKeyUp(event: KeyboardEvent) {
+        switch (event.key) {
+            case 'a':
+                this.moveLeftRequested = false;
+                break;
+            case 'd':
+                this.moveRightRequested = false;
+                break;
+        }
     }
 
     public onDraw(ctx: CanvasRenderingContext2D, _nowTime: number, _deltaTime: number) {
@@ -185,10 +219,51 @@ class BlockBreakerGame {
             ctx.fillRect(paddle.left, paddle.top, paddle.right - paddle.left, paddle.bottom - paddle.top);
         }
     }
+
+    public onUpdate(_nowTime: number, deltaTime: number) {
+        // TODO: bounds check left/right using paddle size.
+        if ((this.currentLevel?.paddles.length ?? 0) > 0) {
+            const paddle = not_null(this.currentLevel).paddles[0];
+
+            if (this.moveLeftRequested) {
+                paddle.move(-PADDLE_SPEED_X * deltaTime, 0);
+            }
+            if (this.moveRightRequested) {
+                paddle.move(PADDLE_SPEED_X * deltaTime, 0);
+            }
+        }
+    }
 }
 
 export function BlockBreaker() {
     const game = useRef(new BlockBreakerGame());
+
+    // Input event handlers.
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            not_null(game.current).onKeyDown(event);
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        }
+    }, []);
+
+    useEffect(() => {
+        const handleKeyUp = (event: KeyboardEvent) => {
+            not_null(game.current).onKeyUp(event);
+        };
+
+        document.addEventListener('keyup', handleKeyUp);
+
+        return () => {
+            document.removeEventListener('keyup', handleKeyUp);
+        }
+    }, []);
+
+    // Game canvas set up.
     return (<Canvas width={800} height={600} onDraw={(ctx, nowTime, deltaTime) => {
         not_null(game.current).onAnimationFrame(ctx, nowTime, deltaTime);
     }}/>);
