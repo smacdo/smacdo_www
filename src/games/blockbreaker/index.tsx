@@ -28,62 +28,130 @@ const BLOCKS: BlockDefinition[] = [
 ]
 
 interface GameObject {
-    /// left x position.
-    left: number;
-    /// top y position.
-    top: number;
-    /// right x position.
-    right: number;
-    /// bottom y position.
-    bottom: number;
+    /// Object's center position on the X axis.
+    x: number;
+    /// Object's center position on the Y axis.
+    y: number;
     /// object movement velocity in the x direction (0 for none).
     vel_x: number;
     /// object movement velocity in the y direction (0 for none).
     vel_y: number;
 }
 
-class Block implements GameObject {
-    left: number;
-    top: number;
-    right: number;
-    bottom: number;
+interface RectBounds {
+    /// Get the object's left position.
+    left: () => number;
+    /// Get the object's top position.
+    top: () => number;
+    /// Get the object's right position.
+    right: () => number;
+    /// Get the object's bottom position.
+    bottom: () => number;
+    /// Get the object's width.
+    width: () => number;
+    /// Get the object's height.
+    height: () => number;
+}
+
+//type GConstructor<T = {}> = new (...args: any[]) => T;
+//type HasRectBounds
+
+
+class Block implements GameObject, RectBounds {
+    x: number;
+    y: number;
+    halfWidth: number;
+    halfHeight: number;
     vel_x: number;
     vel_y: number;
     def: BlockDefinition;
 
     constructor(left: number, top: number, width: number, height: number, def: BlockDefinition) {
-        this.left = left;
-        this.top = top;
-        this.right = left + width;
-        this.bottom = top + height;
+        this.halfWidth = width / 2.0;
+        this.halfHeight = height / 2.0;
+        this.x = left + this.halfWidth;
+        this.y = top + this.halfHeight;
         this.vel_x = 0;
         this.vel_y = 0;
         this.def = def;
     }
+
+    public left() {
+        return this.x - this.halfWidth;
+    }
+
+    public right() {
+        return this.x + this.halfWidth;
+    }
+
+    public top() {
+        return this.y - this.halfHeight;
+    }
+
+    public bottom() {
+        return this.y + this.halfHeight;
+    }
+
+    public width() {
+        return 2.0 * this.halfWidth;
+    }
+
+    public height() {
+        return 2.0 * this.halfHeight;
+    }
 }
 
-class Paddle implements GameObject {
+/*
+class Ball implements GameObject {
     left: number;
     top: number;
     right: number;
     bottom: number;
     vel_x: number;
     vel_y: number;
+}
+ */
+
+class Paddle implements GameObject, RectBounds {
+    x: number;
+    y: number;
+    halfWidth: number;
+    halfHeight: number;
+    vel_x: number;
+    vel_y: number;
 
     constructor(center_x: number, center_y: number, width: number, height: number) {
-        this.left = center_x - width / 2;
-        this.top = center_y - height / 2;
-        this.right = center_x + width / 2;
-        this.bottom = center_y + height / 2;
+        this.x = center_x;
+        this.y = center_y;
+        this.halfWidth = width / 2.0;
+        this.halfHeight = height / 2.0;
+
         this.vel_x = 0;
         this.vel_y = 0;
     }
 
-    public move(x: number, y: number) {
-        this.left += x;
-        this.right += x;
-        this.top += y;
-        this.bottom += y;
+    public left() {
+        return this.x - this.halfWidth;
+    }
+
+    public right() {
+        return this.x + this.halfWidth;
+    }
+
+    public top() {
+        return this.y - this.halfHeight;
+    }
+
+    public bottom() {
+        return this.y + this.halfHeight;
+    }
+
+    public width() {
+        return 2.0 * this.halfWidth;
+    }
+
+    public height() {
+        return 2.0 * this.halfHeight;
     }
 }
 
@@ -214,7 +282,7 @@ class BlockBreakerGame {
             const block = level.blocks[blockIndex];
 
             ctx.fillStyle = block.def.color;
-            ctx.fillRect(block.left, block.top, block.right - block.left, block.bottom - block.top);
+            ctx.fillRect(block.left(), block.top(), block.width(), block.height());
         }
     }
 
@@ -223,7 +291,7 @@ class BlockBreakerGame {
             const paddle = level.paddles[paddleIndex];
 
             ctx.fillStyle = PADDLE_COLOR;
-            ctx.fillRect(paddle.left, paddle.top, paddle.right - paddle.left, paddle.bottom - paddle.top);
+            ctx.fillRect(paddle.left(), paddle.top(), paddle.width(), paddle.height());
         }
     }
 
@@ -233,14 +301,17 @@ class BlockBreakerGame {
         if ((this.currentLevel?.paddles.length ?? 0) > 0) {
             const level = not_null(this.currentLevel);
             const paddle = level.paddles[0];
+
             const displacement = PADDLE_SPEED_X * deltaTime;
 
-            if (this.moveLeftRequested && paddle.left - displacement > 0) {
-                paddle.move(-displacement, 0);
+            if (this.moveLeftRequested && paddle.left() - displacement > 0) {
+                paddle.x -= displacement;
+                paddle.vel_x = -displacement;
             }
 
-            if (this.moveRightRequested && paddle.right + displacement <= level.levelWidth) {
-                paddle.move(displacement, 0);
+            if (this.moveRightRequested && paddle.right() + displacement <= level.levelWidth) {
+                paddle.x += displacement;
+                paddle.vel_x = displacement;
             }
         }
     }
