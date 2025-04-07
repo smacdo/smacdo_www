@@ -93,15 +93,22 @@ class Paddle implements GameObject {
 class GameLevel {
     blocks: Block[];
     paddles: Paddle[];
+    levelWidth: number;
+    levelHeight: number;
 
     constructor(levelWidth: number, levelHeight: number, blocks: number[][]) {
         this.blocks = [];
         this.paddles = [new Paddle(levelWidth / 2, levelHeight - PADDLE_HEIGHT, PADDLE_WIDTH, PADDLE_HEIGHT)];
+        this.levelWidth = levelWidth;
+        this.levelHeight = levelHeight;
+
         this.load(levelWidth, levelHeight, blocks);
     }
 
     public load(levelWidth: number, levelHeight: number, initialBlocks: number[][]) {
         this.blocks = [];
+        this.levelWidth = levelWidth;
+        this.levelHeight = levelHeight;
 
         // Use the first row as the number of columns in the level. This assumes that the grid is
         // rectangular otherwise undefined behavior may occur.
@@ -222,14 +229,18 @@ class BlockBreakerGame {
 
     public onUpdate(_nowTime: number, deltaTime: number) {
         // TODO: bounds check left/right using paddle size.
+        // Handle player paddle movement.
         if ((this.currentLevel?.paddles.length ?? 0) > 0) {
-            const paddle = not_null(this.currentLevel).paddles[0];
+            const level = not_null(this.currentLevel);
+            const paddle = level.paddles[0];
+            const displacement = PADDLE_SPEED_X * deltaTime;
 
-            if (this.moveLeftRequested) {
-                paddle.move(-PADDLE_SPEED_X * deltaTime, 0);
+            if (this.moveLeftRequested && paddle.left - displacement > 0) {
+                paddle.move(-displacement, 0);
             }
-            if (this.moveRightRequested) {
-                paddle.move(PADDLE_SPEED_X * deltaTime, 0);
+
+            if (this.moveRightRequested && paddle.right + displacement <= level.levelWidth) {
+                paddle.move(displacement, 0);
             }
         }
     }
