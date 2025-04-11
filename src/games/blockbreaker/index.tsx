@@ -6,6 +6,11 @@ const PADDLE_WIDTH = 100.0;
 const PADDLE_HEIGHT = 20.0;
 const PADDLE_SPEED_X = 400;
 
+const BALL_VEL_X = 50;
+const BALL_VEL_Y = -50;
+const BALL_RADIUS = 12;
+const BALL_COLOR = "#3FEFAA";
+
 const PADDLE_COLOR = "#B0CAB0";
 
 interface BlockDefinition {
@@ -53,10 +58,6 @@ interface RectBounds {
     height: () => number;
 }
 
-//type GConstructor<T = {}> = new (...args: any[]) => T;
-//type HasRectBounds
-
-
 class Block implements GameObject, RectBounds {
     x: number;
     y: number;
@@ -101,16 +102,16 @@ class Block implements GameObject, RectBounds {
     }
 }
 
-/*
-class Ball implements GameObject {
-    left: number;
-    top: number;
-    right: number;
-    bottom: number;
-    vel_x: number;
-    vel_y: number;
+interface CircleBounds {
+    radius: number;
 }
- */
+
+class Ball implements GameObject, CircleBounds {
+    stuckToPaddle = false;
+
+    constructor(public x: number, public y: number, public radius: number, public vel_x: number, public vel_y: number) {
+    }
+}
 
 class Paddle implements GameObject, RectBounds {
     x: number;
@@ -160,12 +161,14 @@ class Paddle implements GameObject, RectBounds {
 //       Alternatively, store the height (maybe width) as a percentage in the level.
 class GameLevel {
     blocks: Block[];
+    balls: Ball[];
     paddles: Paddle[];
     levelWidth: number;
     levelHeight: number;
 
     constructor(levelWidth: number, levelHeight: number, blocks: number[][]) {
         this.blocks = [];
+        this.balls = [];
         this.paddles = [new Paddle(levelWidth / 2, levelHeight - PADDLE_HEIGHT, PADDLE_WIDTH, PADDLE_HEIGHT)];
         this.levelWidth = levelWidth;
         this.levelHeight = levelHeight;
@@ -203,6 +206,10 @@ class GameLevel {
                 }
             }
         }
+
+        // Spawn an initial ball near the middle.
+        // TODO: Randomize the position, and randomize the direction. Maybe velocity?
+        this.balls.push(new Ball(levelWidth * 0.15, levelHeight * 0.55, BALL_RADIUS, BALL_VEL_X, BALL_VEL_Y));
     }
 }
 
@@ -287,6 +294,7 @@ class BlockBreakerGame {
         if (this.currentLevel) {
             this.drawBlocks(ctx, this.currentLevel);
             this.drawPaddles(ctx, this.currentLevel);
+            this.drawBalls(ctx, this.currentLevel);
         }
     }
 
@@ -309,23 +317,65 @@ class BlockBreakerGame {
         }
     }
 
+    drawBalls(ctx: CanvasRenderingContext2D, level: GameLevel) {
+        for (let ballIndex = 0; ballIndex < level.balls.length; ballIndex++) {
+            const ball = level.balls[ballIndex];
+
+            ctx.fillStyle = BALL_COLOR;
+
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, ball.radius, 0, 2 * Math.PI);
+            ctx.fill();
+        }
+    }
+
     public onUpdate(_nowTime: number, deltaTime: number) {
-        // TODO: bounds check left/right using paddle size.
-        // Handle player paddle movement.
-        if ((this.currentLevel?.paddles.length ?? 0) > 0) {
-            const level = not_null(this.currentLevel);
-            const paddle = level.paddles[0];
+        if (this.currentLevel !== null) {
+            const currentLevel = not_null(this.currentLevel);
 
-            const displacement = PADDLE_SPEED_X * deltaTime;
-
-            if (this.moveLeftRequested && paddle.left() - displacement > 0) {
-                paddle.x -= displacement;
-                paddle.vel_x = -displacement;
+            for (let paddleIndex = 0; paddleIndex < currentLevel.paddles.length; paddleIndex++) {
+                this.updatePaddle(currentLevel.paddles[paddleIndex], currentLevel, deltaTime);
             }
 
-            if (this.moveRightRequested && paddle.right() + displacement <= level.levelWidth) {
-                paddle.x += displacement;
-                paddle.vel_x = displacement;
+            for (let ballIndex = 0; ballIndex < currentLevel.balls.length; ballIndex++) {
+                this.updateBall(currentLevel.balls[ballIndex], currentLevel, deltaTime);
+            }
+        }
+    }
+
+    public updatePaddle(paddle: Paddle, level: GameLevel, deltaTime: number) {
+        // TODO: When bounds checking allow the paddle to move all the way to the edge.
+        const displacement = PADDLE_SPEED_X * deltaTime;
+
+        if (this.moveLeftRequested && paddle.left() - displacement > 0) {
+            paddle.x -= displacement;
+            paddle.vel_x = -displacement;
+        }
+
+        if (this.moveRightRequested && paddle.right() + displacement <= level.levelWidth) {
+            paddle.x += displacement;
+            paddle.vel_x = displacement;
+        }
+    }
+
+    public updateBall(ball: Ball, level: GameLevel, deltaTime: number) {
+        ball.x += ball.vel_x * deltaTime;
+        ball.y += ball.vel_y * deltaTime;
+
+        if (!ball.stuckToPaddle){
+            if (ball.x - ball.radius < 0) {
+                ball.x = ball.radius;
+                ball.vel_x = -ball.vel_x;
+            } else if (ball.x + ball.radius > level.levelWidth) {
+                ball.x = level.levelWidth - ball.radius;
+                ball.vel_x = -ball.vel_x;
+            } else if (ball.y - ball.radius < 0) {
+                ball.y = ball.radius;
+                ball.vel_y = -ball.vel_y;
+            } else if (ball.y + ball.radius > level.levelHeight) {
+                ball.y = ball.y - ball.radius;
+                ball.vel_x = 0;
+                ball.vel_y = 0;
             }
         }
     }
