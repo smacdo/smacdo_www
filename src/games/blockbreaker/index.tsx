@@ -211,22 +211,36 @@ class BlockBreakerGame {
     private hasRunInit = false;
     private moveLeftRequested = false;
     private moveRightRequested = false;
+    private canvasWidth = 0;
+    private canvasHeight = 0;
 
     constructor() {
     }
 
     public onAnimationFrame(ctx: CanvasRenderingContext2D, nowTime: number, deltaTime: number) {
+        // Recalculate the unscaled window size prior to rendering. The window dimensions need to be scaled by the
+        // inverse of the canvas's scaling factor.
+        const {devicePixelRatio: ratio = 1} = window;
+
+        if (devicePixelRatio > 1) {
+            this.canvasWidth = ctx.canvas.width / ratio;
+            this.canvasHeight = ctx.canvas.height / ratio;
+        }
+
+        // Let the game initialize itself when `onAnimationFrame` is called for the first time.
         if (!this.hasRunInit) {
-            this.onInit(ctx.canvas.width, ctx.canvas.height);
+            this.onInit();
             this.hasRunInit = true;
         }
 
+        // Draw and (possibly) update the game.
         // TODO: Proper game loop (fixed update steps, partial draws).
+        ctx.scale(1.0, 1.0);
         this.onUpdate(nowTime, deltaTime);
         this.onDraw(ctx, nowTime, deltaTime);
     }
 
-    public onInit(canvasWidth: number, canvasHeight: number) {
+    public onInit() {
         const blocks = [
             [1, 1, 1, 1, 1, 1],
             [2, 2, 0, 0, 2, 2],
@@ -235,7 +249,7 @@ class BlockBreakerGame {
             [0, 0, 0, 0, 0, 0],
         ];
 
-        this.currentLevel = new GameLevel(canvasWidth, canvasHeight, blocks);
+        this.currentLevel = new GameLevel(this.canvasWidth, this.canvasHeight, blocks);
     }
 
     public onKeyDown(event: KeyboardEvent) {
@@ -261,13 +275,13 @@ class BlockBreakerGame {
     }
 
     public onDraw(ctx: CanvasRenderingContext2D, _nowTime: number, _deltaTime: number) {
-        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
 
         // Draw the background.
         // TODO: Find a fancier background than just black or white.
         // TODO: Optimize rendering by drawing background to an offscreen canvas.
         ctx.fillStyle = '#F0F0F0';
-        ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
 
         // Draw the game level (blocks, paddles, balls etc).
         if (this.currentLevel) {

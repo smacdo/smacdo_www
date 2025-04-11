@@ -31,6 +31,8 @@ export function useCanvas(onDraw: DrawFn) {
             // by the browser which is already accounting for high dpi measurements.
             canvas.style.width = canvasRect.width + 'px';
             canvas.style.height = canvasRect.height + 'px';
+
+            console.log(`DPR = ${devicePixelRatio}, cW = ${canvas.width}, cH = ${canvas.height}, sW = ${canvas.style.width}, sH = ${canvas.style.height}`);
         }
 
         // Create a render lambda function that is invoked on regular cadence by the browser,
