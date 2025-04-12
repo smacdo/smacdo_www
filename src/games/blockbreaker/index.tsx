@@ -1,6 +1,5 @@
-import Canvas from "../../components/Canvas";
-import {useEffect, useRef} from "react";
 import {not_null} from "../../utils.tsx";
+import {BaseGame, GameCanvas} from "../../components/Game";
 
 const PADDLE_WIDTH = 100.0;
 const PADDLE_HEIGHT = 20.0;
@@ -212,43 +211,18 @@ class GameLevel {
     }
 }
 
-class BlockBreakerGame {
+class BlockBreakerGame extends BaseGame {
     private currentLevel?: GameLevel;
-    private hasRunInit = false;
     // TODO: refactor these into an input controller.
     private moveLeftRequested = false;
     private moveRightRequested = false;
     private launchBallRequested = false;
-    private canvasWidth = 0;
-    private canvasHeight = 0;
 
     constructor() {
+        super();
     }
 
-    public onAnimationFrame(ctx: CanvasRenderingContext2D, nowTime: number, deltaTime: number) {
-        // Recalculate the unscaled window size prior to rendering. The window dimensions need to be scaled by the
-        // inverse of the canvas's scaling factor.
-        const {devicePixelRatio: ratio = 1} = window;
-
-        if (devicePixelRatio > 1) {
-            this.canvasWidth = ctx.canvas.width / ratio;
-            this.canvasHeight = ctx.canvas.height / ratio;
-        }
-
-        // Let the game initialize itself when `onAnimationFrame` is called for the first time.
-        if (!this.hasRunInit) {
-            this.onInit();
-            this.hasRunInit = true;
-        }
-
-        // Draw and (possibly) update the game.
-        // TODO: Proper game loop (fixed update steps, partial draws).
-        ctx.scale(1.0, 1.0);
-        this.onUpdate(nowTime, deltaTime);
-        this.onDraw(ctx, nowTime, deltaTime);
-    }
-
-    public onInit() {
+    override onInit() {
         const blocks = [
             [1, 1, 1, 1, 1, 1],
             [2, 2, 0, 0, 2, 2],
@@ -260,7 +234,7 @@ class BlockBreakerGame {
         this.currentLevel = new GameLevel(this.canvasWidth, this.canvasHeight, blocks);
     }
 
-    public onKeyDown(event: KeyboardEvent) {
+    onKeyDown(event: KeyboardEvent) {
         switch (event.key) {
             case 'a':
                 this.moveLeftRequested = true;
@@ -274,7 +248,7 @@ class BlockBreakerGame {
         }
     }
 
-    public onKeyUp(event: KeyboardEvent) {
+    onKeyUp(event: KeyboardEvent) {
         switch (event.key) {
             case 'a':
                 this.moveLeftRequested = false;
@@ -285,7 +259,7 @@ class BlockBreakerGame {
         }
     }
 
-    public onDraw(ctx: CanvasRenderingContext2D, _nowTime: number, _deltaTime: number) {
+    onDraw(ctx: CanvasRenderingContext2D, _nowTime: number, _deltaTime: number) {
         ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
 
         // Draw the background.
@@ -333,7 +307,7 @@ class BlockBreakerGame {
         }
     }
 
-    public onUpdate(_nowTime: number, deltaTime: number) {
+    onUpdate(_nowTime: number, deltaTime: number) {
         if (this.currentLevel !== null) {
             const currentLevel = not_null(this.currentLevel);
 
@@ -347,7 +321,7 @@ class BlockBreakerGame {
         }
     }
 
-    public updatePaddle(level: GameLevel, paddle: Paddle, deltaTime: number) {
+    updatePaddle(level: GameLevel, paddle: Paddle, deltaTime: number) {
         // TODO: When bounds checking allow the paddle to move all the way to the edge.
         const displacement = PADDLE_SPEED_X * deltaTime;
 
@@ -362,7 +336,7 @@ class BlockBreakerGame {
         }
     }
 
-    public updateBall(level: GameLevel, ball: Ball, deltaTime: number) {
+    updateBall(level: GameLevel, ball: Ball, deltaTime: number) {
         ball.x += ball.vel_x * deltaTime;
         ball.y += ball.vel_y * deltaTime;
 
@@ -398,35 +372,5 @@ class BlockBreakerGame {
 }
 
 export function BlockBreaker() {
-    const game = useRef(new BlockBreakerGame());
-
-    // Input event handlers.
-    useEffect(() => {
-        const handleKeyDown = (event: KeyboardEvent) => {
-            not_null(game.current).onKeyDown(event);
-        };
-
-        document.addEventListener('keydown', handleKeyDown);
-
-        return () => {
-            document.removeEventListener('keydown', handleKeyDown);
-        }
-    }, []);
-
-    useEffect(() => {
-        const handleKeyUp = (event: KeyboardEvent) => {
-            not_null(game.current).onKeyUp(event);
-        };
-
-        document.addEventListener('keyup', handleKeyUp);
-
-        return () => {
-            document.removeEventListener('keyup', handleKeyUp);
-        }
-    }, []);
-
-    // Game canvas set up.
-    return (<Canvas width={800} height={600} onDraw={(ctx, nowTime, deltaTime) => {
-        not_null(game.current).onAnimationFrame(ctx, nowTime, deltaTime);
-    }}/>);
+    return (<GameCanvas width={800} height={600} game={new BlockBreakerGame()}/>);
 }

@@ -1,7 +1,7 @@
 import {HTMLAttributes} from "react";
 import {DrawFn, useCanvas} from "../../hooks/UseCanvas";
 
-interface CanvasProps extends HTMLAttributes<HTMLElement> {
+export interface CanvasProps extends HTMLAttributes<HTMLElement> {
     width: number;
     height: number;
     onDraw: DrawFn;
