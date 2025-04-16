@@ -1,2 +1,2 @@
 export {BaseGame, GameCanvas} from "./GameCanvas.tsx";
-export type {RectBounds, CircleBounds} from "./bounds.ts"
+export type {AxisAlignedBoundableBox, CircleBoundable} from "./bounds.ts"

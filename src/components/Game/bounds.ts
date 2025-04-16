@@ -1,7 +1,6 @@
 import {clamp} from "../../utils.tsx";
 
-// TODO: rename AABB, and the existing AABB to AabbGameObject.
-export interface RectBounds {
+export interface AxisAlignedBoundableBox {
     /// Object position on the x axis.
     /// The x position is halfway between the object left and right.
     x: number;
@@ -10,7 +9,10 @@ export interface RectBounds {
     /// The y position is halfway between the object top and bottom.
     y: number;
 
+    /// Half of the width of the bounding box.
     halfWidth: number;
+
+    /// Half of the height of the bounding box.
     halfHeight: number;
 
     /// Get the object's left position.
@@ -32,7 +34,7 @@ export interface RectBounds {
     height(): number;
 }
 
-export class AABB implements RectBounds {
+export class AABB implements AxisAlignedBoundableBox {
     x: number;
     y: number;
     halfWidth: number;
@@ -70,7 +72,7 @@ export class AABB implements RectBounds {
     }
 }
 
-export interface CircleBounds {
+export interface CircleBoundable {
     x: number;
     y: number;
     radius: number;
@@ -81,13 +83,13 @@ export class Circle {
     }
 }
 
-export function rect_rect_intersects(a: RectBounds, b: RectBounds): boolean {
+export function rect_rect_intersects(a: AxisAlignedBoundableBox, b: AxisAlignedBoundableBox): boolean {
     const intersectX = a.right() >= b.left() && b.right() >= a.left();
     const intersectY = a.top() <= b.bottom() && b.top() <= a.bottom();
     return intersectX && intersectY;
 }
 
-export function check_circle_rect_intersect(a: CircleBounds, b: RectBounds): boolean {
+export function check_circle_rect_intersect(a: CircleBoundable, b: AxisAlignedBoundableBox): boolean {
     // Calculate difference vector from center of `b` (AABB) to `a` (circle).
     const diff_x = a.x - b.x;
     const diff_y = a.y - b.y;
@@ -98,7 +100,7 @@ export function check_circle_rect_intersect(a: CircleBounds, b: RectBounds): boo
 
     const closest_x = b.x + clamped_diff_x;
     const closest_y = b.y + clamped_diff_y;
-    
+
     // Check if the length of the vector from the center of the circle to the closest point on the
     // AABB is shorter than the circle radius (intersects) or not.
     //

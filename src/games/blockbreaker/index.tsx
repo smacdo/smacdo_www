@@ -1,6 +1,6 @@
 import {not_null} from "../../utils.tsx";
-import {BaseGame, CircleBounds, GameCanvas, RectBounds} from "../../components/Game";
-import {AABB} from "../../components/Game/bounds.ts";
+import {BaseGame, GameCanvas} from "../../components/Game";
+import {AabbGameObject, CircleGameObject} from "../../components/Game/object.ts";
 
 const PADDLE_WIDTH = 100.0;
 const PADDLE_HEIGHT = 20.0;
@@ -31,77 +31,23 @@ const BLOCKS: BlockDefinition[] = [
     },
 ]
 
-interface GameObject {
-    /// Object's center position on the X axis.
-    x: number;
-    /// Object's center position on the Y axis.
-    y: number;
-    /// object movement velocity in the x direction (0 for none).
-    vel_x: number;
-    /// object movement velocity in the y direction (0 for none).
-    vel_y: number;
-}
-
-class Block extends AABB implements GameObject {
-    vel_x: number;
-    vel_y: number;
-    def: BlockDefinition;
-
-    constructor(left: number, top: number, width: number, height: number, def: BlockDefinition) {
-        super(left, top, width, height);
-        this.vel_x = 0;
-        this.vel_y = 0;
-        this.def = def;
+class Block extends AabbGameObject {
+    constructor(left: number, top: number, width: number, height: number, public def: BlockDefinition) {
+        super(left, top, width, height, 0, 0);
     }
 }
 
-class Ball implements GameObject, CircleBounds {
+class Ball extends CircleGameObject {
     stuckToPaddle = true;
 
     constructor(public x: number, public y: number, public radius: number, public vel_x: number, public vel_y: number) {
+        super(x, y, radius, vel_x, vel_y);
     }
 }
 
-class Paddle implements GameObject, RectBounds {
-    x: number;
-    y: number;
-    halfWidth: number;
-    halfHeight: number;
-    vel_x: number;
-    vel_y: number;
-
+class Paddle extends AabbGameObject {
     constructor(center_x: number, center_y: number, width: number, height: number) {
-        this.x = center_x;
-        this.y = center_y;
-        this.halfWidth = width / 2.0;
-        this.halfHeight = height / 2.0;
-
-        this.vel_x = 0;
-        this.vel_y = 0;
-    }
-
-    public left() {
-        return this.x - this.halfWidth;
-    }
-
-    public right() {
-        return this.x + this.halfWidth;
-    }
-
-    public top() {
-        return this.y - this.halfHeight;
-    }
-
-    public bottom() {
-        return this.y + this.halfHeight;
-    }
-
-    public width() {
-        return 2.0 * this.halfWidth;
-    }
-
-    public height() {
-        return 2.0 * this.halfHeight;
+        super(center_x - width / 2.0, center_y - height / 2.0, width, height, 0, 0);
     }
 }
 
