@@ -1,5 +1,6 @@
 import {not_null} from "../../utils.tsx";
-import {BaseGame, GameCanvas} from "../../components/Game";
+import {BaseGame, CircleBounds, GameCanvas, RectBounds} from "../../components/Game";
+import {AABB} from "../../components/Game/bounds.ts";
 
 const PADDLE_WIDTH = 100.0;
 const PADDLE_HEIGHT = 20.0;
@@ -41,67 +42,17 @@ interface GameObject {
     vel_y: number;
 }
 
-interface RectBounds {
-    /// Get the object's left position.
-    left: () => number;
-    /// Get the object's top position.
-    top: () => number;
-    /// Get the object's right position.
-    right: () => number;
-    /// Get the object's bottom position.
-    bottom: () => number;
-    /// Get the object's width.
-    width: () => number;
-    /// Get the object's height.
-    height: () => number;
-}
-
-class Block implements GameObject, RectBounds {
-    x: number;
-    y: number;
-    halfWidth: number;
-    halfHeight: number;
+class Block extends AABB implements GameObject {
     vel_x: number;
     vel_y: number;
     def: BlockDefinition;
 
     constructor(left: number, top: number, width: number, height: number, def: BlockDefinition) {
-        this.halfWidth = width / 2.0;
-        this.halfHeight = height / 2.0;
-        this.x = left + this.halfWidth;
-        this.y = top + this.halfHeight;
+        super(left, top, width, height);
         this.vel_x = 0;
         this.vel_y = 0;
         this.def = def;
     }
-
-    public left() {
-        return this.x - this.halfWidth;
-    }
-
-    public right() {
-        return this.x + this.halfWidth;
-    }
-
-    public top() {
-        return this.y - this.halfHeight;
-    }
-
-    public bottom() {
-        return this.y + this.halfHeight;
-    }
-
-    public width() {
-        return 2.0 * this.halfWidth;
-    }
-
-    public height() {
-        return 2.0 * this.halfHeight;
-    }
-}
-
-interface CircleBounds {
-    radius: number;
 }
 
 class Ball implements GameObject, CircleBounds {
