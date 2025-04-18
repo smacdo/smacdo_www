@@ -1,6 +1,7 @@
 import {not_null} from "../../utils.tsx";
 import {BaseGame, GameCanvas} from "../../components/Game";
 import {AabbGameObject, CircleGameObject} from "../../components/Game/object.ts";
+import {circle_rect_intersects} from "../../components/Game/bounds.ts";
 
 const PADDLE_WIDTH = 100.0;
 const PADDLE_HEIGHT = 20.0;
@@ -32,6 +33,8 @@ const BLOCKS: BlockDefinition[] = [
 ]
 
 class Block extends AabbGameObject {
+    alive = true;
+
     constructor(left: number, top: number, width: number, height: number, public def: BlockDefinition) {
         super(left, top, width, height, 0, 0);
     }
@@ -178,8 +181,10 @@ class BlockBreakerGame extends BaseGame {
         for (let blockIndex = 0; blockIndex < level.blocks.length; blockIndex++) {
             const block = level.blocks[blockIndex];
 
-            ctx.fillStyle = block.def.color;
-            ctx.fillRect(block.left(), block.top(), block.width(), block.height());
+            if (block.alive) {
+                ctx.fillStyle = block.def.color;
+                ctx.fillRect(block.left(), block.top(), block.width(), block.height());
+            }
         }
     }
 
@@ -213,7 +218,8 @@ class BlockBreakerGame extends BaseGame {
             }
 
             for (let ballIndex = 0; ballIndex < currentLevel.balls.length; ballIndex++) {
-                this.updateBall(currentLevel, currentLevel.balls[ballIndex], deltaTime);
+                this.updateBallPosition(currentLevel, currentLevel.balls[ballIndex], deltaTime);
+                this.updateBallCollisions(currentLevel, currentLevel.balls[ballIndex], deltaTime);
             }
         }
     }
@@ -233,7 +239,7 @@ class BlockBreakerGame extends BaseGame {
         }
     }
 
-    updateBall(level: GameLevel, ball: Ball, deltaTime: number) {
+    updateBallPosition(level: GameLevel, ball: Ball, deltaTime: number) {
         ball.x += ball.vel_x * deltaTime;
         ball.y += ball.vel_y * deltaTime;
 
@@ -263,6 +269,22 @@ class BlockBreakerGame extends BaseGame {
                 ball.y = ball.y - ball.radius;
                 ball.vel_x = 0;
                 ball.vel_y = 0;
+            }
+        }
+    }
+
+    updateBallCollisions(level: GameLevel, ball: Ball, _deltaTime: number) {
+        // Skip if the ball has not launched.
+        if (ball.stuckToPaddle) {
+            return;
+        }
+
+        // Check every block to see if there is a collision between it and the ball.
+        for (let blockIndex = 0; blockIndex < level.blocks.length; blockIndex++) {
+            const block = level.blocks[blockIndex];
+
+            if (block.alive && circle_rect_intersects(ball, block)) {
+                block.alive = false;
             }
         }
     }
