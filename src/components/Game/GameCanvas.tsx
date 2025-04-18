@@ -3,22 +3,22 @@ import {not_null} from "../../utils.tsx";
 import Canvas from "../Canvas";
 
 export abstract class BaseGame {
-    private hasRunInit = false;
     protected canvasWidth = 0;
     protected canvasHeight = 0;
+    private hasRunInit = false;
 
     onAnimationFrame(ctx: CanvasRenderingContext2D, nowTime: number, deltaTime: number) {
         // Recalculate the unscaled window size prior to rendering. The window dimensions need to be scaled by the
         // inverse of the canvas's scaling factor.
         const {devicePixelRatio: ratio = 1} = window;
 
-        if (devicePixelRatio > 1) {
-            this.canvasWidth = ctx.canvas.width / ratio;
-            this.canvasHeight = ctx.canvas.height / ratio;
-        }
+        this.canvasWidth = ctx.canvas.width / ratio;
+        this.canvasHeight = ctx.canvas.height / ratio;
 
         // Let the game initialize itself when `onAnimationFrame` is called for the first time.
         if (!this.hasRunInit) {
+            console.info(`Initializing game with devicePixelRatio ${devicePixelRatio}, canvasWidth ${this.canvasWidth}, canvasHeight ${this.canvasHeight}`);
+
             this.onInit();
             this.hasRunInit = true;
         }
