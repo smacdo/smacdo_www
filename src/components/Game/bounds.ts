@@ -89,7 +89,7 @@ export function rect_rect_intersects(a: AxisAlignedBoundableBox, b: AxisAlignedB
     return intersectX && intersectY;
 }
 
-export function check_circle_rect_intersect(a: CircleBoundable, b: AxisAlignedBoundableBox): boolean {
+export function circle_rect_intersects(a: CircleBoundable, b: AxisAlignedBoundableBox): boolean {
     // Calculate difference vector from center of `b` (AABB) to `a` (circle).
     const diff_x = a.x - b.x;
     const diff_y = a.y - b.y;
