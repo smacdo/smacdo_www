@@ -3,35 +3,58 @@ import {not_null} from "../../utils.tsx";
 import Canvas from "../Canvas";
 
 export abstract class BaseGame {
+    /** The number of seconds between game state updates for a fixed time step simulation. */
+    readonly timePerUpdateStep: number
     protected canvasWidth = 0;
     protected canvasHeight = 0;
+    protected previousOnAnimationFrameTime: number = 0;
+    protected unconsumedUpdateTime: number = 0;
     private hasRunInit = false;
 
+    protected constructor(msPerUpdate: number) {
+        this.timePerUpdateStep = msPerUpdate / 1000;
+    }
+
     onAnimationFrame(ctx: CanvasRenderingContext2D, nowTime: number, deltaTime: number) {
-        // Recalculate the unscaled window size prior to rendering. The window dimensions need to be scaled by the
-        // inverse of the canvas's scaling factor.
-        const {devicePixelRatio: ratio = 1} = window;
-
-        this.canvasWidth = ctx.canvas.width / ratio;
-        this.canvasHeight = ctx.canvas.height / ratio;
-
         // Let the game initialize itself when `onAnimationFrame` is called for the first time.
         if (!this.hasRunInit) {
+            // Recalculate the unscaled window size prior to rendering. The window dimensions need
+            // to be scaled by the inverse of the canvas's scaling factor.
+            const {devicePixelRatio: ratio = 1} = window;
+
+            this.canvasWidth = ctx.canvas.width / ratio;
+            this.canvasHeight = ctx.canvas.height / ratio;
+
             console.info(`Initializing game with devicePixelRatio ${devicePixelRatio}, canvasWidth ${this.canvasWidth}, canvasHeight ${this.canvasHeight}`);
 
+            // Let the derived game initialize itself.
             this.onInit();
+
+            // Mark as initialized.
             this.hasRunInit = true;
         }
 
-        // Draw and (possibly) update the game.
-        // TODO: Proper game loop (fixed update steps, partial draws).
-        this.onUpdate(nowTime, deltaTime);
-        this.onDraw(ctx, nowTime, deltaTime);
+        // Update the game on a fixed time step.
+        this.previousOnAnimationFrameTime = nowTime;
+        this.unconsumedUpdateTime += deltaTime;
+
+        const timePerUpdateStep = this.timePerUpdateStep;
+        let updateTime = this.previousOnAnimationFrameTime;
+
+        while (this.unconsumedUpdateTime >= timePerUpdateStep) {
+            this.onUpdate(updateTime, timePerUpdateStep);
+            updateTime += timePerUpdateStep;
+
+            this.unconsumedUpdateTime -= timePerUpdateStep;
+        }
+
+        // Draw the game.
+        this.onDraw(ctx, this.unconsumedUpdateTime / this.timePerUpdateStep);
     }
 
     abstract onInit(): void;
 
-    abstract onDraw(ctx: CanvasRenderingContext2D, nowTime: number, deltaTime: number): void;
+    abstract onDraw(ctx: CanvasRenderingContext2D, extrapolationFactor: number): void;
 
     abstract onUpdate(nowTime: number, deltaTime: number): void;
 

@@ -1,3 +1,7 @@
+export function lerp(start: number, end: number, t: number): number {
+    return start + (end - start) * t;
+}
+
 /**
  * Calculates the Euclidean distance between two 2D vectors.
  *

@@ -1,5 +1,5 @@
 import {not_null} from "../../utils.tsx";
-import {BaseGame, GameCanvas} from "../../components/Game";
+import {BaseGame, GameCanvas, lerp} from "../../components/Game";
 import {AabbGameObject, CircleGameObject} from "../../components/Game/object.ts";
 import {resolve_circle_rect_collision} from "../../components/Game/bounds.ts";
 import {vector_length} from "../../components/Game/mathutils.ts";
@@ -137,7 +137,7 @@ class BlockBreakerGame extends BaseGame {
     private launchBallRequested = false;
 
     constructor() {
-        super();
+        super(50);
     }
 
     override onInit() {
@@ -173,7 +173,7 @@ class BlockBreakerGame extends BaseGame {
         }
     }
 
-    onDraw(ctx: CanvasRenderingContext2D, _nowTime: number, _deltaTime: number) {
+    onDraw(ctx: CanvasRenderingContext2D, interpolation: number) {
         ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
 
         // Draw the background.
@@ -184,13 +184,13 @@ class BlockBreakerGame extends BaseGame {
 
         // Draw the game level (blocks, paddles, balls etc.).
         if (this.currentLevel) {
-            this.drawBlocks(ctx, this.currentLevel);
-            this.drawPaddles(ctx, this.currentLevel);
-            this.drawBalls(ctx, this.currentLevel);
+            this.drawBlocks(ctx, interpolation, this.currentLevel);
+            this.drawPaddles(ctx, interpolation, this.currentLevel);
+            this.drawBalls(ctx, interpolation, this.currentLevel);
         }
     }
 
-    drawBlocks(ctx: CanvasRenderingContext2D, level: GameLevel) {
+    drawBlocks(ctx: CanvasRenderingContext2D, _interpolation: number, level: GameLevel) {
         // TODO: Draw the blocks to an offscreen canvas that only updates as needed.
         for (let blockIndex = 0; blockIndex < level.blocks.length; blockIndex++) {
             const block = level.blocks[blockIndex];
@@ -202,23 +202,27 @@ class BlockBreakerGame extends BaseGame {
         }
     }
 
-    drawPaddles(ctx: CanvasRenderingContext2D, level: GameLevel) {
+    drawPaddles(ctx: CanvasRenderingContext2D, interpolation: number, level: GameLevel) {
         for (let paddleIndex = 0; paddleIndex < level.paddles.length; paddleIndex++) {
             const paddle = level.paddles[paddleIndex];
+            const paddleX = lerp(paddle.prev_x, paddle.x, interpolation);
+            const paddleY = lerp(paddle.prev_y, paddle.y, interpolation);
 
             ctx.fillStyle = PADDLE_COLOR;
-            ctx.fillRect(paddle.left(), paddle.top(), paddle.width(), paddle.height());
+            ctx.fillRect(paddleX - paddle.halfWidth, paddleY - paddle.halfHeight, paddle.width(), paddle.height());
         }
     }
 
-    drawBalls(ctx: CanvasRenderingContext2D, level: GameLevel) {
+    drawBalls(ctx: CanvasRenderingContext2D, interpolation: number, level: GameLevel) {
         for (let ballIndex = 0; ballIndex < level.balls.length; ballIndex++) {
             const ball = level.balls[ballIndex];
+            const ballX = lerp(ball.prev_x, ball.x, interpolation);
+            const ballY = lerp(ball.prev_y, ball.y, interpolation);
 
             ctx.fillStyle = BALL_COLOR;
 
             ctx.beginPath();
-            ctx.arc(ball.x, ball.y, ball.radius, 0, 2 * Math.PI);
+            ctx.arc(ballX, ballY, ball.radius, 0, 2 * Math.PI);
             ctx.fill();
         }
     }
@@ -230,13 +234,22 @@ class BlockBreakerGame extends BaseGame {
 
             // Update paddles.
             for (let paddleIndex = 0; paddleIndex < currentLevel.paddles.length; paddleIndex++) {
-                this.updatePaddle(currentLevel, currentLevel.paddles[paddleIndex], deltaTime);
-                this.updatePaddleCollision(currentLevel, currentLevel.paddles[paddleIndex], deltaTime);
+                const paddle = currentLevel.paddles[paddleIndex];
+
+                paddle.prev_x = paddle.x;
+                paddle.prev_y = paddle.y;
+
+                this.updatePaddle(currentLevel, paddle, deltaTime);
+                this.updatePaddleCollision(currentLevel, paddle, deltaTime);
             }
 
             // Update balls.
             for (let ballIndex = 0; ballIndex < currentLevel.balls.length; ballIndex++) {
                 const ball = currentLevel.balls[ballIndex];
+
+                ball.prev_x = ball.x;
+                ball.prev_y = ball.y;
+
                 this.updateBallPosition(currentLevel, ball, deltaTime);
                 this.updateBallCollisions(currentLevel, ball, deltaTime);
 
