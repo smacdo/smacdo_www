@@ -88,14 +88,14 @@ describe('vector_angle', () => {
 
     it('should return the correct angle for vectors along the negative axes', () => {
         expect(vector_angle(-1, 0)).toBe(PI); // Negative x-axis
-        expect(vector_angle(0, -1)).toBe(-HALF_PI); // Negative y-axis (or 3*PI/2, depending on implementation)
+        expect(vector_angle(0, -1)).toBe(3 * PI / 2); // Negative y-axis
     });
 
     it('should return the correct angle for vectors in each quadrant', () => {
         expect(vector_angle(1, 1)).toBe(PI / 4); // Quadrant I (45 degrees)
         expect(vector_angle(-1, 1)).toBeCloseTo(3 * PI / 4); // Quadrant II (135 degrees)
-        expect(vector_angle(-1, -1)).toBeCloseTo(-3 * PI / 4); // Quadrant III (-135 degrees or 225 degrees)
-        expect(vector_angle(1, -1)).toBeCloseTo(-PI / 4); // Quadrant IV (-45 degrees or 315 degrees)
+        expect(vector_angle(-1, -1)).toBeCloseTo(5 * PI / 4); // Quadrant III (225 degrees)
+        expect(vector_angle(1, -1)).toBeCloseTo(7 * PI / 4); // Quadrant IV (315 degrees)
     });
 
     it('should return zero angle for the zero vector', () => {

@@ -1,7 +1,7 @@
 import {not_null} from "../../utils.tsx";
 import {BaseGame, GameCanvas} from "../../components/Game";
 import {AabbGameObject, CircleGameObject} from "../../components/Game/object.ts";
-import {circle_rect_intersects} from "../../components/Game/bounds.ts";
+import {resolve_circle_rect_collision} from "../../components/Game/bounds.ts";
 
 const PADDLE_WIDTH = 100.0;
 const PADDLE_HEIGHT = 20.0;
@@ -283,9 +283,21 @@ class BlockBreakerGame extends BaseGame {
         for (let blockIndex = 0; blockIndex < level.blocks.length; blockIndex++) {
             const block = level.blocks[blockIndex];
 
-            if (block.alive && circle_rect_intersects(ball, block)) {
-                block.alive = false;
+            // Skip the block if it's already destroyed.
+            if (!block.alive) {
+                continue;
             }
+
+            // Check if the ball will hit this block. Skip the block if there's no collision.
+            const collision = resolve_circle_rect_collision(ball, block);
+
+            if (collision === undefined) {
+                continue;
+            }
+
+            // TODO: Resolve the collision by ref
+
+            block.alive = false;
         }
     }
 }

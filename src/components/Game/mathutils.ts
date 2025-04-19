@@ -80,7 +80,13 @@ export function vector_angle(x: number, y: number): number | undefined {
     const norm_x = x / length;
     const norm_y = y / length;
 
-    return Math.atan2(norm_y, norm_x); // NOTE: y` before `x` because atan(y, x).
+    let angle_rad = Math.atan2(norm_y, norm_x); // NOTE: y` before `x` because atan(y, x).
+
+    if (angle_rad < 0) {
+        angle_rad += 2 * Math.PI;
+    }
+
+    return angle_rad;
 }
 
 /**
