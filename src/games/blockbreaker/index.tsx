@@ -18,6 +18,14 @@ const BALL_COLOR = "#3FEFAA";
 
 const PADDLE_COLOR = "#B0CAB0";
 
+const DEFAULT_LEVEL: number[][] = [
+    [1, 1, 1, 1, 1, 1],
+    [2, 2, 0, 0, 2, 2],
+    [3, 3, 4, 4, 3, 3],
+    [0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0],
+];
+
 interface BlockDefinition {
     color: string;
     solid: boolean;
@@ -40,7 +48,7 @@ const BLOCKS: BlockDefinition[] = [
         color: "#FF8000",
         solid: false,
     },
-]
+];
 
 class Block extends AabbGameObject {
     alive = true;
@@ -133,15 +141,11 @@ class BlockBreakerGame extends BaseGame {
     }
 
     override onInit() {
-        const blocks = [
-            [1, 1, 1, 1, 1, 1],
-            [2, 2, 0, 0, 2, 2],
-            [3, 3, 4, 4, 3, 3],
-            [0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0],
-        ];
+        this.loadLevel();
+    }
 
-        this.currentLevel = new GameLevel(this.canvasWidth, this.canvasHeight, blocks);
+    loadLevel() {
+        this.currentLevel = new GameLevel(this.canvasWidth, this.canvasHeight, DEFAULT_LEVEL);
     }
 
     onKeyDown(event: KeyboardEvent) {
@@ -220,17 +224,27 @@ class BlockBreakerGame extends BaseGame {
     }
 
     onUpdate(_nowTime: number, deltaTime: number) {
+        // Only run the game update logic when there is a loaded level.
         if (this.currentLevel !== null) {
             const currentLevel = not_null(this.currentLevel);
 
+            // Update paddles.
             for (let paddleIndex = 0; paddleIndex < currentLevel.paddles.length; paddleIndex++) {
                 this.updatePaddle(currentLevel, currentLevel.paddles[paddleIndex], deltaTime);
                 this.updatePaddleCollision(currentLevel, currentLevel.paddles[paddleIndex], deltaTime);
             }
 
+            // Update balls.
             for (let ballIndex = 0; ballIndex < currentLevel.balls.length; ballIndex++) {
-                this.updateBallPosition(currentLevel, currentLevel.balls[ballIndex], deltaTime);
-                this.updateBallCollisions(currentLevel, currentLevel.balls[ballIndex], deltaTime);
+                const ball = currentLevel.balls[ballIndex];
+                this.updateBallPosition(currentLevel, ball, deltaTime);
+                this.updateBallCollisions(currentLevel, ball, deltaTime);
+
+                // Check for game over condition, which happens when a ball goes out of bounds.
+                if (ball.y >= currentLevel.levelHeight) {
+                    console.warn("game over!");
+                    this.loadLevel();
+                }
             }
         }
     }
@@ -250,7 +264,7 @@ class BlockBreakerGame extends BaseGame {
         }
     }
 
-    updatePaddleCollision(level: GameLevel, paddle: Paddle, deltaTime: number) {
+    updatePaddleCollision(level: GameLevel, paddle: Paddle, _deltaTime: number) {
         for (let ballIndex = 0; ballIndex < level.balls.length; ballIndex++) {
             const ball = level.balls[ballIndex];
 
@@ -297,8 +311,8 @@ class BlockBreakerGame extends BaseGame {
             ball.vel_y = BALL_VEL_Y;
 
             if (this.launchBallRequested) {
-                console.info(`launch ball at vx ${ball.vel_x}`);
                 ball.stuckToPaddle = false;
+                this.launchBallRequested = false;
             }
         } else {
             if (ball.x - ball.radius < 0) {
@@ -310,10 +324,6 @@ class BlockBreakerGame extends BaseGame {
             } else if (ball.y - ball.radius < 0) {
                 ball.y = ball.radius;
                 ball.vel_y = -ball.vel_y;
-            } else if (ball.y + ball.radius > level.levelHeight) {
-                ball.y = ball.y - ball.radius;
-                ball.vel_x = 0;
-                ball.vel_y = 0;
             }
         }
     }
