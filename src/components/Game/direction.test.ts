@@ -30,7 +30,7 @@ describe('vector_direction', () => {
     });
 
     test('should return undefined for a zero-length vector', () => {
-        expect(vector_direction(0, 0)).toBeUndefined();
+        expect(vector_direction(0, 0)).toBeNull();
     });
 
     test('should return boundary conditions correctly', () => {

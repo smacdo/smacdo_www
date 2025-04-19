@@ -12,25 +12,25 @@ export enum Direction {
 
 /**
  * Returns the closest cardinal direction for a 2D vector.
- * Returns `undefined` if the input vector has a length of zero.
+ * Returns `null` if the input vector has a length of zero.
  *
  * @param x The x-coordinate of the vector.
  * @param y The y-coordinate of the vector.
  * @returns The `Direction` enum value representing the vector's direction,
- * or `undefined` if the vector's length is zero.
+ * or `null` if the vector's length is zero.
  *
  * @example
  * ```typescript
  * const direction1 = vector_direction(1, 0); // Returns Direction.East
  * const direction2 = vector_direction(0, 1); // Returns Direction.North
- * const zeroVectorDirection = vector_direction(0, 0); // Returns undefined
+ * const zeroVectorDirection = vector_direction(0, 0); // Returns null
  * ```
  */
-export function vector_direction(x: number, y: number): Direction | undefined {
+export function vector_direction(x: number, y: number): Direction | null {
     const angle = vector_angle(x, y);
 
-    if (angle === undefined) {
-        return undefined;
+    if (angle === null) {
+        return null;
     }
 
     const degree = rad_to_degree(angle);

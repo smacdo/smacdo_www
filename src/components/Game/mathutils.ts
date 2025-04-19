@@ -57,24 +57,24 @@ export function vector_length(x: number, y: number): number {
 
 /**
  * Calculates the angle (in radians) of a 2D vector relative to the positive x-axis.
- * Returns `undefined` if the vector has a length of zero.
+ * Returns `null` if the vector has a length of zero.
  *
  * @param x The x-coordinate of the vector.
  * @param y The y-coordinate of the vector.
- * @returns The angle of the vector in radians, or `undefined` if the vector's length is zero.
+ * @returns The angle of the vector in radians, or `null` if the vector's length is zero.
  * The angle ranges from -π to π.
  *
  * @example
  * ```typescript
  * const angle = vector_angle(1, 1); // Returns approximately 0.785 (π/4 radians)
- * const zeroVectorAngle = vector_angle(0, 0); // Returns undefined
+ * const zeroVectorAngle = vector_angle(0, 0); // Returns null
  * ```
  */
-export function vector_angle(x: number, y: number): number | undefined {
+export function vector_angle(x: number, y: number): number | null {
     const length = vector_length(x, y);
 
     if (length === 0) {
-        return undefined;
+        return null;
     }
 
     const norm_x = x / length;

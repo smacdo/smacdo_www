@@ -91,18 +91,18 @@ export function rect_rect_intersects(a: AxisAlignedBoundableBox, b: AxisAlignedB
 }
 
 /// Returns a (x, y) vector to apply to the circle `a` parameter to resolve the collision. Alternatively apply it to `b`
-/// as (-x, -y) to resolve the collision. If the two objects do not collide then `undefined` is returned.
+/// as (-x, -y) to resolve the collision. If the two objects do not collide then `null` is returned.
 
 
 /// Calculates the minimum interpenetration vector between a possibly colliding circle `a` and axis aligned bounding box
 /// `b`. Adding the returned `(x, y)` vector to a's position will move the circle to the closest point such that it no
 /// longer penetrates `b`.
 ///
-/// `undefined` is returned if the two shapes are not colliding with each other.
+/// `null` is returned if the two shapes are not colliding with each other.
 export function resolve_circle_rect_collision(a: CircleBoundable, b: AxisAlignedBoundableBox): {
     x: number,
     y: number
-} | undefined {
+} | null {
     // Calculate difference vector from center of `b` (AABB) to `a` (circle).
     const diff_x = a.x - b.x;
     const diff_y = a.y - b.y;
@@ -119,10 +119,10 @@ export function resolve_circle_rect_collision(a: CircleBoundable, b: AxisAligned
     if (vector_distance(closest_x, closest_y, a.x, a.y) <= a.radius) {
         return {x: diff_x, y: diff_y};
     } else {
-        return undefined;
+        return null;
     }
 }
 
 export function circle_rect_intersects(a: CircleBoundable, b: AxisAlignedBoundableBox): boolean {
-    return resolve_circle_rect_collision(a, b) !== undefined;
+    return resolve_circle_rect_collision(a, b) !== null;
 }

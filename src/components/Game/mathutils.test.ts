@@ -99,7 +99,7 @@ describe('vector_angle', () => {
     });
 
     it('should return zero angle for the zero vector', () => {
-        expect(vector_angle(0, 0)).toBeUndefined();
+        expect(vector_angle(0, 0)).toBeNull();
     });
 
     it('should handle floating point numbers correctly', () => {
