@@ -137,7 +137,7 @@ class BlockBreakerGame extends BaseGame {
     private launchBallRequested = false;
 
     constructor() {
-        super(50);
+        super(2);
     }
 
     override onInit() {
@@ -367,20 +367,20 @@ class BlockBreakerGame extends BaseGame {
             const c_len = vector_length(collision.x, collision.y);
             const c_dir = vector_direction(collision.x / c_len, collision.y / c_len);
 
-            if (c_dir == Direction.East || c_dir == Direction.West) {
+            if (c_dir === Direction.East || c_dir === Direction.West) {
                 const penetration_distance = ball.radius - Math.abs(collision.x);
 
-                if (c_dir == Direction.East) {
+                if (c_dir === Direction.East) {
                     ball.x += penetration_distance;
                 } else {
-                    ball.y -= penetration_distance;
+                    ball.x -= penetration_distance;
                 }
 
                 ball.vel_x *= -1;
             } else {
                 const penetration_distance = ball.radius - Math.abs(collision.y);
 
-                if (c_dir == Direction.North) {
+                if (c_dir === Direction.North) {
                     ball.y -= penetration_distance;
                 } else {
                     ball.y += penetration_distance;

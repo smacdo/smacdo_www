@@ -117,7 +117,10 @@ export function resolve_circle_rect_collision(a: CircleBoundable, b: AxisAligned
     // Check if the length of the vector from the center of the circle to the closest point on the
     // AABB is shorter than the circle radius (intersects) or not.
     if (vector_distance(closest_x, closest_y, a.x, a.y) <= a.radius) {
-        return {x: diff_x, y: diff_y};
+        const r_x = closest_x - a.x;
+        const r_y = closest_y - a.y;
+
+        return {x: r_x, y: r_y};
     } else {
         return null;
     }
