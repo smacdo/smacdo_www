@@ -2,10 +2,15 @@ import {not_null} from "../../utils.tsx";
 import {BaseGame, GameCanvas} from "../../components/Game";
 import {AabbGameObject, CircleGameObject} from "../../components/Game/object.ts";
 import {resolve_circle_rect_collision} from "../../components/Game/bounds.ts";
+import {vector_length} from "../../components/Game/mathutils.ts";
+import {Direction, vector_direction} from "../../components/Game/direction.ts";
 
-const PADDLE_WIDTH = 100.0;
+const PADDLE_WIDTH = 120.0;
 const PADDLE_HEIGHT = 20.0;
 const PADDLE_SPEED_X = 400;
+
+const BALL_BASE_VELOCITY_X = 100.0;
+const BALL_BLOCK_COLLISION_VELOCITY_MODIFIER = 2.0;
 
 const BALL_VEL_Y = -400;
 const BALL_RADIUS = 12;
@@ -15,20 +20,25 @@ const PADDLE_COLOR = "#B0CAB0";
 
 interface BlockDefinition {
     color: string;
+    solid: boolean;
 }
 
 const BLOCKS: BlockDefinition[] = [
     {
         color: "#3399FF",
+        solid: true,
     },
     {
         color: "#00B300",
+        solid: false,
     },
     {
         color: "#CCCC66",
+        solid: false,
     },
     {
         color: "#FF8000",
+        solid: false,
     },
 ]
 
@@ -215,6 +225,7 @@ class BlockBreakerGame extends BaseGame {
 
             for (let paddleIndex = 0; paddleIndex < currentLevel.paddles.length; paddleIndex++) {
                 this.updatePaddle(currentLevel, currentLevel.paddles[paddleIndex], deltaTime);
+                this.updatePaddleCollision(currentLevel, currentLevel.paddles[paddleIndex], deltaTime);
             }
 
             for (let ballIndex = 0; ballIndex < currentLevel.balls.length; ballIndex++) {
@@ -236,6 +247,40 @@ class BlockBreakerGame extends BaseGame {
         if (this.moveRightRequested && paddle.right() + displacement <= level.levelWidth) {
             paddle.x += displacement;
             paddle.vel_x = PADDLE_SPEED_X;
+        }
+    }
+
+    updatePaddleCollision(level: GameLevel, paddle: Paddle, deltaTime: number) {
+        for (let ballIndex = 0; ballIndex < level.balls.length; ballIndex++) {
+            const ball = level.balls[ballIndex];
+
+            // Skip the ball if it's stuck to the paddle, or if it doesn't intersect with the paddle.
+            if (ball.stuckToPaddle) {
+                continue;
+            }
+
+            const collision = resolve_circle_rect_collision(ball, paddle);
+
+            if (collision === null) {
+                continue;
+            }
+
+            // Find the distance from the middle of the paddle to the ball intersection point. The
+            // velocity change from impact is larger the further from the middle the collision is.
+            const distance = ball.x - paddle.x;
+            const scaled_distance = distance / paddle.halfWidth;
+
+            const old_vel_x = ball.vel_x;
+            const old_vel_y = ball.vel_y;
+
+            ball.vel_x = BALL_BASE_VELOCITY_X * BALL_BLOCK_COLLISION_VELOCITY_MODIFIER * scaled_distance;
+            ball.vel_y = -1.0 * Math.abs(ball.vel_y); // always move up, fixes "ball stuck in paddle" bug.
+
+            const new_vel_len = vector_length(ball.vel_x, ball.vel_y);
+            const old_vel_len = vector_length(old_vel_x, old_vel_y);
+
+            ball.vel_x = ball.vel_x / new_vel_len * old_vel_len;
+            ball.vel_y = ball.vel_y / new_vel_len * old_vel_len;
         }
     }
 
@@ -291,13 +336,40 @@ class BlockBreakerGame extends BaseGame {
             // Check if the ball will hit this block. Skip the block if there's no collision.
             const collision = resolve_circle_rect_collision(ball, block);
 
-            if (collision === undefined) {
+            if (collision === null) {
                 continue;
             }
 
-            // TODO: Resolve the collision by ref
+            // Resolve the collision by only on the collision axis, and ignore the other axis.
+            const c_len = vector_length(collision.x, collision.y);
+            const c_dir = vector_direction(collision.x / c_len, collision.y / c_len);
 
-            block.alive = false;
+            if (c_dir == Direction.East || c_dir == Direction.West) {
+                const penetration_distance = ball.radius - Math.abs(collision.x);
+
+                if (c_dir == Direction.East) {
+                    ball.x += penetration_distance;
+                } else {
+                    ball.y -= penetration_distance;
+                }
+
+                ball.vel_x *= -1;
+            } else {
+                const penetration_distance = ball.radius - Math.abs(collision.y);
+
+                if (c_dir == Direction.North) {
+                    ball.y -= penetration_distance;
+                } else {
+                    ball.y += penetration_distance;
+                }
+
+                ball.vel_y *= -1;
+            }
+
+            // Destroy any non-solid block that has been hit.
+            if (!block.def.solid) {
+                block.alive = false;
+            }
         }
     }
 }
