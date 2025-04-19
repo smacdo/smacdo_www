@@ -1,4 +1,5 @@
 import {clamp} from "../../utils.tsx";
+import {vector_distance} from "./mathutils.ts";
 
 export interface AxisAlignedBoundableBox {
     /// Object position on the x axis.
@@ -89,7 +90,19 @@ export function rect_rect_intersects(a: AxisAlignedBoundableBox, b: AxisAlignedB
     return intersectX && intersectY;
 }
 
-export function circle_rect_intersects(a: CircleBoundable, b: AxisAlignedBoundableBox): boolean {
+/// Returns a (x, y) vector to apply to the circle `a` parameter to resolve the collision. Alternatively apply it to `b`
+/// as (-x, -y) to resolve the collision. If the two objects do not collide then `undefined` is returned.
+
+
+/// Calculates the minimum interpenetration vector between a possibly colliding circle `a` and axis aligned bounding box
+/// `b`. Adding the returned `(x, y)` vector to a's position will move the circle to the closest point such that it no
+/// longer penetrates `b`.
+///
+/// `undefined` is returned if the two shapes are not colliding with each other.
+export function resolve_circle_rect_collision(a: CircleBoundable, b: AxisAlignedBoundableBox): {
+    x: number,
+    y: number
+} | undefined {
     // Calculate difference vector from center of `b` (AABB) to `a` (circle).
     const diff_x = a.x - b.x;
     const diff_y = a.y - b.y;
@@ -103,12 +116,13 @@ export function circle_rect_intersects(a: CircleBoundable, b: AxisAlignedBoundab
 
     // Check if the length of the vector from the center of the circle to the closest point on the
     // AABB is shorter than the circle radius (intersects) or not.
-    //
-    // The square root must be taken here because the direction is important - a negative length
-    // implies the circle is not intersecting.
-    const shortest_diff_x = closest_x - a.x;
-    const shortest_diff_y = closest_y - a.y;
-    const length_squared = shortest_diff_x * shortest_diff_x + shortest_diff_y * shortest_diff_y;
+    if (vector_distance(closest_x, closest_y, a.x, a.y) <= a.radius) {
+        return {x: diff_x, y: diff_y};
+    } else {
+        return undefined;
+    }
+}
 
-    return Math.sqrt(length_squared) <= a.radius;
+export function circle_rect_intersects(a: CircleBoundable, b: AxisAlignedBoundableBox): boolean {
+    return resolve_circle_rect_collision(a, b) !== undefined;
 }
