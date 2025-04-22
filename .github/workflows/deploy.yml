@@ -34,7 +34,7 @@ jobs:
           path: ./dist
 
   deploy_development:
-    name: deploy
+    name: deploy to development environment
     needs: build
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/development'
@@ -66,7 +66,7 @@ jobs:
              ./dist/ ${{ secrets.STAGING_SSH_USER }}@staging:/home/${{ secrets.STAGING_SSH_USER }}/test.smacdo.com/
 
   deploy_prod:
-    name: deploy
+    name: deploy to production environment
     needs: build
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
