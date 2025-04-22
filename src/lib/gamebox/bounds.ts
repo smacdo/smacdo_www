@@ -1,5 +1,5 @@
 import {clamp} from "../../utils.tsx";
-import {vector_distance} from "./mathutils.ts";
+import {vector_distance} from "./math.ts";
 
 export interface AxisAlignedBoundableBox {
     /// Object position on the x axis.

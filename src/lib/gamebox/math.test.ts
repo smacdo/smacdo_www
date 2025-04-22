@@ -5,7 +5,7 @@ import {
     vector_distance,
     vector_distance_squared,
     vector_length
-} from "./mathutils.ts";
+} from "./math.ts";
 
 const PI = Math.PI;
 const HALF_PI = Math.PI / 2;

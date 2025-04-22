@@ -1,9 +1,9 @@
 import {not_null} from "../../utils.tsx";
-import {BaseGame, GameCanvas, lerp} from "../../components/Game";
-import {AabbGameObject, CircleGameObject} from "../../components/Game/object.ts";
-import {resolve_circle_rect_collision} from "../../components/Game/bounds.ts";
-import {vector_length} from "../../components/Game/mathutils.ts";
-import {Direction, vector_direction} from "../../components/Game/direction.ts";
+import {BaseGame, GameCanvas} from "../../components/Game";
+import {AabbGameObject, CircleGameObject} from "../../lib/gamebox/object.ts";
+import {resolve_circle_rect_collision} from "../../lib/gamebox/bounds.ts";
+import {lerp, vector_length} from "../../lib/gamebox/math.ts";
+import {Direction, vector_direction} from "../../lib/gamebox/direction.ts";
 
 const PADDLE_WIDTH = 120.0;
 const PADDLE_HEIGHT = 20.0;
