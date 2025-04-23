@@ -1,4 +1,4 @@
-import {not_null} from "../../utils.tsx";
+import {not_null} from "../../lib/utils.tsx";
 import {BaseGame, GameCanvas} from "../../components/Game";
 import {AabbGameObject, CircleGameObject} from "../../lib/gamebox/object.ts";
 import {resolve_circle_rect_collision} from "../../lib/gamebox/bounds.ts";

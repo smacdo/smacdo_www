@@ -1,5 +1,4 @@
-import '@testing-library/jest-dom';
-import {clamp, not_null} from "./utils";
+import {clamp, not_null} from "./utils.tsx";
 
 describe('clamp', () => {
     test('returns the number if it is between min and max', () => {

@@ -1,5 +1,5 @@
 import {useEffect, useRef} from "react";
-import {not_null} from "../utils";
+import {not_null} from "../lib/utils.tsx";
 
 export type DrawFn = (ctx: CanvasRenderingContext2D, nowTime: DOMHighResTimeStamp, deltaTime: number) => void;
 

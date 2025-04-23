@@ -1,5 +1,5 @@
 import {useEffect, useRef} from "react";
-import {not_null} from "../../utils.tsx";
+import {not_null} from "../../lib/utils.tsx";
 import Canvas from "../Canvas";
 
 export abstract class BaseGame {

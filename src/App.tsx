@@ -5,7 +5,7 @@ import './App.css'
 import Copyright from "./components/Copyright";
 import Route from "./components/Route.tsx";
 import {HTMLAttributes, useEffect, useRef} from "react";
-import {not_null} from "./utils.tsx";
+import {not_null} from "./lib/utils.tsx";
 import {BlockBreaker} from "./games/blockbreaker";
 
 

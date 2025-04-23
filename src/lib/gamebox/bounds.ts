@@ -1,4 +1,4 @@
-import {clamp} from "../../utils.tsx";
+import {clamp} from "../utils.tsx";
 import {vector_distance} from "./math.ts";
 
 export interface AxisAlignedBoundableBox {
