@@ -4,6 +4,9 @@ import {AabbGameObject, CircleGameObject} from "../../lib/gamebox/object.ts";
 import {resolve_circle_rect_collision} from "../../lib/gamebox/bounds.ts";
 import {lerp, vector_length} from "../../lib/gamebox/math.ts";
 import {Direction, vector_direction} from "../../lib/gamebox/direction.ts";
+import {ImageLoader} from "../../lib/gamebox/resources.ts";
+
+import PuzzleSpritesheetImage from "../../content/puzzle-spritesheet.png";
 
 const PADDLE_WIDTH = 120.0;
 const PADDLE_HEIGHT = 20.0;
@@ -129,18 +132,26 @@ class GameLevel {
     }
 }
 
+// TODO: Visually report that assets failed to load.
+
 class BlockBreakerGame extends BaseGame {
+    private imageLoader: ImageLoader = new ImageLoader();
     private currentLevel?: GameLevel;
     // TODO: refactor these into an input controller.
     private moveLeftRequested = false;
     private moveRightRequested = false;
     private launchBallRequested = false;
+    private puzzleSpritesheet?: HTMLImageElement = undefined;
 
     constructor() {
         super(2);
+
+        this.imageLoader.load("PuzzleSpritesheet", PuzzleSpritesheetImage, (image) => {
+            this.puzzleSpritesheet = image;
+        });
     }
 
-    override onInit() {
+    override onStart() {
         this.loadLevel();
     }
 
@@ -175,6 +186,18 @@ class BlockBreakerGame extends BaseGame {
 
     onDraw(ctx: CanvasRenderingContext2D, interpolation: number) {
         ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+
+        // Display an initial progress bar at start up while loading resources for the game.
+        // TODO: Show a progress bar.
+        if (this.imageLoader.errorCount() > 0) {
+            ctx.fillText('failed to load resources, please see developer console for details', 10, 10);
+            return;
+        } else if (this.imageLoader.requestsPendingCount() > 0) {
+            ctx.fillText('loading resources...', 10, 10);
+            return;
+        }
+
+        ctx.drawImage(not_null(this.puzzleSpritesheet), 0, 0); // TOOD: not_null is annoying.
 
         // Draw the background.
         // TODO: Find a fancier background than just black or white.

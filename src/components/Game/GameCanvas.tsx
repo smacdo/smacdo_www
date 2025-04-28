@@ -15,7 +15,7 @@ export abstract class BaseGame {
         this.timePerUpdateStep = msPerUpdate / 1000;
     }
 
-    onAnimationFrame(ctx: CanvasRenderingContext2D, nowTime: number, deltaTime: number) {
+    async onAnimationFrame(ctx: CanvasRenderingContext2D, nowTime: number, deltaTime: number) {
         // Let the game initialize itself when `onAnimationFrame` is called for the first time.
         if (!this.hasRunInit) {
             // Recalculate the unscaled window size prior to rendering. The window dimensions need
@@ -28,7 +28,7 @@ export abstract class BaseGame {
             console.info(`Initializing game with devicePixelRatio ${devicePixelRatio}, canvasWidth ${this.canvasWidth}, canvasHeight ${this.canvasHeight}`);
 
             // Let the derived game initialize itself.
-            this.onInit();
+            this.onStart();
 
             // Mark as initialized.
             this.hasRunInit = true;
@@ -52,7 +52,7 @@ export abstract class BaseGame {
         this.onDraw(ctx, this.unconsumedUpdateTime / this.timePerUpdateStep);
     }
 
-    abstract onInit(): void;
+    abstract onStart(): void;
 
     abstract onDraw(ctx: CanvasRenderingContext2D, extrapolationFactor: number): void;
 
