@@ -1,9 +1,9 @@
-// TODO: tests
-
 import {not_null} from "../utils.tsx";
 
 export abstract class ResourceLoader<T> {
     resources = new Map<string, T>();
+    onRequestError?: (reason: unknown) => void;
+    onStartRequest?: (name: string, url: string, requestPendingCount: number) => void;
 
     protected _requestsPendingCount = 0;
     protected _requestErrorsCount = 0;
@@ -50,7 +50,7 @@ export abstract class ResourceLoader<T> {
 
     requestLoad(name: string, url: string, onLoadedCallback?: (resource: T) => void) {
         this.load(name, url).then((resource) => {
-            if (onLoadedCallback) {
+            if (resource !== undefined && onLoadedCallback) {
                 onLoadedCallback(not_null(resource));
             }
         });
@@ -68,15 +68,26 @@ export abstract class ResourceLoader<T> {
         }
 
         try {
+            if (this.onStartRequest === undefined) {
+                console.debug(`awaiting resource ${name} from ${url} (${this.requestsPendingCount()} requests pending)`);
+            } else {
+                this.onStartRequest(name, url, this.requestsPendingCount());
+            }
+
             this._requestsPendingCount += 1;
-            console.debug(`awaiting resource ${name} from ${url} (${this.requestsPendingCount()} requests pending)`);
             const resource = await this.onRequestResource(url);
 
             this.resources.set(name, resource);
             return resource;
         } catch (reason) {
-            console.error(reason);
             this._requestErrorsCount += 1;
+
+            if (this.onRequestError === undefined) {
+                console.error(reason);
+            } else {
+                this.onRequestError(reason);
+            }
+
             return undefined;
         } finally {
             this._requestsPendingCount -= 1;
@@ -88,11 +99,11 @@ export abstract class ResourceLoader<T> {
 
 export class ImageLoader extends ResourceLoader<HTMLImageElement> {
     override onRequestResource(url: string): Promise<HTMLImageElement> {
-        return loadImageResource(url);
+        return httpGetImage(url);
     }
 }
 
-export async function loadImageResource(url: string): Promise<HTMLImageElement> {
+export async function httpGetImage(url: string): Promise<HTMLImageElement> {
     return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         xhr.open('GET', url);
@@ -106,7 +117,7 @@ export async function loadImageResource(url: string): Promise<HTMLImageElement> 
                 asset.onerror = () => reject(`failed to load image from ${url}`);
                 resolve(asset);
             } else {
-                reject(`failed to load image asset from ${url} [status ${xhr.status}]`);
+                reject(`failed to load image resource from ${url} [HTTP status ${xhr.status}]`);
             }
         };
 
@@ -115,27 +126,17 @@ export async function loadImageResource(url: string): Promise<HTMLImageElement> 
     });
 }
 
-/*
-export async function loadAsset(url: string, type: ResourceType): Promise<> {
+export async function httpGetData<T>(url: string, responseType: XMLHttpRequestResponseType): Promise<T> {
     return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         xhr.open('GET', url);
-        xhr.responseType = type === ResourceType.Image ? 'blob' : 'text';
+        xhr.responseType = responseType;
 
         xhr.onload = () => {
             if (xhr.status >= 200 && xhr.status < 300) {
-                if (type === ResourceType.Image) {
-                    const asset = new Image();
-                    asset.src = URL.createObjectURL(xhr.response);
-                    asset.onload = () => resolve(asset);
-                    asset.onerror = () => reject(`Failed to load image from ${url}`);
-                    resolve(asset);
-                } else {
-                    const asset = xhr.response;
-                    resolve(asset);
-                }
+                resolve(xhr.response);
             } else {
-                reject(`failed to load asset from ${url} [status ${xhr.status}]`);
+                reject(`failed to load ${responseType} resource from ${url} [HTTP status ${xhr.status}]`);
             }
         };
 
@@ -143,4 +144,3 @@ export async function loadAsset(url: string, type: ResourceType): Promise<> {
         xhr.send();
     });
 }
- */
