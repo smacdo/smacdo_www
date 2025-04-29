@@ -1,7 +1,14 @@
-export class ImageLoader {
-    resources = new Map<string, HTMLImageElement>();
-    private _requestsPendingCount = 0;
-    private _requestErrorsCount = 0;
+// TODO: tests
+
+import {not_null} from "../utils.tsx";
+
+export abstract class ResourceLoader<T> {
+    resources = new Map<string, T>();
+
+    protected _requestsPendingCount = 0;
+    protected _requestErrorsCount = 0;
+
+    private cache = new Map<string, T>();
 
     requestsPendingCount(): number {
         return this._requestsPendingCount;
@@ -11,25 +18,77 @@ export class ImageLoader {
         return this._requestErrorsCount;
     }
 
-    load(name: string, url: string, onLoadedCallback?: (image: HTMLImageElement) => void): Promise<HTMLImageElement | void> {
-        this._requestsPendingCount += 1;
+    isLoaded(name: string): boolean {
+        return this.resources.has(name);
+    }
 
-        return loadImageResource(url).then((image) => {
-            console.log(`loaded image ${name} from ${url}`);
-            this._requestsPendingCount -= 1;
+    find(name: string): T | undefined {
+        return this.resources.get(name);
+    }
 
-            this.resources.set(name, image);
-            return image;
-        }).then((image) => {
+    get(name: string): T {
+        const resource = this.resources.get(name);
+
+        if (resource === undefined) {
+            throw Error(`resource ${name} not loaded`);
+        }
+
+        return resource;
+    }
+
+    set(name: string, value: T) {
+        this.resources.set(name, value);
+    }
+
+    unload(name: string) {
+        if (this.resources.has(name)) {
+            this.resources.delete(name);
+        } else {
+            console.warn(`could not find resource when unloading ${name}`);
+        }
+    }
+
+    requestLoad(name: string, url: string, onLoadedCallback?: (resource: T) => void) {
+        this.load(name, url).then((resource) => {
             if (onLoadedCallback) {
-                onLoadedCallback(image);
+                onLoadedCallback(not_null(resource));
             }
+        });
+    }
 
-            return image;
-        }).catch((reason) => {
+    async load(name: string, url: string): Promise<T | undefined> {
+        if (this.resources.has(name)) {
+            return this.resources.get(name);
+        }
+
+        if (this.cache.has(name)) {
+            const cached = not_null(this.cache.get(name));
+            this.resources.set(name, not_null(cached));
+            return cached;
+        }
+
+        try {
+            this._requestsPendingCount += 1;
+            console.debug(`awaiting resource ${name} from ${url} (${this.requestsPendingCount()} requests pending)`);
+            const resource = await this.onRequestResource(url);
+
+            this.resources.set(name, resource);
+            return resource;
+        } catch (reason) {
             console.error(reason);
             this._requestErrorsCount += 1;
-        }).finally(() => this._requestsPendingCount--);
+            return undefined;
+        } finally {
+            this._requestsPendingCount -= 1;
+        }
+    }
+
+    abstract onRequestResource(url: string): Promise<T>;
+}
+
+export class ImageLoader extends ResourceLoader<HTMLImageElement> {
+    override onRequestResource(url: string): Promise<HTMLImageElement> {
+        return loadImageResource(url);
     }
 }
 

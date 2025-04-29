@@ -146,7 +146,7 @@ class BlockBreakerGame extends BaseGame {
     constructor() {
         super(2);
 
-        this.imageLoader.load("PuzzleSpritesheet", PuzzleSpritesheetImage, (image) => {
+        this.imageLoader.requestLoad("PuzzleSpritesheet", PuzzleSpritesheetImage, (image) => {
             this.puzzleSpritesheet = image;
         });
     }
@@ -197,7 +197,7 @@ class BlockBreakerGame extends BaseGame {
             return;
         }
 
-        ctx.drawImage(not_null(this.puzzleSpritesheet), 0, 0); // TOOD: not_null is annoying.
+        ctx.drawImage(not_null(this.puzzleSpritesheet), 0, 0); // TODO: not_null is annoying.
 
         // Draw the background.
         // TODO: Find a fancier background than just black or white.
