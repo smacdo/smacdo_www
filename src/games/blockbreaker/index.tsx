@@ -7,10 +7,12 @@ import {Direction, vector_direction} from "../../lib/gamebox/direction.ts";
 import {ImageLoader} from "../../lib/gamebox/resources.ts";
 
 import PuzzleSpritesheetImage from "../../content/puzzle-spritesheet.png";
+import {SpriteDefinition} from "../../lib/gamebox/sprites.ts";
 
 // ASSORTED TODO LIST
 // ==================================
 //  Draw arbitrary output size from fixed internal canvas size while respecting ratio
+//  Use Puzzle Spritesheet JSON instead of hard coded sprite definition values.
 
 const PADDLE_WIDTH = 104;
 const PADDLE_HEIGHT = 24;
@@ -35,74 +37,60 @@ const DEFAULT_LEVEL: number[][] = [
 interface BlockDefinition {
     color: string;
     solid: boolean;
-    spriteName: string;
-    spriteX: number;
-    spriteY: number;
+    spriteDef: SpriteDefinition;
 }
 
 const BLOCKS: BlockDefinition[] = [
     {
         color: "#3399FF",
         solid: true,
-        spriteName: "element_grey_rectangle",
-        spriteX: 151,
-        spriteY: 213,
+        spriteDef: new SpriteDefinition(151, 213, BLOCK_WIDTH, BLOCK_HEIGHT, "element_grey_rectangle"),
     },
     {
         color: "#00B300",
         solid: false,
-        spriteName: "element_blue_rectangle_glossy",
-        spriteX: 1,
-        spriteY: 113,
+        spriteDef: new SpriteDefinition(1, 113, BLOCK_WIDTH, BLOCK_HEIGHT, "element_blue_rectangle_glossy"),
     },
     {
         color: "#CCCC66",
         solid: false,
-        spriteName: "element_green_rectangle_glossy",
-        spriteX: 167,
-        spriteY: 163,
+        spriteDef: new SpriteDefinition(167, 163, BLOCK_WIDTH, BLOCK_HEIGHT, "element_green_rectangle_glossy"),
     },
     {
         color: "#FF8000",
         solid: false,
-        spriteName: "element_purple_rectange_glossy",
-        spriteX: 117,
-        spriteY: 295,
+        spriteDef: new SpriteDefinition(117, 295, BLOCK_WIDTH, BLOCK_HEIGHT, "element_purple_rectangle_glossy"),
     },
     {
         color: "#FF8000",
         solid: false,
-        spriteName: "element_red_rectangle_glossy",
-        spriteX: 351,
-        spriteY: 231,
+        spriteDef: new SpriteDefinition(351, 231, BLOCK_WIDTH, BLOCK_HEIGHT, "element_red_rectangle_glossy"),
     },
     {
         color: "#FF8000",
         solid: false,
-        spriteName: "element_yellow_rectangle_glossy",
-        spriteX: 117,
-        spriteY: 347,
+        spriteDef: new SpriteDefinition(117, 347, BLOCK_WIDTH, BLOCK_HEIGHT, "element_yellow_rectangle_glossy"),
     },
 ];
 
 class Block extends AabbGameObject {
     alive = true;
 
-    constructor(left: number, top: number, width: number, height: number, public def: BlockDefinition) {
-        super(left, top, width, height, 0, 0);
+    constructor(left: number, top: number, public def: BlockDefinition) {
+        super(left, top, BLOCK_WIDTH, BLOCK_HEIGHT, 0, 0);
     }
 }
 
 class Ball extends CircleGameObject {
     stuckToPaddle = true;
 
-    constructor(public x: number, public y: number, public radius: number, public vel_x: number, public vel_y: number) {
-        super(x, y, radius, vel_x, vel_y);
+    constructor(public x: number, public y: number, public radius: number, public spriteDef: SpriteDefinition) {
+        super(x, y, radius, 0, 0);
     }
 }
 
 class Paddle extends AabbGameObject {
-    constructor(center_x: number, center_y: number, width: number, height: number) {
+    constructor(center_x: number, center_y: number, width: number, height: number, public spriteDef: SpriteDefinition) {
         super(center_x - width / 2.0, center_y - height / 2.0, width, height, 0, 0);
     }
 }
@@ -114,10 +102,10 @@ class GameLevel {
     levelWidth: number;
     levelHeight: number;
 
-    constructor(levelWidth: number, levelHeight: number, blocks: number[][]) {
+    constructor(levelWidth: number, levelHeight: number, blocks: number[][], ballSpriteDef: SpriteDefinition, paddleSpriteDef: SpriteDefinition) {
         this.blocks = [];
-        this.balls = [];
-        this.paddles = [new Paddle(levelWidth / 2, levelHeight - PADDLE_HEIGHT, PADDLE_WIDTH, PADDLE_HEIGHT)];
+        this.balls = [new Ball(0, 0, BALL_RADIUS, ballSpriteDef)];
+        this.paddles = [new Paddle(levelWidth / 2, levelHeight - PADDLE_HEIGHT, PADDLE_WIDTH, PADDLE_HEIGHT, paddleSpriteDef)];
         this.levelWidth = levelWidth;
         this.levelHeight = levelHeight;
 
@@ -142,17 +130,11 @@ class GameLevel {
                     this.blocks.push(new Block(
                         col * BLOCK_WIDTH,
                         row * BLOCK_HEIGHT,
-                        BLOCK_WIDTH,
-                        BLOCK_HEIGHT,
                         BLOCKS[block - 1]
                     ));
                 }
             }
         }
-
-        // Spawn an initial ball near the middle.
-        // TODO: Randomize the position, and randomize the direction. Maybe velocity?
-        this.balls.push(new Ball(levelWidth * 0.15, levelHeight * 0.55, BALL_RADIUS, 0, BALL_VEL_Y));
     }
 }
 
@@ -180,7 +162,13 @@ class BlockBreakerGame extends BaseGame {
     }
 
     loadLevel() {
-        this.currentLevel = new GameLevel(this.canvasWidth, this.canvasHeight, DEFAULT_LEVEL);
+        this.currentLevel = new GameLevel(
+            this.canvasWidth,
+            this.canvasHeight,
+            DEFAULT_LEVEL,
+            new SpriteDefinition(1, 1, 22, 22, "ballBlue"),
+            new SpriteDefinition(1, 265, 104, 24, "paddleBlu"),
+        );
     }
 
     onKeyDown(event: KeyboardEvent) {
@@ -245,10 +233,10 @@ class BlockBreakerGame extends BaseGame {
             if (block.alive) {
                 ctx.drawImage(
                     not_null(this.puzzleSpritesheet),
-                    block.def.spriteX,
-                    block.def.spriteY,
-                    BLOCK_WIDTH,
-                    BLOCK_HEIGHT,
+                    block.def.spriteDef.x,
+                    block.def.spriteDef.y,
+                    block.def.spriteDef.width,
+                    block.def.spriteDef.height,
                     block.left(),
                     block.top(),
                     block.width(),
@@ -265,10 +253,10 @@ class BlockBreakerGame extends BaseGame {
 
             ctx.drawImage(
                 not_null(this.puzzleSpritesheet),
-                1, // spriteX
-                265, // spriteY
-                104,
-                24,
+                paddle.spriteDef.x,
+                paddle.spriteDef.y,
+                paddle.spriteDef.width,
+                paddle.spriteDef.height,
                 paddleX - paddle.halfWidth,
                 paddleY - paddle.halfHeight,
                 paddle.width(),
@@ -284,10 +272,10 @@ class BlockBreakerGame extends BaseGame {
 
             ctx.drawImage(
                 not_null(this.puzzleSpritesheet),
-                1, // spriteX
-                1, // spriteY
-                22,
-                22,
+                ball.spriteDef.x,
+                ball.spriteDef.y,
+                ball.spriteDef.width,
+                ball.spriteDef.height,
                 ballX - ball.radius,
                 ballY - ball.radius,
                 ball.radius * 2,
