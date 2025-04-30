@@ -1,37 +1,39 @@
 import {clamp} from "../utils.tsx";
 import {vector_distance} from "./math.ts";
 
-export interface AxisAlignedBoundableBox {
-    /// Object position on the x axis.
-    /// The x position is halfway between the object left and right.
+/** A bounding region. */
+export interface Boundable {
+    /** The center of the object on the x-axis. */
     x: number;
 
-    /// Object position on the y axis.
-    /// The y position is halfway between the object top and bottom.
+    /** The center of the object on the y-axis. */
     y: number;
+}
 
-    /// Half of the width of the bounding box.
-    halfWidth: number;
+/** A bounding region defined by an axis aligned box. */
+export interface AxisAlignedBoundableBox extends Boundable {
+    /** Half of the width of the bounding box. */
+    readonly halfWidth: number;
 
-    /// Half of the height of the bounding box.
-    halfHeight: number;
+    /** Half of the height of the bounding box. */
+    readonly halfHeight: number;
 
-    /// Get the object's left position.
+    /** Get the bounding box's leftmost position on the x-axis. */
     left(): number;
 
-    /// Get the object's top position.
+    /** Get the bounding box's topmost position on the y-axis. */
     top(): number;
 
-    /// Get the object's right position.
+    /** Get the bounding box's rightmost position on the x-axis. */
     right(): number;
 
-    /// Get the object's bottom position.
+    /** Get the bounding box's bottommost position on the y-axis. */
     bottom(): number;
 
-    /// Get the object's width.
+    /** Get the width of the bounding box. */
     width(): number;
 
-    /// Get the object's height.
+    /** Get the height of the bounding box. */
     height(): number;
 }
 
@@ -73,10 +75,10 @@ export class AABB implements AxisAlignedBoundableBox {
     }
 }
 
-export interface CircleBoundable {
-    x: number;
-    y: number;
-    radius: number;
+/** A bounding region defined by a circle. */
+export interface CircleBoundable extends Boundable {
+    /** The radius of the circle. */
+    readonly radius: number;
 }
 
 export class Circle {
@@ -90,15 +92,13 @@ export function rect_rect_intersects(a: AxisAlignedBoundableBox, b: AxisAlignedB
     return intersectX && intersectY;
 }
 
-/// Returns a (x, y) vector to apply to the circle `a` parameter to resolve the collision. Alternatively apply it to `b`
-/// as (-x, -y) to resolve the collision. If the two objects do not collide then `null` is returned.
-
-
-/// Calculates the minimum interpenetration vector between a possibly colliding circle `a` and axis aligned bounding box
-/// `b`. Adding the returned `(x, y)` vector to a's position will move the circle to the closest point such that it no
-/// longer penetrates `b`.
-///
-/// `null` is returned if the two shapes are not colliding with each other.
+/**
+ * Calculates the minimum interpenetration vector between a possibly colliding circle `a` and axis
+ * aligned bounding box `b`. Adding the returned `(x, y)` vector to a's position will move the
+ * circle to the closest point such that it no longer penetrates `b`.
+ *
+ * `null` is returned if the two shapes are not colliding with each other.
+ */
 export function resolve_circle_rect_collision(a: CircleBoundable, b: AxisAlignedBoundableBox): {
     x: number,
     y: number
