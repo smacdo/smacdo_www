@@ -8,18 +8,21 @@ import {ImageLoader} from "../../lib/gamebox/resources.ts";
 
 import PuzzleSpritesheetImage from "../../content/puzzle-spritesheet.png";
 
-const PADDLE_WIDTH = 120.0;
-const PADDLE_HEIGHT = 20.0;
+// ASSORTED TODO LIST
+// ==================================
+//  Draw arbitrary output size from fixed internal canvas size while respecting ratio
+
+const PADDLE_WIDTH = 104;
+const PADDLE_HEIGHT = 24;
 const PADDLE_SPEED_X = 400;
+const BLOCK_WIDTH = 64;
+const BLOCK_HEIGHT = 32;
 
 const BALL_BASE_VELOCITY_X = 100.0;
 const BALL_BLOCK_COLLISION_VELOCITY_MODIFIER = 2.0;
 
 const BALL_VEL_Y = -400;
-const BALL_RADIUS = 12;
-const BALL_COLOR = "#3FEFAA";
-
-const PADDLE_COLOR = "#B0CAB0";
+const BALL_RADIUS = 11;
 
 const DEFAULT_LEVEL: number[][] = [
     [1, 1, 1, 1, 1, 1],
@@ -32,24 +35,53 @@ const DEFAULT_LEVEL: number[][] = [
 interface BlockDefinition {
     color: string;
     solid: boolean;
+    spriteName: string;
+    spriteX: number;
+    spriteY: number;
 }
 
 const BLOCKS: BlockDefinition[] = [
     {
         color: "#3399FF",
         solid: true,
+        spriteName: "element_grey_rectangle",
+        spriteX: 151,
+        spriteY: 213,
     },
     {
         color: "#00B300",
         solid: false,
+        spriteName: "element_blue_rectangle_glossy",
+        spriteX: 1,
+        spriteY: 113,
     },
     {
         color: "#CCCC66",
         solid: false,
+        spriteName: "element_green_rectangle_glossy",
+        spriteX: 167,
+        spriteY: 163,
     },
     {
         color: "#FF8000",
         solid: false,
+        spriteName: "element_purple_rectange_glossy",
+        spriteX: 117,
+        spriteY: 295,
+    },
+    {
+        color: "#FF8000",
+        solid: false,
+        spriteName: "element_red_rectangle_glossy",
+        spriteX: 351,
+        spriteY: 231,
+    },
+    {
+        color: "#FF8000",
+        solid: false,
+        spriteName: "element_yellow_rectangle_glossy",
+        spriteX: 117,
+        spriteY: 347,
     },
 ];
 
@@ -75,9 +107,6 @@ class Paddle extends AabbGameObject {
     }
 }
 
-// TODO: Don't store the width or height of the level here, calculate using canvas dims. Assume
-//       a maximum of 10 rows that take up to 50% of the top half of the screen.
-//       Alternatively, store the height (maybe width) as a percentage in the level.
 class GameLevel {
     blocks: Block[];
     balls: Ball[];
@@ -102,13 +131,8 @@ class GameLevel {
 
         // Use the first row as the number of columns in the level. This assumes that the grid is
         // rectangular otherwise undefined behavior may occur.
-        // TODO: Check if non-rectangular and issue a warning.
+        // TODO: Check if width or height exceeds expected viewport size.
         const rowCount = initialBlocks.length;
-        const colCount = rowCount > 0 ? initialBlocks[0].length : 0;
-
-        // Generate game objects from the provided block map.
-        const blockWidth = colCount > 0 ? levelWidth / colCount : 0;
-        const blockHeight = rowCount > 0 ? levelHeight / 2 / rowCount : 0;
 
         for (let row = 0; row < rowCount; row++) {
             for (let col = 0; col < initialBlocks[row].length; col++) {
@@ -116,10 +140,10 @@ class GameLevel {
 
                 if (block > 0) {
                     this.blocks.push(new Block(
-                        col * blockWidth,
-                        row * blockHeight,
-                        blockWidth,
-                        blockHeight,
+                        col * BLOCK_WIDTH,
+                        row * BLOCK_HEIGHT,
+                        BLOCK_WIDTH,
+                        BLOCK_HEIGHT,
                         BLOCKS[block - 1]
                     ));
                 }
@@ -219,8 +243,16 @@ class BlockBreakerGame extends BaseGame {
             const block = level.blocks[blockIndex];
 
             if (block.alive) {
-                ctx.fillStyle = block.def.color;
-                ctx.fillRect(block.left(), block.top(), block.width(), block.height());
+                ctx.drawImage(
+                    not_null(this.puzzleSpritesheet),
+                    block.def.spriteX,
+                    block.def.spriteY,
+                    BLOCK_WIDTH,
+                    BLOCK_HEIGHT,
+                    block.left(),
+                    block.top(),
+                    block.width(),
+                    block.height());
             }
         }
     }
@@ -231,8 +263,16 @@ class BlockBreakerGame extends BaseGame {
             const paddleX = lerp(paddle.prev_x, paddle.x, interpolation);
             const paddleY = lerp(paddle.prev_y, paddle.y, interpolation);
 
-            ctx.fillStyle = PADDLE_COLOR;
-            ctx.fillRect(paddleX - paddle.halfWidth, paddleY - paddle.halfHeight, paddle.width(), paddle.height());
+            ctx.drawImage(
+                not_null(this.puzzleSpritesheet),
+                1, // spriteX
+                265, // spriteY
+                104,
+                24,
+                paddleX - paddle.halfWidth,
+                paddleY - paddle.halfHeight,
+                paddle.width(),
+                paddle.height());
         }
     }
 
@@ -242,11 +282,16 @@ class BlockBreakerGame extends BaseGame {
             const ballX = lerp(ball.prev_x, ball.x, interpolation);
             const ballY = lerp(ball.prev_y, ball.y, interpolation);
 
-            ctx.fillStyle = BALL_COLOR;
-
-            ctx.beginPath();
-            ctx.arc(ballX, ballY, ball.radius, 0, 2 * Math.PI);
-            ctx.fill();
+            ctx.drawImage(
+                not_null(this.puzzleSpritesheet),
+                1, // spriteX
+                1, // spriteY
+                22,
+                22,
+                ballX - ball.radius,
+                ballY - ball.radius,
+                ball.radius * 2,
+                ball.radius * 2);
         }
     }
 
@@ -421,5 +466,5 @@ class BlockBreakerGame extends BaseGame {
 }
 
 export function BlockBreaker() {
-    return (<GameCanvas width={800} height={600} game={new BlockBreakerGame()}/>);
+    return (<GameCanvas width={402} height={874} game={new BlockBreakerGame()}/>);
 }

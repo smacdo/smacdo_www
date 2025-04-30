@@ -133,7 +133,6 @@ describe('resource loading', () => {
         expect(callback).toHaveBeenCalledWith(22);
     });
 
-
     it('requestLoad does not call onLoadedCallback when load has error', async () => {
         const loader = new TestLoaderWithControllableFutures();
         loader.onRequestError = vi.fn().mockImplementation(() => {
@@ -143,6 +142,7 @@ describe('resource loading', () => {
         });
 
         loader.requestLoad("first", FIRST_URL, callback);
+
 
         expect(async () => await expect(loader.failRequest(FIRST_URL)).rejects.toThrow());
         expect(callback).not.toHaveBeenCalled();
