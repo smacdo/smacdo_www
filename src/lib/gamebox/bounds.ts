@@ -86,23 +86,62 @@ export class Circle {
     }
 }
 
-export function rect_rect_intersects(a: AxisAlignedBoundableBox, b: AxisAlignedBoundableBox): boolean {
-    const intersectX = a.right() >= b.left() && b.right() >= a.left();
-    const intersectY = a.top() <= b.bottom() && b.top() <= a.bottom();
-    return intersectX && intersectY;
+/**
+ * Calculates the interpenetration vector between two possibly colliding axis aligned boxes.
+ * `undefined` is returned when `a` and `b` are not intersecting.
+ *
+ * Incorrect cases:
+ *  - One AABB fully overlaps the other.
+ *
+ * @param a The first AABB to test.
+ * @param b The second AABB to test.
+ */
+export function resolve_aabb_aabb_collision(a: AxisAlignedBoundableBox, b: AxisAlignedBoundableBox): {
+    x: number,
+    y: number
+} | undefined {
+    const intersectX = a.right() > b.left() && b.right() > a.left();
+    const intersectY = a.top() < b.bottom() && b.top() < a.bottom();
+
+    if (intersectX && intersectY) {
+        const left = Math.max(a.left(), b.left());
+        const right = Math.min(a.right(), b.right());
+        const top = Math.max(a.top(), b.top());
+        const bottom = Math.min(a.bottom(), b.bottom());
+
+        return {x: right - left, y: bottom - top};
+    } else {
+        return undefined;
+    }
 }
 
 /**
- * Calculates the minimum interpenetration vector between a possibly colliding circle `a` and axis
- * aligned bounding box `b`. Adding the returned `(x, y)` vector to a's position will move the
- * circle to the closest point such that it no longer penetrates `b`.
+ * Returns true if `a` and `b` intersect with each other, false otherwise.
  *
- * `null` is returned if the two shapes are not colliding with each other.
+ * @param a The first AABB to test.
+ * @param b The second AABB to test.
+ */
+export function aabb_aabb_intersects(a: AxisAlignedBoundableBox, b: AxisAlignedBoundableBox): boolean {
+    return resolve_aabb_aabb_collision(a, b) !== undefined;
+}
+
+/**
+ * Calculates the interpenetration vector between a possibly colliding circle and axis aligned box.
+ * `undefined` is returned when `a` and `b` are not intersecting.
+ *
+ * @param a The circle to test.
+ * @param b The axis aligned box to test.
+ *
+ * Incorrect cases:
+ *  - Circle center is on the edge or inside the rect.
+ *
+ * Degenerate cases:
+ *  - Zero sized circle (point) inside AABB -> not colliding.
  */
 export function resolve_circle_rect_collision(a: CircleBoundable, b: AxisAlignedBoundableBox): {
     x: number,
     y: number
-} | null {
+} | undefined {
     // Calculate difference vector from center of `b` (AABB) to `a` (circle).
     const diff_x = a.x - b.x;
     const diff_y = a.y - b.y;
@@ -116,16 +155,16 @@ export function resolve_circle_rect_collision(a: CircleBoundable, b: AxisAligned
 
     // Check if the length of the vector from the center of the circle to the closest point on the
     // AABB is shorter than the circle radius (intersects) or not.
-    if (vector_distance(closest_x, closest_y, a.x, a.y) <= a.radius) {
-        const r_x = closest_x - a.x;
-        const r_y = closest_y - a.y;
+    if (vector_distance(closest_x, closest_y, a.x, a.y) < a.radius) {
+        const r_x = a.x - closest_x;
+        const r_y = a.y - closest_y;
 
         return {x: r_x, y: r_y};
     } else {
-        return null;
+        return undefined;
     }
 }
 
 export function circle_rect_intersects(a: CircleBoundable, b: AxisAlignedBoundableBox): boolean {
-    return resolve_circle_rect_collision(a, b) !== null;
+    return resolve_circle_rect_collision(a, b) !== undefined;
 }

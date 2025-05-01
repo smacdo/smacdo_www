@@ -30,8 +30,6 @@ const DEFAULT_LEVEL: number[][] = [
     [1, 1, 1, 1, 1, 1],
     [2, 2, 0, 0, 2, 2],
     [3, 3, 4, 4, 3, 3],
-    [0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0],
 ];
 
 interface BlockDefinition {
@@ -321,6 +319,7 @@ class BlockBreakerGame extends BaseGame {
     updatePaddle(level: GameLevel, paddle: Paddle, deltaTime: number) {
         // TODO: When bounds checking allow the paddle to move all the way to the edge.
         const displacement = PADDLE_SPEED_X * deltaTime;
+        paddle.vel_x = 0;
 
         if (this.moveLeftRequested && paddle.left() - displacement > 0) {
             paddle.x -= displacement;
@@ -344,7 +343,7 @@ class BlockBreakerGame extends BaseGame {
 
             const collision = resolve_circle_rect_collision(ball, paddle);
 
-            if (collision === null) {
+            if (!collision) {
                 continue;
             }
 
@@ -415,7 +414,7 @@ class BlockBreakerGame extends BaseGame {
             // Check if the ball will hit this block. Skip the block if there's no collision.
             const collision = resolve_circle_rect_collision(ball, block);
 
-            if (collision === null) {
+            if (!collision) {
                 continue;
             }
 
@@ -437,9 +436,9 @@ class BlockBreakerGame extends BaseGame {
                 const penetration_distance = ball.radius - Math.abs(collision.y);
 
                 if (c_dir === Direction.North) {
-                    ball.y -= penetration_distance;
-                } else {
                     ball.y += penetration_distance;
+                } else {
+                    ball.y -= penetration_distance;
                 }
 
                 ball.vel_y *= -1;
