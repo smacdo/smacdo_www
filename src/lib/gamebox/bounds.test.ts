@@ -15,6 +15,43 @@ function createCircle(x: number, y: number, radius: number) {
     return new Circle(x, y, radius);
 }
 
+describe('AABB', () => {
+    it('should set x and y center properties from the constructor', () => {
+        const a = new AABB(5, 12, 6, 8);
+        expect(a.x).toBe(8);
+        expect(a.y).toBe(16);
+    });
+
+    it('should set half width and height properties from the constructor', () => {
+        const a = new AABB(5, 12, 6, 8);
+        expect(a.halfWidth).toBe(3);
+        expect(a.halfHeight).toBe(4);
+    });
+
+    it('should calculate left, right, top and bottom values', () => {
+        const a = new AABB(5, 12, 6, 8);
+        expect(a.left).toBe(5);
+        expect(a.right).toBe(11);
+        expect(a.top).toBe(12);
+        expect(a.bottom).toBe(20);
+    });
+
+    it('should calculate width and height values', () => {
+        const a = new AABB(5, 12, 6, 8);
+        expect(a.width).toBe(6);
+        expect(a.height).toBe(8);
+    });
+});
+
+describe('Circle', () => {
+    it('should set the x, y and radius properties from the constructor', () => {
+        const c = new Circle(-5, 13, 7);
+        expect(c.x).toBe(-5);
+        expect(c.y).toBe(13);
+        expect(c.radius).toBe(7);
+    });
+});
+
 describe('rect_rect_intersects', () => {
     it('should return true when a and b are the same rectangle', () => {
         const a = createAABB(1, 1, 4, 4);

@@ -1,8 +1,6 @@
 import {clamp} from "../utils.tsx";
 import {vector_distance} from "./math.ts";
 
-// TODO: Convert methods to properties?
-
 /** A bounding region. */
 export interface Boundable {
     /** The center of the object on the x-axis. */
@@ -33,27 +31,27 @@ export class AABB implements Boundable {
         this.y = top + this.halfHeight;
     }
 
-    public left() {
+    get left() {
         return this.x - this.halfWidth;
     }
 
-    public right() {
+    get right() {
         return this.x + this.halfWidth;
     }
 
-    public top() {
+    get top() {
         return this.y - this.halfHeight;
     }
 
-    public bottom() {
+    get bottom() {
         return this.y + this.halfHeight;
     }
 
-    public width() {
+    get width() {
         return 2.0 * this.halfWidth;
     }
 
-    public height() {
+    get height() {
         return 2.0 * this.halfHeight;
     }
 }
@@ -122,14 +120,14 @@ export function resolve_aabb_aabb_collision(a: AABB, b: AABB): {
     x: number,
     y: number
 } | undefined {
-    const intersectX = a.right() > b.left() && b.right() > a.left();
-    const intersectY = a.top() < b.bottom() && b.top() < a.bottom();
+    const intersectX = a.right > b.left && b.right > a.left;
+    const intersectY = a.top < b.bottom && b.top < a.bottom;
 
     if (intersectX && intersectY) {
-        const left = Math.max(a.left(), b.left());
-        const right = Math.min(a.right(), b.right());
-        const top = Math.max(a.top(), b.top());
-        const bottom = Math.min(a.bottom(), b.bottom());
+        const left = Math.max(a.left, b.left);
+        const right = Math.min(a.right, b.right);
+        const top = Math.max(a.top, b.top);
+        const bottom = Math.min(a.bottom, b.bottom);
 
         return {x: right - left, y: bottom - top};
     } else {

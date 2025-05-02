@@ -235,10 +235,10 @@ class BlockBreakerGame extends BaseGame {
                     block.def.spriteDef.y,
                     block.def.spriteDef.width,
                     block.def.spriteDef.height,
-                    block.aabb.left(),
-                    block.aabb.top(),
-                    block.aabb.width(),
-                    block.aabb.height());
+                    block.aabb.left,
+                    block.aabb.top,
+                    block.aabb.width,
+                    block.aabb.height);
             }
         }
     }
@@ -257,8 +257,8 @@ class BlockBreakerGame extends BaseGame {
                 paddle.spriteDef.height,
                 paddleX - paddle.aabb.halfWidth,
                 paddleY - paddle.aabb.halfHeight,
-                paddle.aabb.width(),
-                paddle.aabb.height());
+                paddle.aabb.width,
+                paddle.aabb.height);
         }
     }
 
@@ -276,8 +276,8 @@ class BlockBreakerGame extends BaseGame {
                 ball.spriteDef.height,
                 ballX - ball.aabb.halfWidth,
                 ballY - ball.aabb.halfHeight,
-                ball.aabb.width(),
-                ball.aabb.height());
+                ball.aabb.width,
+                ball.aabb.height);
         }
     }
 
@@ -321,12 +321,12 @@ class BlockBreakerGame extends BaseGame {
         const displacement = PADDLE_SPEED_X * deltaTime;
         paddle.vel_x = 0;
 
-        if (this.moveLeftRequested && paddle.aabb.left() - displacement > 0) {
+        if (this.moveLeftRequested && paddle.aabb.left - displacement > 0) {
             paddle.x -= displacement;
             paddle.vel_x = -PADDLE_SPEED_X;
         }
 
-        if (this.moveRightRequested && paddle.aabb.right() + displacement <= level.levelWidth) {
+        if (this.moveRightRequested && paddle.aabb.right + displacement <= level.levelWidth) {
             paddle.x += displacement;
             paddle.vel_x = PADDLE_SPEED_X;
         }
@@ -374,7 +374,7 @@ class BlockBreakerGame extends BaseGame {
             const paddle = not_null(level.paddles[0]);
 
             ball.x = paddle.x;
-            ball.y = paddle.aabb.top() - ball.aabb.halfHeight;
+            ball.y = paddle.aabb.top - ball.aabb.halfHeight;
             ball.vel_x = paddle.vel_x;
             ball.vel_y = BALL_VEL_Y;
 
