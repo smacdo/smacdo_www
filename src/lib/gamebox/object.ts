@@ -1,24 +1,31 @@
 import {AABB, Circle} from "./bounds.ts";
 
 export class GameObject {
-    prev_x: number = 0; // TODO: Rename prevX
-    prev_y: number = 0; // TODO: Rename prevY
+    prevX: number = 0;
+    prevY: number = 0;
     /** object movement velocity in the x direction (0 for none). */
-    vel_x: number = 0; // TODO: Rename velX
+    velX: number = 0;
     /** object movement velocity in the y direction (0 for none). */
-    vel_y: number = 0; // TODO:  Rename velY
+    velY: number = 0;
     aabb: AABB;
     preciseBounds: AABB | Circle;
 
-    constructor(aabb: AABB, preciseBounds?: AABB | Circle) { // TODO: calculate aabb from preciseBounds.
-        this.aabb = aabb;
-        this.preciseBounds = preciseBounds ?? aabb;
+    constructor(bounds: AABB | Circle) {
+        if (bounds instanceof AABB) {
+            this.aabb = bounds;
+            this.preciseBounds = bounds;
+        } else {
+            this.aabb = new AABB(bounds.x - bounds.radius, bounds.y - bounds.radius, bounds.radius * 2, bounds.radius * 2);
+            this.preciseBounds = bounds;
+        }
     }
 
+    /** Get the center of the object on the x-axis. */
     get x() {
         return this.aabb.x;
     }
 
+    /** Set the center of the object on the x-axis. */
     set x(x: number) {
         this.aabb.x = x;
 
@@ -27,10 +34,12 @@ export class GameObject {
         }
     }
 
+    /** Get the center of the object on the y-axis. */
     get y() {
         return this.aabb.y;
     }
 
+    /** Set the center of the object on the x-axis. */
     set y(y: number) {
         this.aabb.y = y;
 

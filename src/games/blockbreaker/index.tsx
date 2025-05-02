@@ -83,7 +83,7 @@ class Ball extends GameObject {
     stuckToPaddle = true;
 
     constructor(x: number, y: number, radius: number, public spriteDef: SpriteDefinition) {
-        super(new AABB(x - radius, y - radius, radius * 2, radius * 2), new Circle(x, y, radius));
+        super(new Circle(x, y, radius));
     }
 }
 
@@ -246,8 +246,8 @@ class BlockBreakerGame extends BaseGame {
     drawPaddles(ctx: CanvasRenderingContext2D, interpolation: number, level: GameLevel) {
         for (let paddleIndex = 0; paddleIndex < level.paddles.length; paddleIndex++) {
             const paddle = level.paddles[paddleIndex];
-            const paddleX = lerp(paddle.prev_x, paddle.x, interpolation);
-            const paddleY = lerp(paddle.prev_y, paddle.y, interpolation);
+            const paddleX = lerp(paddle.prevX, paddle.x, interpolation);
+            const paddleY = lerp(paddle.prevY, paddle.y, interpolation);
 
             ctx.drawImage(
                 not_null(this.puzzleSpritesheet),
@@ -265,8 +265,8 @@ class BlockBreakerGame extends BaseGame {
     drawBalls(ctx: CanvasRenderingContext2D, interpolation: number, level: GameLevel) {
         for (let ballIndex = 0; ballIndex < level.balls.length; ballIndex++) {
             const ball = level.balls[ballIndex];
-            const ballX = lerp(ball.prev_x, ball.x, interpolation);
-            const ballY = lerp(ball.prev_y, ball.y, interpolation);
+            const ballX = lerp(ball.prevX, ball.x, interpolation);
+            const ballY = lerp(ball.prevY, ball.y, interpolation);
 
             ctx.drawImage(
                 not_null(this.puzzleSpritesheet),
@@ -290,8 +290,8 @@ class BlockBreakerGame extends BaseGame {
             for (let paddleIndex = 0; paddleIndex < currentLevel.paddles.length; paddleIndex++) {
                 const paddle = currentLevel.paddles[paddleIndex];
 
-                paddle.prev_x = paddle.x;
-                paddle.prev_y = paddle.y;
+                paddle.prevX = paddle.x;
+                paddle.prevY = paddle.y;
 
                 this.updatePaddle(currentLevel, paddle, deltaTime);
                 this.updatePaddleCollision(currentLevel, paddle, deltaTime);
@@ -301,8 +301,8 @@ class BlockBreakerGame extends BaseGame {
             for (let ballIndex = 0; ballIndex < currentLevel.balls.length; ballIndex++) {
                 const ball = currentLevel.balls[ballIndex];
 
-                ball.prev_x = ball.x;
-                ball.prev_y = ball.y;
+                ball.prevX = ball.x;
+                ball.prevY = ball.y;
 
                 this.updateBallPosition(currentLevel, ball, deltaTime);
                 this.updateBallCollisions(currentLevel, ball, deltaTime);
@@ -319,16 +319,16 @@ class BlockBreakerGame extends BaseGame {
     updatePaddle(level: GameLevel, paddle: Paddle, deltaTime: number) {
         // TODO: When bounds checking allow the paddle to move all the way to the edge.
         const displacement = PADDLE_SPEED_X * deltaTime;
-        paddle.vel_x = 0;
+        paddle.velX = 0;
 
         if (this.moveLeftRequested && paddle.aabb.left - displacement > 0) {
             paddle.x -= displacement;
-            paddle.vel_x = -PADDLE_SPEED_X;
+            paddle.velX = -PADDLE_SPEED_X;
         }
 
         if (this.moveRightRequested && paddle.aabb.right + displacement <= level.levelWidth) {
             paddle.x += displacement;
-            paddle.vel_x = PADDLE_SPEED_X;
+            paddle.velX = PADDLE_SPEED_X;
         }
     }
 
@@ -352,31 +352,31 @@ class BlockBreakerGame extends BaseGame {
             const distance = ball.x - paddle.x;
             const scaled_distance = distance / paddle.aabb.halfWidth;
 
-            const old_vel_x = ball.vel_x;
-            const old_vel_y = ball.vel_y;
+            const old_vel_x = ball.velX;
+            const old_vel_y = ball.velY;
 
-            ball.vel_x = BALL_BASE_VELOCITY_X * BALL_BLOCK_COLLISION_VELOCITY_MODIFIER * scaled_distance;
-            ball.vel_y = -1.0 * Math.abs(ball.vel_y); // always move up, fixes "ball stuck in paddle" bug.
+            ball.velX = BALL_BASE_VELOCITY_X * BALL_BLOCK_COLLISION_VELOCITY_MODIFIER * scaled_distance;
+            ball.velY = -1.0 * Math.abs(ball.velY); // always move up, fixes "ball stuck in paddle" bug.
 
-            const new_vel_len = vector_length(ball.vel_x, ball.vel_y);
+            const new_vel_len = vector_length(ball.velX, ball.velY);
             const old_vel_len = vector_length(old_vel_x, old_vel_y);
 
-            ball.vel_x = ball.vel_x / new_vel_len * old_vel_len;
-            ball.vel_y = ball.vel_y / new_vel_len * old_vel_len;
+            ball.velX = ball.velX / new_vel_len * old_vel_len;
+            ball.velY = ball.velY / new_vel_len * old_vel_len;
         }
     }
 
     updateBallPosition(level: GameLevel, ball: Ball, deltaTime: number) {
-        ball.x += ball.vel_x * deltaTime;
-        ball.y += ball.vel_y * deltaTime;
+        ball.x += ball.velX * deltaTime;
+        ball.y += ball.velY * deltaTime;
 
         if (ball.stuckToPaddle) {
             const paddle = not_null(level.paddles[0]);
 
             ball.x = paddle.x;
             ball.y = paddle.aabb.top - ball.aabb.halfHeight;
-            ball.vel_x = paddle.vel_x;
-            ball.vel_y = BALL_VEL_Y;
+            ball.velX = paddle.velX;
+            ball.velY = BALL_VEL_Y;
 
             if (this.launchBallRequested) {
                 ball.stuckToPaddle = false;
@@ -387,13 +387,13 @@ class BlockBreakerGame extends BaseGame {
 
             if (ball.x - radius < 0) {
                 ball.x = radius;
-                ball.vel_x = -ball.vel_x;
+                ball.velX = -ball.velX;
             } else if (ball.x + radius > level.levelWidth) {
                 ball.x = level.levelWidth - radius;
-                ball.vel_x = -ball.vel_x;
+                ball.velX = -ball.velX;
             } else if (ball.y - radius < 0) {
                 ball.y = radius;
-                ball.vel_y = -ball.vel_y;
+                ball.velY = -ball.velY;
             }
         }
     }
@@ -433,7 +433,7 @@ class BlockBreakerGame extends BaseGame {
                     ball.x -= penetration_distance;
                 }
 
-                ball.vel_x *= -1;
+                ball.velX *= -1;
             } else {
                 const penetration_distance = ball.aabb.halfHeight - Math.abs(collision.y);
 
@@ -443,7 +443,7 @@ class BlockBreakerGame extends BaseGame {
                     ball.y -= penetration_distance;
                 }
 
-                ball.vel_y *= -1;
+                ball.velY *= -1;
             }
 
             // Destroy any non-solid block that has been hit.
