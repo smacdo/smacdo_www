@@ -1,7 +1,6 @@
 import {clamp} from "../utils.tsx";
 import {vector_distance} from "./math.ts";
 
-// TODO: Merge the interface / class divide in this file.
 // TODO: Convert methods to properties?
 
 /** A bounding region. */
@@ -13,37 +12,18 @@ export interface Boundable {
     y: number;
 }
 
-/** A bounding region defined by an axis aligned box. */
-export interface AxisAlignedBoundableBox extends Boundable {
-    /** Half of the width of the bounding box. */
-    readonly halfWidth: number;
-
-    /** Half of the height of the bounding box. */
-    readonly halfHeight: number;
-
-    /** Get the bounding box's leftmost position on the x-axis. */
-    left(): number;
-
-    /** Get the bounding box's topmost position on the y-axis. */
-    top(): number;
-
-    /** Get the bounding box's rightmost position on the x-axis. */
-    right(): number;
-
-    /** Get the bounding box's bottommost position on the y-axis. */
-    bottom(): number;
-
-    /** Get the width of the bounding box. */
-    width(): number;
-
-    /** Get the height of the bounding box. */
-    height(): number;
-}
-
-export class AABB implements AxisAlignedBoundableBox {
+/** An axis aligned bounding box. */
+export class AABB implements Boundable {
+    /** The center of the AABB on the x-axis. */
     x: number;
+
+    /** The center of the AABB on the y-axis. */
     y: number;
+
+    /** Half of the AABB width. */
     halfWidth: number;
+
+    /** Half of the AABB height. */
     halfHeight: number;
 
     constructor(left: number, top: number, width: number, height: number) {
@@ -78,17 +58,31 @@ export class AABB implements AxisAlignedBoundableBox {
     }
 }
 
-/** A bounding region defined by a circle. */
-export interface CircleBoundable extends Boundable {
-    /** The radius of the circle. */
-    readonly radius: number;
-}
+/** A circular bounding box. */
+export class Circle implements Boundable {
+    /** The center of the circle on the x-axis. */
+    x: number;
 
-export class Circle {
-    constructor(public x: number, public y: number, public radius: number) {
+    /** The center of the circle on the y-axis. */
+    y: number;
+
+    /** The circle's radius. */
+    radius: number;
+
+    constructor(x: number, y: number, radius: number) {
+        this.x = x;
+        this.y = y;
+        this.radius = radius;
     }
 }
 
+/**
+ * Calculates the interpenetration vector between two possibly colliding bounding regions.
+ * `undefined` is returned when `a` and `b` are not intersecting.
+ *
+ * @param a The first bounding region to test.
+ * @param b The second bounding region to test.
+ */
 export function resolve_collision(a: AABB | Circle, b: AABB): {
     x: number,
     y: number
@@ -97,6 +91,20 @@ export function resolve_collision(a: AABB | Circle, b: AABB): {
         return resolve_aabb_aabb_collision(a, b);
     } else {
         return resolve_circle_rect_collision(a, b);
+    }
+}
+
+/**
+ * Returns true if `a` and `b` intersect with each other, false otherwise.
+ *
+ * @param a The first bounding region to test.
+ * @param b The second bounding region to test.
+ */
+export function intersects(a: AABB | Circle, b: AABB): boolean {
+    if (a instanceof AABB) {
+        return aabb_aabb_intersects(a, b);
+    } else {
+        return circle_rect_intersects(a, b);
     }
 }
 
@@ -110,7 +118,7 @@ export function resolve_collision(a: AABB | Circle, b: AABB): {
  * @param a The first AABB to test.
  * @param b The second AABB to test.
  */
-export function resolve_aabb_aabb_collision(a: AxisAlignedBoundableBox, b: AxisAlignedBoundableBox): {
+export function resolve_aabb_aabb_collision(a: AABB, b: AABB): {
     x: number,
     y: number
 } | undefined {
@@ -135,7 +143,7 @@ export function resolve_aabb_aabb_collision(a: AxisAlignedBoundableBox, b: AxisA
  * @param a The first AABB to test.
  * @param b The second AABB to test.
  */
-export function aabb_aabb_intersects(a: AxisAlignedBoundableBox, b: AxisAlignedBoundableBox): boolean {
+export function aabb_aabb_intersects(a: AABB, b: AABB): boolean {
     return resolve_aabb_aabb_collision(a, b) !== undefined;
 }
 
@@ -152,7 +160,7 @@ export function aabb_aabb_intersects(a: AxisAlignedBoundableBox, b: AxisAlignedB
  * Degenerate cases:
  *  - Zero sized circle (point) inside AABB -> not colliding.
  */
-export function resolve_circle_rect_collision(a: CircleBoundable, b: AxisAlignedBoundableBox): {
+export function resolve_circle_rect_collision(a: Circle, b: AABB): {
     x: number,
     y: number
 } | undefined {
@@ -179,6 +187,12 @@ export function resolve_circle_rect_collision(a: CircleBoundable, b: AxisAligned
     }
 }
 
-export function circle_rect_intersects(a: CircleBoundable, b: AxisAlignedBoundableBox): boolean {
+/**
+ * Returns true if `a` and `b` intersect with each other, false otherwise.
+ *
+ * @param a The circle to test.
+ * @param b The axis aligned box to test.
+ */
+export function circle_rect_intersects(a: Circle, b: AABB): boolean {
     return resolve_circle_rect_collision(a, b) !== undefined;
 }
