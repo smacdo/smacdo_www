@@ -1,6 +1,9 @@
 import {clamp} from "../utils.tsx";
 import {vector_distance} from "./math.ts";
 
+// TODO: Merge the interface / class divide in this file.
+// TODO: Convert methods to properties?
+
 /** A bounding region. */
 export interface Boundable {
     /** The center of the object on the x-axis. */
@@ -83,6 +86,17 @@ export interface CircleBoundable extends Boundable {
 
 export class Circle {
     constructor(public x: number, public y: number, public radius: number) {
+    }
+}
+
+export function resolve_collision(a: AABB | Circle, b: AABB): {
+    x: number,
+    y: number
+} | undefined {
+    if (a instanceof AABB) {
+        return resolve_aabb_aabb_collision(a, b);
+    } else {
+        return resolve_circle_rect_collision(a, b);
     }
 }
 

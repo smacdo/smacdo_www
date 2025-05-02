@@ -1,7 +1,7 @@
 import {not_null} from "../../lib/utils.tsx";
 import {BaseGame, GameCanvas} from "../../components/Game";
-import {AabbGameObject, CircleGameObject} from "../../lib/gamebox/object.ts";
-import {resolve_circle_rect_collision} from "../../lib/gamebox/bounds.ts";
+import {GameObject} from "../../lib/gamebox/object.ts";
+import {AABB, Circle, resolve_collision} from "../../lib/gamebox/bounds.ts";
 import {lerp, vector_length} from "../../lib/gamebox/math.ts";
 import {Direction, vector_direction} from "../../lib/gamebox/direction.ts";
 import {ImageLoader} from "../../lib/gamebox/resources.ts";
@@ -71,25 +71,25 @@ const BLOCKS: BlockDefinition[] = [
     },
 ];
 
-class Block extends AabbGameObject {
+class Block extends GameObject {
     alive = true;
 
     constructor(left: number, top: number, public def: BlockDefinition) {
-        super(left, top, BLOCK_WIDTH, BLOCK_HEIGHT, 0, 0);
+        super(new AABB(left, top, BLOCK_WIDTH, BLOCK_HEIGHT));
     }
 }
 
-class Ball extends CircleGameObject {
+class Ball extends GameObject {
     stuckToPaddle = true;
 
-    constructor(public x: number, public y: number, public radius: number, public spriteDef: SpriteDefinition) {
-        super(x, y, radius, 0, 0);
+    constructor(x: number, y: number, radius: number, public spriteDef: SpriteDefinition) {
+        super(new AABB(x - radius, y - radius, radius * 2, radius * 2), new Circle(x, y, radius));
     }
 }
 
-class Paddle extends AabbGameObject {
-    constructor(center_x: number, center_y: number, width: number, height: number, public spriteDef: SpriteDefinition) {
-        super(center_x - width / 2.0, center_y - height / 2.0, width, height, 0, 0);
+class Paddle extends GameObject {
+    constructor(centerX: number, centerY: number, width: number, height: number, public spriteDef: SpriteDefinition) {
+        super(new AABB(centerX - width / 2.0, centerY - height / 2.0, width, height));
     }
 }
 
@@ -235,10 +235,10 @@ class BlockBreakerGame extends BaseGame {
                     block.def.spriteDef.y,
                     block.def.spriteDef.width,
                     block.def.spriteDef.height,
-                    block.left(),
-                    block.top(),
-                    block.width(),
-                    block.height());
+                    block.aabb.left(),
+                    block.aabb.top(),
+                    block.aabb.width(),
+                    block.aabb.height());
             }
         }
     }
@@ -255,10 +255,10 @@ class BlockBreakerGame extends BaseGame {
                 paddle.spriteDef.y,
                 paddle.spriteDef.width,
                 paddle.spriteDef.height,
-                paddleX - paddle.halfWidth,
-                paddleY - paddle.halfHeight,
-                paddle.width(),
-                paddle.height());
+                paddleX - paddle.aabb.halfWidth,
+                paddleY - paddle.aabb.halfHeight,
+                paddle.aabb.width(),
+                paddle.aabb.height());
         }
     }
 
@@ -274,10 +274,10 @@ class BlockBreakerGame extends BaseGame {
                 ball.spriteDef.y,
                 ball.spriteDef.width,
                 ball.spriteDef.height,
-                ballX - ball.radius,
-                ballY - ball.radius,
-                ball.radius * 2,
-                ball.radius * 2);
+                ballX - ball.aabb.halfWidth,
+                ballY - ball.aabb.halfHeight,
+                ball.aabb.width(),
+                ball.aabb.height());
         }
     }
 
@@ -321,12 +321,12 @@ class BlockBreakerGame extends BaseGame {
         const displacement = PADDLE_SPEED_X * deltaTime;
         paddle.vel_x = 0;
 
-        if (this.moveLeftRequested && paddle.left() - displacement > 0) {
+        if (this.moveLeftRequested && paddle.aabb.left() - displacement > 0) {
             paddle.x -= displacement;
             paddle.vel_x = -PADDLE_SPEED_X;
         }
 
-        if (this.moveRightRequested && paddle.right() + displacement <= level.levelWidth) {
+        if (this.moveRightRequested && paddle.aabb.right() + displacement <= level.levelWidth) {
             paddle.x += displacement;
             paddle.vel_x = PADDLE_SPEED_X;
         }
@@ -341,7 +341,7 @@ class BlockBreakerGame extends BaseGame {
                 continue;
             }
 
-            const collision = resolve_circle_rect_collision(ball, paddle);
+            const collision = resolve_collision(ball.preciseBounds, paddle.aabb);
 
             if (!collision) {
                 continue;
@@ -350,7 +350,7 @@ class BlockBreakerGame extends BaseGame {
             // Find the distance from the middle of the paddle to the ball intersection point. The
             // velocity change from impact is larger the further from the middle the collision is.
             const distance = ball.x - paddle.x;
-            const scaled_distance = distance / paddle.halfWidth;
+            const scaled_distance = distance / paddle.aabb.halfWidth;
 
             const old_vel_x = ball.vel_x;
             const old_vel_y = ball.vel_y;
@@ -374,7 +374,7 @@ class BlockBreakerGame extends BaseGame {
             const paddle = not_null(level.paddles[0]);
 
             ball.x = paddle.x;
-            ball.y = paddle.top() - ball.radius;
+            ball.y = paddle.aabb.top() - ball.aabb.halfHeight;
             ball.vel_x = paddle.vel_x;
             ball.vel_y = BALL_VEL_Y;
 
@@ -383,14 +383,16 @@ class BlockBreakerGame extends BaseGame {
                 this.launchBallRequested = false;
             }
         } else {
-            if (ball.x - ball.radius < 0) {
-                ball.x = ball.radius;
+            const radius = (ball.preciseBounds as Circle).radius;
+
+            if (ball.x - radius < 0) {
+                ball.x = radius;
                 ball.vel_x = -ball.vel_x;
-            } else if (ball.x + ball.radius > level.levelWidth) {
-                ball.x = level.levelWidth - ball.radius;
+            } else if (ball.x + radius > level.levelWidth) {
+                ball.x = level.levelWidth - radius;
                 ball.vel_x = -ball.vel_x;
-            } else if (ball.y - ball.radius < 0) {
-                ball.y = ball.radius;
+            } else if (ball.y - radius < 0) {
+                ball.y = radius;
                 ball.vel_y = -ball.vel_y;
             }
         }
@@ -412,7 +414,7 @@ class BlockBreakerGame extends BaseGame {
             }
 
             // Check if the ball will hit this block. Skip the block if there's no collision.
-            const collision = resolve_circle_rect_collision(ball, block);
+            const collision = resolve_collision(ball.preciseBounds, block.aabb);
 
             if (!collision) {
                 continue;
@@ -423,7 +425,7 @@ class BlockBreakerGame extends BaseGame {
             const c_dir = vector_direction(collision.x / c_len, collision.y / c_len);
 
             if (c_dir === Direction.East || c_dir === Direction.West) {
-                const penetration_distance = ball.radius - Math.abs(collision.x);
+                const penetration_distance = ball.aabb.halfHeight - Math.abs(collision.x);
 
                 if (c_dir === Direction.East) {
                     ball.x += penetration_distance;
@@ -433,7 +435,7 @@ class BlockBreakerGame extends BaseGame {
 
                 ball.vel_x *= -1;
             } else {
-                const penetration_distance = ball.radius - Math.abs(collision.y);
+                const penetration_distance = ball.aabb.halfHeight - Math.abs(collision.y);
 
                 if (c_dir === Direction.North) {
                     ball.y += penetration_distance;
