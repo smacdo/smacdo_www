@@ -8,6 +8,7 @@ import {HTMLAttributes, useEffect, useRef} from "react";
 import {not_null} from "./lib/utils.tsx";
 import {BlockBreaker} from "./games/blockbreaker";
 import MastheadPageLink from "./components/Masthead";
+import PageLink from './components/PageLink.tsx';
 
 
 function App() {
@@ -15,12 +16,15 @@ function App() {
         <div>
             <Header/>
 
-            <div className="pagecontent">
-                <Route path="/games">
-                    <BlockBreaker/>
-                </Route>
-            </div>
-            
+            <Route path="/">
+                <p>Hello there!</p>
+                <p>Would you like to <PageLink path="games">play a game?</PageLink></p>
+            </Route>
+
+            <Route path="/games">
+                <BlockBreaker/>
+            </Route>
+
             <Footer/>
         </div>
     )
