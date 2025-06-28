@@ -14,6 +14,7 @@ export default function Route(props: RouteProps): React.ReactNode {
 
     // Render the child element when `props.path` matches the current URL, otherwise do not render
     // the element.
+    console.log(`window path is ${windowPath}`);
     return windowPath === props.path ? (
         <main role="main">
             {props.children}

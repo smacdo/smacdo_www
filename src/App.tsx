@@ -7,6 +7,7 @@ import Route from "./components/Route.tsx";
 import {HTMLAttributes, useEffect, useRef} from "react";
 import {not_null} from "./lib/utils.tsx";
 import {BlockBreaker} from "./games/blockbreaker";
+import MastheadPageLink from "./components/Masthead";
 
 
 function App() {
@@ -14,23 +15,12 @@ function App() {
         <div>
             <Header/>
 
-            <Route path="/">
-                <BlockBreaker/>
-            </Route>
-
-            <Route path="/about">
-                <p>[about goes here...]</p>
-            </Route>
-
-            <Route path="/contact">
-                <p>[contact goes here...]</p>
-            </Route>
-
-            <Route path="/projects">
-                <p>[projects go here...]</p>
-            </Route>
-
-
+            <div className="pagecontent">
+                <Route path="/games">
+                    <BlockBreaker/>
+                </Route>
+            </div>
+            
             <Footer/>
         </div>
     )
@@ -77,6 +67,7 @@ function Header() {
                 <div id="logo">
                     <a href="/">smacdo.com</a>
                 </div>
+                <MastheadPageLink name="Games" path="games"/>
             </nav>
         </header>
     )
