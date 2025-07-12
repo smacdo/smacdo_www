@@ -26,10 +26,10 @@ jobs:
       - name: Test project
         run: npm test
 
-      - name: Upload production-ready build files
+      - name: Upload build artifact for deployment
         uses: actions/upload-artifact@v4
         with:
-          name: production-files
+          name: deployment-files
           path: ./dist
 
   deploy_staging:
@@ -53,12 +53,12 @@ jobs:
           SSH_HOST: ${{ secrets.STAGING_SSH_HOST }}
           SSH_KEY: ${{ secrets.STAGING_SSH_KEY }}
           SSH_USER: ${{ secrets.STAGING_SSH_USER }}
-      - name: Get production files
+      - name: Get deployment artifact
         uses: actions/download-artifact@v4
         with:
-          name: production-files
+          name: deployment-files
           path: ./dist
-      - name: Deploy production files
+      - name: Deploy to staging
         run: |
           rsync --recursive --verbose --archive --compress --delay-updates --delete-after --recursive \
-             ./dist/ ${{ secrets.STAGING_SSH_USER }}@staging:/home/${{ secrets.STAGING_SSH_USER }}/smacdo.com/
+             ./dist/ ${{ secrets.STAGING_SSH_USER }}@staging:/home/${{ secrets.STAGING_SSH_USER }}/test.smacdo.com/
