@@ -58,6 +58,11 @@ nav li.masthead-link {
     margin: auto var(--masthead-link-gap);
 }
 
+main {
+    margin: 32px auto 32px auto;
+    padding: 0 16px 0 16px;
+}
+
 .main-footer {
     text-align: center;
     margin-top: 40px;
