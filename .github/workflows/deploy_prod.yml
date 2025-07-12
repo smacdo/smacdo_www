@@ -1,65 +1,21 @@
+name: Deploy to Production
+
 on:
   push:
-    # Pattern matched against refs/tags
     tags:
-      - 'releases-v\d+'           # Only publish release-v* tags.
+      - 'releases-v\d+'
 
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 jobs:
-  build:
-    name: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build project
-        run: npm run build
-
-      - name: Test project
-        run: npm test
-
-      - name: Upload build artifact for deployment
-        uses: actions/upload-artifact@v4
-        with:
-          name: deployment-files
-          path: ./dist
-
-  deploy_prod:
-    name: deploy to prod environment
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Generate SSH keys
-        run: |
-          mkdir -p ~/.ssh/
-          echo "$SSH_KEY" > ~/.ssh/staging.key
-          chmod 600 ~/.ssh/staging.key
-          cat >> ~/.ssh/config <<END
-          Host staging
-            HostName $SSH_HOST
-            User $SSH_USER
-            IdentityFile ~/.ssh/staging.key
-            StrictHostKeyChecking no
-          END
-        env:
-          SSH_HOST: ${{ secrets.STAGING_SSH_HOST }}
-          SSH_KEY: ${{ secrets.STAGING_SSH_KEY }}
-          SSH_USER: ${{ secrets.STAGING_SSH_USER }}
-      - name: Get deployment artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: deployment-files
-          path: ./dist
-      - name: Deploy to prod
-        run: |
-          rsync --recursive --verbose --archive --compress --delay-updates --delete-after --recursive \
-             ./dist/ ${{ secrets.STAGING_SSH_USER }}@staging:/home/${{ secrets.STAGING_SSH_USER }}/smacdo.com/
+  call-deploy-template:
+    uses: ./.github/workflows/deploy_template.yml
+    with:
+      ssh_host: ${{ secrets.PROD_SSH_HOST }}
+      ssh_key: ${{ secrets.PROD_SSH_KEY }}
+      ssh_user: ${{ secrets.PROD_SSH_USER }}
+      deploy_path: /home/${{ secrets.PROD_SSH_USER }}/smacdo.com/
+    secrets:
+      SSH_HOST_SECRET: ${{ secrets.PROD_SSH_HOST }}
+      SSH_KEY_SECRET: ${{ secrets.PROD_SSH_KEY }}
+      SSH_USER_SECRET: ${{ secrets.PROD_SSH_USER }}

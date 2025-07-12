@@ -1,0 +1,81 @@
+# .github/workflows/deploy_template.yml
+name: Reusable Deploy Workflow
+on:
+  workflow_call:
+    inputs:
+      ssh_host:
+        required: true
+        type: string
+      ssh_key:
+        required: true
+        type: string
+      ssh_user:
+        required: true
+        type: string
+      deploy_path:
+        required: true
+        type: string
+    secrets:
+      SSH_HOST_SECRET:
+        required: true
+      SSH_KEY_SECRET:
+        required: true
+      SSH_USER_SECRET:
+        required: true
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build project
+        run: npm run build
+
+      - name: Test project
+        run: npm test
+
+      - name: Upload build artifact for deployment
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-files
+          path: ./dist
+
+  deploy:
+    name: Deploy to ${{ github.event.inputs.deploy_path }}
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate SSH keys
+        run: |
+          mkdir -p ~/.ssh/
+          echo "$SSH_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          cat >> ~/.ssh/config <<END
+          Host remote-host
+            HostName $SSH_HOST
+            User $SSH_USER
+            IdentityFile ~/.ssh/id_rsa
+            StrictHostKeyChecking no
+          END
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST_SECRET }}
+          SSH_KEY: ${{ secrets.SSH_KEY_SECRET }}
+          SSH_USER: ${{ secrets.SSH_USER_SECRET }}
+      - name: Get deployment artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: deployment-files
+          path: ./dist
+      - name: Deploy
+        run: |
+          rsync --recursive --verbose --archive --compress --delay-updates --delete-after \
+             ./dist/ ${{ secrets.SSH_USER_SECRET }}@remote-host:${{ inputs.deploy_path }}
