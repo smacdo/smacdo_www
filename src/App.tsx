@@ -9,6 +9,7 @@ import {not_null} from "./lib/utils.tsx";
 import {BlockBreaker} from "./games/blockbreaker";
 import MastheadPageLink from "./components/Masthead";
 import PageLink from './components/PageLink.tsx';
+import useWindowPath from "./hooks/UseWindowPath.ts";
 
 
 function App() {
@@ -64,13 +65,15 @@ function Cloud({start_x, start_y}: CloudProps) {
 }
 
 function Header() {
+    const [windowPath] = useWindowPath();
+
     return (
-        <header className="masthead" role="banner">
+        <header role="banner">
             <Cloud start_x={10} start_y={2}/>
-            <nav className="navbar" role="navigation">
-                <div id="logo">
-                    <a href="/">smacdo.com</a>
-                </div>
+            <nav role="navigation">
+                <span id="sitename">{windowPath === "/" ? "" : "< "}<a
+                    href="/">smacdo.com</a></span>
+                <MastheadPageLink name="Code" path="code"/>
                 <MastheadPageLink name="Games" path="games"/>
             </nav>
         </header>

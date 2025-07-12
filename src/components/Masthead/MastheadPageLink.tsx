@@ -7,7 +7,7 @@ export default function MastheadPageLink({name, path}: { name: string, path: str
     const [windowPath] = useWindowPath();
 
     return (
-        <li>{windowPath !== path ?
+        <li className="masthead-link">{windowPath !== path ?
             <a href={path} onClick={(event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
                 // Use the default behavior of opening a link in a new window when the appropriate
                 // keyboard button is pressed.

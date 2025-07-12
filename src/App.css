@@ -1,19 +1,19 @@
 :root {
-    --gap: 24px;
+    --masthead-link-gap: 12px;
     --masthead-height: 200px;
 }
 
-.navbar {
-    display: flex;
-    justify-content: space-between;
+header {
     height: calc(var(--masthead-height));
     margin-inline-start: auto;
     margin-inline-end: auto;
     background-image: url("/theme/NighttimeGradient.png");
+    display: flex;
+    flex-direction: column;
 }
 
 @media (prefers-color-scheme: light) {
-    .navbar {
+    header {
         background-image: url("/theme/DaytimeGradient.png");
     }
 }
@@ -26,32 +26,36 @@
     position: absolute;
 }
 
-.navbar #logo {
-    font-size: 32px;
-    font-family: "Delicious Handrawn", cursive;
-    font-style: normal;
-    font-weight: bold;
-    color: var(--text-color);
-    margin: auto var(--gap);
-    margin-top: 22px;
-    margin-left: 42px;
-    z-index: 100;
-}
-
-.navbar #menu {
-    list-style: none;
+nav {
+    background-color: rgb(60, 60, 60);
     display: flex;
-    margin: auto var(--gap);
-    margin-top: 24px;
+    overflow: auto;
+    padding: 0 18px 0 32px;
+    height: 42px;
+    box-shadow: 0 1px 10px 0 rgba(0, 0, 0, 0.25);
+    z-index: 100;
 
+    a {
+        color: white;
+    }
 }
 
-.navbar #menu a {
-    font-size: 16px;
+nav span#sitename {
+    margin-right: auto;
+    color: white;
+    font-weight: bold;
+    font-size: 18px;
+
+    a {
+        font-family: "Delicious Handrawn", cursive;
+        font-size: 24px;
+        font-style: normal;
+    }
 }
 
-.navbar #menu li + li {
-    margin-inline-start: var(--gap)
+nav li.masthead-link {
+    list-style: none;
+    margin: auto var(--masthead-link-gap);
 }
 
 .main-footer {
