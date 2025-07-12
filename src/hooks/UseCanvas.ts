@@ -27,8 +27,8 @@ export function useCanvas(onDraw: DrawFn) {
 
             // Set the canvas element's CSS width and height to the _original_ size of the element.
             //
-            // This is done because the CSS dimensions is physical (not logical pixels) and managed
-            // by the browser which is already accounting for high dpi measurements.
+            // This is done because the CSS dimensions are physical (not logical pixels) and managed
+            // by the browser, which is already accounting for high dpi measurements.
             canvas.style.width = canvasRect.width + 'px';
             canvas.style.height = canvasRect.height + 'px';
 
