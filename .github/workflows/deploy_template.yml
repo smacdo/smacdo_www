@@ -40,7 +40,7 @@ jobs:
           path: ./dist
 
   deploy:
-    name: Deploy to ${{ github.event.inputs.deploy_dir }}
+    name: Deploy to ${{ inputs.deploy_dir }}
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -68,4 +68,4 @@ jobs:
       - name: Deploy
         run: |
           rsync --recursive --verbose --archive --compress --delay-updates --delete-after \
-             ./dist/ ${{ secrets.SSH_USER }}@remote-host:/home/${{ secrets.SSH_USER }}/${{ github.event.inputs.deploy_dir }}/
+             ./dist/ ${{ secrets.SSH_USER }}@remote-host:/home/${{ secrets.SSH_USER }}/${{ inputs.deploy_dir }}/
