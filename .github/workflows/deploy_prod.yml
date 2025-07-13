@@ -13,6 +13,6 @@ jobs:
     with:
       deploy_dir: smacdo.com
     secrets:
-      SSH_HOST: ${{ secrets.STAGING_SSH_HOST }}
-      SSH_KEY: ${{ secrets.STAGING_SSH_KEY }}
-      SSH_USER: ${{ secrets.STAGING_SSH_USER }}
+      SSH_HOST: ${{ secrets.PROD_SSH_HOST }}
+      SSH_KEY: ${{ secrets.PROD_SSH_KEY }}
+      SSH_USER: ${{ secrets.PROD_SSH_USER }}
