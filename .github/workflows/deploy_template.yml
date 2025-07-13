@@ -1,26 +1,16 @@
-# .github/workflows/deploy_template.yml
 name: Reusable Deploy Workflow
 on:
   workflow_call:
     inputs:
-      ssh_host:
-        required: true
-        type: string
-      ssh_key:
-        required: true
-        type: string
-      ssh_user:
-        required: true
-        type: string
-      deploy_path:
+      deploy_dir:
         required: true
         type: string
     secrets:
-      SSH_HOST_SECRET:
+      SSH_HOST:
         required: true
-      SSH_KEY_SECRET:
+      SSH_KEY:
         required: true
-      SSH_USER_SECRET:
+      SSH_USER:
         required: true
 
 jobs:
@@ -50,7 +40,7 @@ jobs:
           path: ./dist
 
   deploy:
-    name: Deploy to ${{ github.event.inputs.deploy_path }}
+    name: Deploy to ${{ github.event.inputs.deploy_dir }}
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -67,9 +57,9 @@ jobs:
             StrictHostKeyChecking no
           END
         env:
-          SSH_HOST: ${{ secrets.SSH_HOST_SECRET }}
-          SSH_KEY: ${{ secrets.SSH_KEY_SECRET }}
-          SSH_USER: ${{ secrets.SSH_USER_SECRET }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+          SSH_USER: ${{ secrets.SSH_USER }}
       - name: Get deployment artifact
         uses: actions/download-artifact@v4
         with:
@@ -78,4 +68,4 @@ jobs:
       - name: Deploy
         run: |
           rsync --recursive --verbose --archive --compress --delay-updates --delete-after \
-             ./dist/ ${{ secrets.SSH_USER_SECRET }}@remote-host:${{ inputs.deploy_path }}
+             ./dist/ ${{ secrets.SSH_USER }}@remote-host:/home/${{ secrets.SSH_USER }}/${{ github.event.inputs.deploy_dir }}/

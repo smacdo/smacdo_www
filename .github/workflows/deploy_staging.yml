@@ -11,11 +11,8 @@ jobs:
   call-deploy-template:
     uses: ./.github/workflows/deploy_template.yml
     with:
-      ssh_host: ${{ secrets.STAGING_SSH_HOST }}
-      ssh_key: ${{ secrets.STAGING_SSH_KEY }}
-      ssh_user: ${{ secrets.STAGING_SSH_USER }}
-      deploy_path: /home/${{ secrets.STAGING_SSH_USER }}/test.smacdo.com/
+      deploy_dir: test.smacdo.com
     secrets:
-      SSH_HOST_SECRET: ${{ secrets.STAGING_SSH_HOST }}
-      SSH_KEY_SECRET: ${{ secrets.STAGING_SSH_KEY }}
-      SSH_USER_SECRET: ${{ secrets.STAGING_SSH_USER }}
+      SSH_HOST: ${{ secrets.STAGING_SSH_HOST }}
+      SSH_KEY: ${{ secrets.STAGING_SSH_KEY }}
+      SSH_USER: ${{ secrets.STAGING_SSH_USER }}
