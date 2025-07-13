@@ -11,8 +11,9 @@ jobs:
   call-deploy-template:
     uses: ./.github/workflows/deploy_template.yml
     with:
-      deploy_dir: smacdo.com
+      deployment_name: smacdo.com
     secrets:
+      DEPLOY_DIR: ${{ secrets.PROD_DEPLOY_DIR }}
       SSH_HOST: ${{ secrets.PROD_SSH_HOST }}
       SSH_KEY: ${{ secrets.PROD_SSH_KEY }}
       SSH_USER: ${{ secrets.PROD_SSH_USER }}
