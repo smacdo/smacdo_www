@@ -9,6 +9,7 @@ on:
 
 jobs:
   call-deploy-template:
+    environment: production
     uses: ./.github/workflows/deploy_template.yml
     with:
       deployment_name: smacdo.com

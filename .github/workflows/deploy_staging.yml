@@ -9,6 +9,7 @@ on:
 
 jobs:
   call-deploy-template:
+    environment: staging
     uses: ./.github/workflows/deploy_template.yml
     with:
       deployment_name: staging.smacdo.com
