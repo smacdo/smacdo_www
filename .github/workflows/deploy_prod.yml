@@ -12,7 +12,7 @@ jobs:
     uses: ./.github/workflows/deploy_template.yml
     with:
       deployment_name: smacdo.com
-    environment: production
+      environment: production
     secrets:
       DEPLOY_DIR: ${{ secrets.PROD_DEPLOY_DIR }}
       SSH_HOST: ${{ secrets.PROD_SSH_HOST }}

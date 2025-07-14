@@ -5,6 +5,9 @@ on:
       deployment_name:
         required: true
         type: string
+      environment:
+        required: true
+        type: string
     secrets:
       DEPLOY_DIR:
         required: true
@@ -43,6 +46,7 @@ jobs:
 
   deploy:
     name: Deploy to ${{ inputs.deployment_name }}
+    environment: ${{ inputs.environment }}
     needs: build
     runs-on: ubuntu-latest
     steps:
