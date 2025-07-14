@@ -17,6 +17,8 @@ on:
         required: true
       SSH_USER:
         required: true
+      SSH_SERVER_KEY:
+        required: true
 
 jobs:
   build:
@@ -55,12 +57,14 @@ jobs:
           mkdir -p ~/.ssh/
           echo "$SSH_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_SERVER_KEY }}" >> ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
           cat >> ~/.ssh/config <<END
           Host remote-host
             HostName $SSH_HOST
             User $SSH_USER
             IdentityFile ~/.ssh/id_rsa
-            StrictHostKeyChecking no
+            StrictHostKeyChecking yes
           END
         env:
           SSH_HOST: ${{ secrets.SSH_HOST }}

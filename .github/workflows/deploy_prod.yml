@@ -18,3 +18,4 @@ jobs:
       SSH_HOST: ${{ secrets.PROD_SSH_HOST }}
       SSH_KEY: ${{ secrets.PROD_SSH_KEY }}
       SSH_USER: ${{ secrets.PROD_SSH_USER }}
+      SSH_SERVER_KEY: ${{ secrets.PROD_SSH_SERVER_KEY }}

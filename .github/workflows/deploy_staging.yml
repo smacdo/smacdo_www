@@ -18,3 +18,4 @@ jobs:
       SSH_HOST: ${{ secrets.STAGING_SSH_HOST }}
       SSH_KEY: ${{ secrets.STAGING_SSH_KEY }}
       SSH_USER: ${{ secrets.STAGING_SSH_USER }}
+      SSH_SERVER_KEY: ${{ secrets.STAGING_SSH_SERVER_KEY }}
