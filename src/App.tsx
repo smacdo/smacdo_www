@@ -69,7 +69,7 @@ function Header() {
 
     return (
         <header role="banner">
-            <Cloud start_x={10} start_y={2}/>
+            <Cloud start_x={10} start_y={50}/>
             <nav role="navigation">
                 <span id="sitename">{windowPath === "/" ? "" : "< "}<a
                     href="/">smacdo.com</a></span>
