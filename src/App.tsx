@@ -32,22 +32,18 @@ function App() {
 }
 
 interface CloudProps extends HTMLAttributes<HTMLElement> {
-    start_x: number;
+    delay_time_ms: number;
     start_y: number;
 }
 
-function Cloud({start_x, start_y}: CloudProps) {
+function Cloud({delay_time_ms, start_y}: CloudProps) {
     const elementRef = useRef<HTMLElement>(null);
 
     useEffect(() => {
-        // Determine where the sprite starts on the timeline by measuring the requested start_x
-        // against the browser window's width.
-        const start_left = (window.innerWidth >= start_x ? start_x / window.innerWidth : 1);
-
         const element = not_null(elementRef.current);
         element.animate([
             {
-                left: "0%",
+                left: "-203px",  // Start the cloud offscreen based on the width of the sprite.
             },
             {
                 left: "100%",
@@ -55,12 +51,12 @@ function Cloud({start_x, start_y}: CloudProps) {
         ], {
             duration: 300000,
             iterations: Number.POSITIVE_INFINITY,
-            iterationStart: start_left,
+            delay: delay_time_ms,
         });
     });
 
     return (
-        <span ref={elementRef} className="cloud" style={{left: start_x, top: start_y}}/>
+        <span ref={elementRef} className="cloud" style={{top: start_y}}/>
     );
 }
 
@@ -69,7 +65,7 @@ function Header() {
 
     return (
         <header role="banner">
-            <Cloud start_x={10} start_y={50}/>
+            <Cloud delay_time_ms={0} start_y={50}/>
             <nav role="navigation">
                 <span id="sitename">{windowPath === "/" ? "" : "< "}<a
                     href="/">smacdo.com</a></span>
