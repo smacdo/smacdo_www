@@ -455,5 +455,12 @@ class BlockBreakerGame extends BaseGame {
 }
 
 export function BlockBreaker() {
-    return (<GameCanvas width={402} height={874} game={new BlockBreakerGame()}/>);
+    return (
+        <div className="game-container">
+            <GameCanvas 
+                style={{ width: '100%', height: '100%', maxWidth: '500px' }}
+                game={new BlockBreakerGame()}
+            />
+        </div>
+    );
 }

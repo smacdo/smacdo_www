@@ -1,4 +1,4 @@
-import {useEffect, useRef} from "react";
+import React, {useEffect, useRef} from "react";
 import {not_null} from "../../lib/utils.tsx";
 import Canvas from "../Canvas";
 
@@ -64,9 +64,10 @@ export abstract class BaseGame {
 }
 
 interface GameProps {
-    width: number;
-    height: number;
+    width?: number;
+    height?: number;
     game: BaseGame;
+    style?: React.CSSProperties;
 }
 
 export function GameCanvas({game, ...props}: GameProps) {
