@@ -14,6 +14,9 @@ import {SpriteDefinition} from "../../lib/gamebox/sprites.ts";
 //  Draw arbitrary output size from fixed internal canvas size while respecting ratio
 //  Use Puzzle Spritesheet JSON instead of hard coded sprite definition values.
 
+const RENDER_WIDTH = 1024;
+const RENDER_HEIGHT = 1920;
+
 const PADDLE_WIDTH = 104;
 const PADDLE_HEIGHT = 24;
 const PADDLE_SPEED_X = 400;
@@ -101,19 +104,17 @@ class GameLevel {
     levelHeight: number;
 
     constructor(levelWidth: number, levelHeight: number, blocks: number[][], ballSpriteDef: SpriteDefinition, paddleSpriteDef: SpriteDefinition) {
+        this.levelWidth = levelWidth;
+        this.levelHeight = levelHeight;
         this.blocks = [];
         this.balls = [new Ball(0, 0, BALL_RADIUS, ballSpriteDef)];
         this.paddles = [new Paddle(levelWidth / 2, levelHeight - PADDLE_HEIGHT, PADDLE_WIDTH, PADDLE_HEIGHT, paddleSpriteDef)];
-        this.levelWidth = levelWidth;
-        this.levelHeight = levelHeight;
 
-        this.load(levelWidth, levelHeight, blocks);
+        this.load(blocks);
     }
 
-    public load(levelWidth: number, levelHeight: number, initialBlocks: number[][]) {
+    public load(initialBlocks: number[][]) {
         this.blocks = [];
-        this.levelWidth = levelWidth;
-        this.levelHeight = levelHeight;
 
         // Use the first row as the number of columns in the level. This assumes that the grid is
         // rectangular otherwise undefined behavior may occur.
@@ -148,7 +149,7 @@ class BlockBreakerGame extends BaseGame {
     private puzzleSpritesheet?: HTMLImageElement = undefined;
 
     constructor() {
-        super(2);
+        super(RENDER_WIDTH, RENDER_HEIGHT, 2);
 
         this.imageLoader.requestLoad("PuzzleSpritesheet", PuzzleSpritesheetImage, (image) => {
             this.puzzleSpritesheet = image;
@@ -161,8 +162,8 @@ class BlockBreakerGame extends BaseGame {
 
     loadLevel() {
         this.currentLevel = new GameLevel(
-            this.canvasWidth,
-            this.canvasHeight,
+            RENDER_WIDTH,
+            RENDER_HEIGHT,
             DEFAULT_LEVEL,
             new SpriteDefinition(1, 1, 22, 22, "ballBlue"),
             new SpriteDefinition(1, 265, 104, 24, "paddleBlu"),
@@ -195,7 +196,7 @@ class BlockBreakerGame extends BaseGame {
     }
 
     onDraw(ctx: CanvasRenderingContext2D, interpolation: number) {
-        ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+        ctx.clearRect(0, 0, this.viewport.canvasWidth(), this.viewport.canvasHeight());
 
         // Display an initial progress bar at start up while loading resources for the game.
         // TODO: Show a progress bar.
@@ -207,13 +208,17 @@ class BlockBreakerGame extends BaseGame {
             return;
         }
 
-        ctx.drawImage(not_null(this.puzzleSpritesheet), 0, 0); // TODO: not_null is annoying.
+        //ctx.drawImage(not_null(this.puzzleSpritesheet), 0, 0); // TODO: not_null is annoying.
 
         // Draw the background.
         // TODO: Find a fancier background than just black or white.
         // TODO: Optimize rendering by drawing background to an offscreen canvas.
         ctx.fillStyle = '#F0F0F0';
-        ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight);
+        ctx.fillRect(
+            this.viewport.outputOffsetX(),
+            this.viewport.outputOffsetY(),
+            this.viewport.outputWidth(),
+            this.viewport.outputHeight());
 
         // Draw the game level (blocks, paddles, balls etc.).
         if (this.currentLevel) {
@@ -221,6 +226,7 @@ class BlockBreakerGame extends BaseGame {
             this.drawPaddles(ctx, interpolation, this.currentLevel);
             this.drawBalls(ctx, interpolation, this.currentLevel);
         }
+
     }
 
     drawBlocks(ctx: CanvasRenderingContext2D, _interpolation: number, level: GameLevel) {
@@ -235,8 +241,8 @@ class BlockBreakerGame extends BaseGame {
                     block.def.spriteDef.y,
                     block.def.spriteDef.width,
                     block.def.spriteDef.height,
-                    block.aabb.left,
-                    block.aabb.top,
+                    this.viewport.outputOffsetX() + block.aabb.left,
+                    this.viewport.outputOffsetY() + block.aabb.top,
                     block.aabb.width,
                     block.aabb.height);
             }
@@ -255,8 +261,8 @@ class BlockBreakerGame extends BaseGame {
                 paddle.spriteDef.y,
                 paddle.spriteDef.width,
                 paddle.spriteDef.height,
-                paddleX - paddle.aabb.halfWidth,
-                paddleY - paddle.aabb.halfHeight,
+                this.viewport.outputOffsetX() + paddleX - paddle.aabb.halfWidth,
+                this.viewport.outputOffsetY() + paddleY - paddle.aabb.halfHeight,
                 paddle.aabb.width,
                 paddle.aabb.height);
         }
@@ -274,8 +280,8 @@ class BlockBreakerGame extends BaseGame {
                 ball.spriteDef.y,
                 ball.spriteDef.width,
                 ball.spriteDef.height,
-                ballX - ball.aabb.halfWidth,
-                ballY - ball.aabb.halfHeight,
+                this.viewport.outputOffsetX() + ballX - ball.aabb.halfWidth,
+                this.viewport.outputOffsetY() + ballY - ball.aabb.halfHeight,
                 ball.aabb.width,
                 ball.aabb.height);
         }
@@ -457,8 +463,8 @@ class BlockBreakerGame extends BaseGame {
 export function BlockBreaker() {
     return (
         <div className="game-container">
-            <GameCanvas 
-                style={{ width: '100%', height: '100%', maxWidth: '500px' }}
+            <GameCanvas
+                style={{width: '100%', height: '100%'}}
                 game={new BlockBreakerGame()}
             />
         </div>

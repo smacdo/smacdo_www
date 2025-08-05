@@ -1,31 +1,27 @@
 import React, {useEffect, useRef} from "react";
 import {not_null} from "../../lib/utils.tsx";
 import Canvas from "../Canvas";
+import {Viewport} from "../../lib/gamebox/viewport.ts";
 
 export abstract class BaseGame {
     /** The number of seconds between game state updates for a fixed time step simulation. */
     readonly timePerUpdateStep: number
-    protected canvasWidth = 0;
-    protected canvasHeight = 0;
+    protected viewport: Viewport;
     protected previousOnAnimationFrameTime: number = 0;
     protected unconsumedUpdateTime: number = 0;
     private hasRunInit = false;
 
-    protected constructor(msPerUpdate: number) {
+    protected constructor(renderWidth: number, renderHeight: number, msPerUpdate: number) {
         this.timePerUpdateStep = msPerUpdate / 1000;
+        this.viewport = new Viewport(renderWidth, renderHeight);
     }
 
     async onAnimationFrame(ctx: CanvasRenderingContext2D, nowTime: number, deltaTime: number) {
         // Let the game initialize itself when `onAnimationFrame` is called for the first time.
         if (!this.hasRunInit) {
-            // Recalculate the unscaled window size prior to rendering. The window dimensions need
-            // to be scaled by the inverse of the canvas's scaling factor.
-            const {devicePixelRatio: ratio = 1} = window;
-
-            this.canvasWidth = ctx.canvas.width / ratio;
-            this.canvasHeight = ctx.canvas.height / ratio;
-
-            console.info(`Initializing game with devicePixelRatio ${devicePixelRatio}, canvasWidth ${this.canvasWidth}, canvasHeight ${this.canvasHeight}`);
+            const {devicePixelRatio: dpr = 1} = window;
+            this.viewport.onCanvasSizeChanged(ctx.canvas.width, ctx.canvas.height, dpr);
+            console.info(`Initializing game with DPR ${dpr}`);
 
             // Let the derived game initialize itself.
             this.onStart();
