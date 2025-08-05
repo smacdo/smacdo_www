@@ -14,25 +14,28 @@ import {SpriteDefinition} from "../../lib/gamebox/sprites.ts";
 //  Draw arbitrary output size from fixed internal canvas size while respecting ratio
 //  Use Puzzle Spritesheet JSON instead of hard coded sprite definition values.
 
-const RENDER_WIDTH = 1024;
-const RENDER_HEIGHT = 1920;
+const RENDER_WIDTH = 720;
+const RENDER_HEIGHT = 1280;
 
 const PADDLE_WIDTH = 104;
 const PADDLE_HEIGHT = 24;
-const PADDLE_SPEED_X = 400;
+const PADDLE_SPEED_X = 500;
 const BLOCK_WIDTH = 64;
 const BLOCK_HEIGHT = 32;
 
 const BALL_BASE_VELOCITY_X = 100.0;
 const BALL_BLOCK_COLLISION_VELOCITY_MODIFIER = 2.0;
 
-const BALL_VEL_Y = -400;
+const BALL_VEL_Y = -600;
 const BALL_RADIUS = 11;
 
 const DEFAULT_LEVEL: number[][] = [
-    [1, 1, 1, 1, 1, 1],
-    [2, 2, 0, 0, 2, 2],
-    [3, 3, 4, 4, 3, 3],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [2, 2, 0, 0, 2, 2, 2, 2, 2, 2, 2],
+    [3, 3, 4, 4, 3, 3, 3, 4, 4, 3, 3],
+    [3, 3, 4, 4, 3, 3, 3, 4, 4, 3, 3],
+    [2, 2, 3, 3, 4, 4, 3, 3, 2, 2, 3],
+    [2, 2, 2, 3, 3, 4, 3, 3, 2, 2, 2],
 ];
 
 interface BlockDefinition {
