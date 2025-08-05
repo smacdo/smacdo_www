@@ -195,8 +195,8 @@ class BlockBreakerGame extends BaseGame {
         }
     }
 
-    onDraw(ctx: CanvasRenderingContext2D, interpolation: number) {
-        ctx.clearRect(0, 0, this.viewport.canvasWidth(), this.viewport.canvasHeight());
+    onDraw(ctx: OffscreenCanvasRenderingContext2D, interpolation: number) {
+        ctx.clearRect(0, 0, RENDER_WIDTH, RENDER_HEIGHT); // TODO: clean up, fetch from central spot.
 
         // Display an initial progress bar at start up while loading resources for the game.
         // TODO: Show a progress bar.
@@ -215,10 +215,10 @@ class BlockBreakerGame extends BaseGame {
         // TODO: Optimize rendering by drawing background to an offscreen canvas.
         ctx.fillStyle = '#F0F0F0';
         ctx.fillRect(
-            this.viewport.outputOffsetX(),
-            this.viewport.outputOffsetY(),
-            this.viewport.outputWidth(),
-            this.viewport.outputHeight());
+            0,
+            0,
+            RENDER_WIDTH,
+            RENDER_HEIGHT); // TODO: fetch from same central spot
 
         // Draw the game level (blocks, paddles, balls etc.).
         if (this.currentLevel) {
@@ -229,7 +229,7 @@ class BlockBreakerGame extends BaseGame {
 
     }
 
-    drawBlocks(ctx: CanvasRenderingContext2D, _interpolation: number, level: GameLevel) {
+    drawBlocks(ctx: OffscreenCanvasRenderingContext2D, _interpolation: number, level: GameLevel) {
         // TODO: Draw the blocks to an offscreen canvas that only updates as needed.
         for (let blockIndex = 0; blockIndex < level.blocks.length; blockIndex++) {
             const block = level.blocks[blockIndex];
@@ -241,15 +241,15 @@ class BlockBreakerGame extends BaseGame {
                     block.def.spriteDef.y,
                     block.def.spriteDef.width,
                     block.def.spriteDef.height,
-                    this.viewport.outputOffsetX() + block.aabb.left,
-                    this.viewport.outputOffsetY() + block.aabb.top,
+                    block.aabb.left,
+                    block.aabb.top,
                     block.aabb.width,
                     block.aabb.height);
             }
         }
     }
 
-    drawPaddles(ctx: CanvasRenderingContext2D, interpolation: number, level: GameLevel) {
+    drawPaddles(ctx: OffscreenCanvasRenderingContext2D, interpolation: number, level: GameLevel) {
         for (let paddleIndex = 0; paddleIndex < level.paddles.length; paddleIndex++) {
             const paddle = level.paddles[paddleIndex];
             const paddleX = lerp(paddle.prevX, paddle.x, interpolation);
@@ -261,14 +261,14 @@ class BlockBreakerGame extends BaseGame {
                 paddle.spriteDef.y,
                 paddle.spriteDef.width,
                 paddle.spriteDef.height,
-                this.viewport.outputOffsetX() + paddleX - paddle.aabb.halfWidth,
-                this.viewport.outputOffsetY() + paddleY - paddle.aabb.halfHeight,
+                paddleX - paddle.aabb.halfWidth,
+                paddleY - paddle.aabb.halfHeight,
                 paddle.aabb.width,
                 paddle.aabb.height);
         }
     }
 
-    drawBalls(ctx: CanvasRenderingContext2D, interpolation: number, level: GameLevel) {
+    drawBalls(ctx: OffscreenCanvasRenderingContext2D, interpolation: number, level: GameLevel) {
         for (let ballIndex = 0; ballIndex < level.balls.length; ballIndex++) {
             const ball = level.balls[ballIndex];
             const ballX = lerp(ball.prevX, ball.x, interpolation);
@@ -280,8 +280,8 @@ class BlockBreakerGame extends BaseGame {
                 ball.spriteDef.y,
                 ball.spriteDef.width,
                 ball.spriteDef.height,
-                this.viewport.outputOffsetX() + ballX - ball.aabb.halfWidth,
-                this.viewport.outputOffsetY() + ballY - ball.aabb.halfHeight,
+                ballX - ball.aabb.halfWidth,
+                ballY - ball.aabb.halfHeight,
                 ball.aabb.width,
                 ball.aabb.height);
         }

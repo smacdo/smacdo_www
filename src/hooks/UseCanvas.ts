@@ -9,7 +9,7 @@ export function useCanvas(onDraw: DrawFn) {
     useEffect(() => {
         // Request a 2d canvas context from the HTML canvas element.
         const canvas = not_null(canvasRef.current);
-        const context = not_null(canvas.getContext('2d'), "canvas element does not support 2d mode or the mode was already set");
+        const context = not_null(canvas.getContext("2d"), "canvas element does not support 2d mode or the mode was already set");
 
         // Rescale the internal pixel buffer for this canvas element if the user has a high dpi
         // display.

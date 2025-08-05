@@ -10,10 +10,15 @@ export abstract class BaseGame {
     protected previousOnAnimationFrameTime: number = 0;
     protected unconsumedUpdateTime: number = 0;
     private hasRunInit = false;
+    private offscreenCanvas?: OffscreenCanvas = undefined;
+    private readonly renderWidth: number;
+    private readonly renderHeight: number;
 
     protected constructor(renderWidth: number, renderHeight: number, msPerUpdate: number) {
         this.timePerUpdateStep = msPerUpdate / 1000;
         this.viewport = new Viewport(renderWidth, renderHeight);
+        this.renderWidth = renderWidth;
+        this.renderHeight = renderHeight;
     }
 
     async onAnimationFrame(ctx: CanvasRenderingContext2D, nowTime: number, deltaTime: number) {
@@ -22,6 +27,10 @@ export abstract class BaseGame {
             const {devicePixelRatio: dpr = 1} = window;
             this.viewport.onCanvasSizeChanged(ctx.canvas.width, ctx.canvas.height, dpr);
             console.info(`Initializing game with DPR ${dpr}`);
+
+            // Create an offscreen bitmap for the game to render to, rather than the physical canvas
+            // present in the HTML document.
+            this.offscreenCanvas = new OffscreenCanvas(this.renderWidth, this.renderHeight);
 
             // Let the derived game initialize itself.
             this.onStart();
@@ -44,13 +53,29 @@ export abstract class BaseGame {
             this.unconsumedUpdateTime -= timePerUpdateStep;
         }
 
-        // Draw the game.
-        this.onDraw(ctx, this.unconsumedUpdateTime / this.timePerUpdateStep);
+        // Draw the game to an offscreen buffer.
+        const offscreenCtx = not_null(not_null(this.offscreenCanvas).getContext("2d"), "canvas element does not support 2d mode or the mode was already set");
+        this.onDraw(offscreenCtx, this.unconsumedUpdateTime / this.timePerUpdateStep);
+
+        // Scale the offscreen buffer to the physical dimensions of the HTML canvas while respecting
+        // the game's aspect ratio. The output should be centered to allow for blank space on any
+        // side because of arbitrary window sizes not respecting the game's aspect ratio.
+        ctx.drawImage(
+            not_null(this.offscreenCanvas),
+            0, // offscreen source x
+            0, // offscreen source y
+            this.renderWidth, // offscreen source width
+            this.renderHeight, // offscreen source height
+            this.viewport.outputOffsetX(), // canvas destination x
+            this.viewport.outputOffsetY(), // canvas destination y
+            this.viewport.outputWidth(), // canvas destination width
+            this.viewport.outputHeight(), // canvas destination height.
+        );
     }
 
     abstract onStart(): void;
 
-    abstract onDraw(ctx: CanvasRenderingContext2D, extrapolationFactor: number): void;
+    abstract onDraw(ctx: OffscreenCanvasRenderingContext2D, extrapolationFactor: number): void;
 
     abstract onUpdate(nowTime: number, deltaTime: number): void;
 
