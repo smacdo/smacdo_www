@@ -15,7 +15,7 @@ export function useCanvas(onDraw: DrawFn) {
         // display.
         const {devicePixelRatio: ratio = 1} = window;
 
-        if (devicePixelRatio !== 1) {
+        if (devicePixelRatio !== 1) { // TODO: this block should match the one in render.
             const canvasRect = canvas.getBoundingClientRect();
 
             // Scale the internal pixel buffer up by the pixel ratio to ensure rendering is

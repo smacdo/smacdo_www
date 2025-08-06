@@ -22,12 +22,13 @@ export abstract class BaseGame {
     }
 
     async onAnimationFrame(ctx: CanvasRenderingContext2D, nowTime: number, deltaTime: number) {
-        // Let the game initialize itself when `onAnimationFrame` is called for the first time.
-        if (!this.hasRunInit) {
-            const {devicePixelRatio: dpr = 1} = window;
-            this.viewport.onCanvasSizeChanged(ctx.canvas.width, ctx.canvas.height, dpr);
-            console.info(`Initializing game with DPR ${dpr}`);
+        // Send the canvas size and DPI to the viewport in case the viewport has changed and needs
+        // to be updated.
+        const {devicePixelRatio: dpr = 1} = window;
+        this.viewport.onCanvasSizeChanged(ctx.canvas.width, ctx.canvas.height, dpr);
 
+        // Perform any initialization required when the animation callback fires for the first time.
+        if (!this.hasRunInit) {
             // Create an offscreen bitmap for the game to render to, rather than the physical canvas
             // present in the HTML document.
             this.offscreenCanvas = new OffscreenCanvas(this.renderWidth, this.renderHeight);
@@ -37,6 +38,7 @@ export abstract class BaseGame {
 
             // Mark as initialized.
             this.hasRunInit = true;
+            console.debug("GameCanvas initialized");
         }
 
         // Update the game on a fixed time step.

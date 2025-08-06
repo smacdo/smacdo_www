@@ -45,7 +45,7 @@ export class Viewport {
         if (newCanvasWidth != this.#canvasWidth || newCanvasHeight != this.#canvasHeight) {
             this.#canvasWidth = newCanvasWidth;
             this.#canvasHeight = newCanvasHeight;
-            console.info(`Viewport canvasWidth = ${this.#canvasWidth}, canvasHeight = ${this.#canvasHeight}, dpr = ${devicePixelRatio}`);
+            console.debug(`Viewport resized; canvasWidth = ${this.#canvasWidth}, canvasHeight = ${this.#canvasHeight}, dpr = ${devicePixelRatio}`);
         }
 
         const newOutputHeight = newCanvasHeight;
@@ -54,7 +54,7 @@ export class Viewport {
         if (newOutputWidth != this.#outputWidth || newOutputHeight != this.#outputHeight) {
             this.#outputWidth = newOutputWidth;
             this.#outputHeight = newOutputHeight;
-            console.info(`Viewport aspectRatio = ${this.aspectRatio}, outputWidth = ${this.#outputWidth}, outputHeight = ${this.#outputHeight}`);
+            console.debug(`Render buffer resized; outputWidth = ${this.#outputWidth}, outputHeight = ${this.#outputHeight}, aspectRatio = ${this.aspectRatio}`);
         }
     }
 
