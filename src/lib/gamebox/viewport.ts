@@ -1,13 +1,13 @@
-// TODO: use properties
-
 import {not_null} from "../utils.tsx";
 
 /**
- * TODO: Document me!
+ * A viewport TODO: document me properly!
+ * The final output will be
+ * scalled by this aspect ratio value if the canvas physical size does not match the render size.
  */
 export class Viewport {
-    /** Aspect ratio to use when rendering the game to a non-default viewport size. */
-    readonly aspectRatio: number;
+    /** The aspect ratio used by the game's internal rendering buffer. */
+    readonly #aspectRatio: number;
 
     /** Logical internal rendering width independent of final output width. */
     readonly #renderWidth: number;
@@ -16,6 +16,7 @@ export class Viewport {
 
     /** The game's canvas width, which defines the maximum width that can be used when rendering. */
     #canvasWidth: number | undefined;
+
     /** The game's canvas height, which defines the maximum height that can be used when rendering. */
     #canvasHeight: number | undefined;
     #outputWidth: number | undefined;
@@ -24,7 +25,11 @@ export class Viewport {
     constructor(renderWidth: number, renderHeight: number) {
         this.#renderWidth = renderWidth;
         this.#renderHeight = renderHeight;
-        this.aspectRatio = renderWidth / renderHeight;
+        this.#aspectRatio = renderWidth / renderHeight;
+    }
+
+    get aspectRatio(): number {
+        return this.#aspectRatio;
     }
 
     get renderWidth(): number {
@@ -33,6 +38,38 @@ export class Viewport {
 
     get renderHeight(): number {
         return this.#renderHeight;
+    }
+
+    get canvasWidth(): number | undefined {
+        return this.#canvasWidth;
+    }
+
+    get canvasHeight(): number | undefined {
+        return this.#canvasHeight;
+    }
+
+    get outputOffsetX(): number | undefined {
+        if (this.#canvasWidth !== undefined && this.#outputWidth !== undefined) {
+            return (this.#canvasWidth - this.#outputWidth) / 2.0;
+        } else {
+            return undefined;
+        }
+    }
+
+    get outputOffsetY(): number | undefined {
+        if (this.#canvasHeight !== undefined && this.#outputHeight !== undefined) {
+            return (this.#canvasHeight - this.#outputHeight) / 2.0;
+        } else {
+            return undefined;
+        }
+    }
+
+    get outputWidth(): number | undefined {
+        return this.#outputWidth;
+    }
+
+    get outputHeight(): number | undefined {
+        return this.#outputHeight;
     }
 
     onCanvasSizeChanged(canvasWidth: number, canvasHeight: number, devicePixelRatio: number) {
@@ -51,7 +88,7 @@ export class Viewport {
         }
 
         const newOutputHeight = newCanvasHeight;
-        const newOutputWidth = newOutputHeight * this.aspectRatio;
+        const newOutputWidth = newOutputHeight * this.#aspectRatio;
 
         if (newOutputWidth != this.#outputWidth || newOutputHeight != this.#outputHeight) {
             this.#outputWidth = newOutputWidth;
@@ -76,41 +113,9 @@ export class Viewport {
         // Draw the output zone (the "drawable" region for the game).
         ctx.fillStyle = '#00FF00'; // '#F0F0A';
         ctx.fillRect(
-            not_null(this.outputOffsetX()),
-            not_null(this.outputOffsetY()),
-            not_null(this.outputWidth()),
-            not_null(this.outputHeight()));
-    }
-
-    canvasWidth(): number | undefined {
-        return this.#canvasWidth;
-    }
-
-    canvasHeight(): number | undefined {
-        return this.#canvasHeight;
-    }
-
-    outputOffsetX(): number | undefined {
-        if (this.#canvasWidth !== undefined && this.#outputWidth !== undefined) {
-            return (this.#canvasWidth - this.#outputWidth) / 2.0;
-        } else {
-            return undefined;
-        }
-    }
-
-    outputOffsetY(): number | undefined {
-        if (this.#canvasHeight !== undefined && this.#outputHeight !== undefined) {
-            return (this.#canvasHeight - this.#outputHeight) / 2.0;
-        } else {
-            return undefined;
-        }
-    }
-
-    outputWidth(): number | undefined {
-        return this.#outputWidth;
-    }
-
-    outputHeight(): number | undefined {
-        return this.#outputHeight;
+            not_null(this.outputOffsetX),
+            not_null(this.outputOffsetY),
+            not_null(this.outputWidth),
+            not_null(this.outputHeight));
     }
 }

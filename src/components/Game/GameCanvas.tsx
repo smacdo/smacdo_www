@@ -68,10 +68,10 @@ export abstract class BaseGame {
             0, // offscreen source y
             this.renderWidth, // offscreen source width
             this.renderHeight, // offscreen source height
-            not_null(this.viewport.outputOffsetX()), // canvas destination x
-            not_null(this.viewport.outputOffsetY()), // canvas destination y
-            not_null(this.viewport.outputWidth()), // canvas destination width
-            not_null(this.viewport.outputHeight()), // canvas destination height.
+            not_null(this.viewport.outputOffsetX), // canvas destination x
+            not_null(this.viewport.outputOffsetY), // canvas destination y
+            not_null(this.viewport.outputWidth), // canvas destination width
+            not_null(this.viewport.outputHeight), // canvas destination height.
         );
     }
 
