@@ -11,14 +11,10 @@ export abstract class BaseGame {
     protected unconsumedUpdateTime: number = 0;
     private hasRunInit = false;
     private offscreenCanvas?: OffscreenCanvas = undefined;
-    private readonly renderWidth: number;
-    private readonly renderHeight: number;
 
     protected constructor(renderWidth: number, renderHeight: number, msPerUpdate: number) {
         this.timePerUpdateStep = msPerUpdate / 1000;
         this.viewport = new Viewport(renderWidth, renderHeight);
-        this.renderWidth = renderWidth;
-        this.renderHeight = renderHeight;
     }
 
     async onAnimationFrame(ctx: CanvasRenderingContext2D, nowTime: number, deltaTime: number) {
@@ -31,7 +27,7 @@ export abstract class BaseGame {
         if (!this.hasRunInit) {
             // Create an offscreen bitmap for the game to render to, rather than the physical canvas
             // present in the HTML document.
-            this.offscreenCanvas = new OffscreenCanvas(this.renderWidth, this.renderHeight);
+            this.offscreenCanvas = new OffscreenCanvas(this.viewport.renderWidth, this.viewport.renderHeight);
 
             // Let the derived game initialize itself.
             this.onStart();
@@ -66,8 +62,8 @@ export abstract class BaseGame {
             not_null(this.offscreenCanvas),
             0, // offscreen source x
             0, // offscreen source y
-            this.renderWidth, // offscreen source width
-            this.renderHeight, // offscreen source height
+            this.viewport.renderWidth, // offscreen source width
+            this.viewport.renderHeight, // offscreen source height
             not_null(this.viewport.outputOffsetX), // canvas destination x
             not_null(this.viewport.outputOffsetY), // canvas destination y
             not_null(this.viewport.outputWidth), // canvas destination width

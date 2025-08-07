@@ -199,7 +199,7 @@ class BlockBreakerGame extends BaseGame {
     }
 
     onDraw(ctx: OffscreenCanvasRenderingContext2D, interpolation: number) {
-        ctx.clearRect(0, 0, RENDER_WIDTH, RENDER_HEIGHT); // TODO: clean up, fetch from central spot.
+        ctx.clearRect(0, 0, this.viewport.renderWidth, this.viewport.renderHeight);
 
         // Display an initial progress bar at start up while loading resources for the game.
         // TODO: Show a progress bar.
@@ -220,8 +220,8 @@ class BlockBreakerGame extends BaseGame {
         ctx.fillRect(
             0,
             0,
-            RENDER_WIDTH,
-            RENDER_HEIGHT); // TODO: fetch from same central spot
+            this.viewport.renderWidth,
+            this.viewport.renderHeight);
 
         // Draw the game level (blocks, paddles, balls etc.).
         if (this.currentLevel) {
@@ -229,7 +229,6 @@ class BlockBreakerGame extends BaseGame {
             this.drawPaddles(ctx, interpolation, this.currentLevel);
             this.drawBalls(ctx, interpolation, this.currentLevel);
         }
-
     }
 
     drawBlocks(ctx: OffscreenCanvasRenderingContext2D, _interpolation: number, level: GameLevel) {
