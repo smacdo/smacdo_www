@@ -68,7 +68,7 @@ export abstract class BaseGame {
         // for the game to draw on.
         this.offscreenCanvas = new OffscreenCanvas(this.viewport.renderWidth, this.viewport.renderHeight);
 
-        // Let the game perform any needed initialize logic.
+        // Let the game perform any needed initialization logic.
         this.onStart();
     }
 
@@ -104,7 +104,7 @@ export abstract class BaseGame {
 
         // Cache the logical pixel size for the game to use. The game should always use the logical
         // pixel size, and let the engine worry about up scaling.
-        this.viewport.onCanvasSizeChanged(canvasRect.width, canvasRect.height, devicePixelRatio);
+        this.viewport.onCanvasSizeChanged(canvasRect.width, canvasRect.height);
 
         console.log(
             "canvas resized: devicePixelRatio = %d, canvas.width = %d, canvas.height = %d, styleWidth = %d, styleHeight = %d, gameCanvasWidth = %d, gameCanvasHeight = %d",

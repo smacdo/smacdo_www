@@ -2,8 +2,6 @@ import {not_null} from "../utils.tsx";
 
 /**
  * A viewport TODO: document me properly!
- * The final output will be
- * scalled by this aspect ratio value if the canvas physical size does not match the render size.
  */
 export class Viewport {
     /** The aspect ratio used by the game's internal rendering buffer. */
@@ -72,19 +70,18 @@ export class Viewport {
         return this.#outputHeight;
     }
 
-    onCanvasSizeChanged(canvasWidth: number, canvasHeight: number, devicePixelRatio: number) {
-        // Recalculate the unscaled window size prior to rendering. The window dimensions need
-        // to be scaled by the inverse of the canvas's scaling factor.
-        // TODO: This implementation may not be not correct.
+    onCanvasSizeChanged(cssWidth: number, cssHeight: number) {
+        // TODO: explain the aspect ratio resizing logic.
         // TODO: make it configurable if we lock to canvas height or width.
         // TODO: error if the final output width/height is smaller than the canvas.
-        const newCanvasWidth = canvasWidth / devicePixelRatio;
-        const newCanvasHeight = canvasHeight / devicePixelRatio;
+        const newCanvasWidth = cssWidth;
+        const newCanvasHeight = cssHeight;
+        let wasResized = false;
 
         if (newCanvasWidth != this.#canvasWidth || newCanvasHeight != this.#canvasHeight) {
             this.#canvasWidth = newCanvasWidth;
             this.#canvasHeight = newCanvasHeight;
-            console.debug(`Viewport resized; canvasWidth = ${this.#canvasWidth}, canvasHeight = ${this.#canvasHeight}, dpr = ${devicePixelRatio}`);
+            wasResized = true;
         }
 
         const newOutputHeight = newCanvasHeight;
@@ -93,7 +90,11 @@ export class Viewport {
         if (newOutputWidth != this.#outputWidth || newOutputHeight != this.#outputHeight) {
             this.#outputWidth = newOutputWidth;
             this.#outputHeight = newOutputHeight;
-            console.debug(`Render buffer resized; outputWidth = ${this.#outputWidth}, outputHeight = ${this.#outputHeight}, aspectRatio = ${this.aspectRatio}`);
+            wasResized = true;
+        }
+
+        if (wasResized) {
+            console.debug(`Viewport resized; canvasWidth = ${this.#canvasWidth}, canvasHeight = ${this.#canvasHeight}, outputWidth = ${this.#outputWidth}, outputHeight = ${this.#outputHeight}, aspectRatio = ${this.aspectRatio}`);
         }
     }
 
