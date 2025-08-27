@@ -18,23 +18,12 @@ export abstract class BaseGame {
     }
 
     async onAnimationFrame(ctx: CanvasRenderingContext2D, nowTime: number, deltaTime: number) {
-        // Send the canvas size and DPI to the viewport in case the viewport has changed and needs
-        // to be updated.
-        const {devicePixelRatio: dpr = 1} = window;
-        this.viewport.onCanvasSizeChanged(ctx.canvas.width, ctx.canvas.height, dpr);
-
-        // Perform any initialization required when the animation callback fires for the first time.
+        // Let the game initialize itself when `onAnimationFrame` is called for the first time.
         if (!this.hasRunInit) {
-            // Create an offscreen bitmap for the game to render to, rather than the physical canvas
-            // present in the HTML document.
-            this.offscreenCanvas = new OffscreenCanvas(this.viewport.renderWidth, this.viewport.renderHeight);
-
-            // Let the derived game initialize itself.
-            this.onStart();
-
-            // Mark as initialized.
+            this.onInit(ctx);
             this.hasRunInit = true;
-            console.debug("GameCanvas initialized");
+
+            console.debug("GameCanvas initialized")
         }
 
         // Update the game on a fixed time step.
@@ -68,6 +57,64 @@ export abstract class BaseGame {
             not_null(this.viewport.outputOffsetY), // canvas destination y
             not_null(this.viewport.outputWidth), // canvas destination width
             not_null(this.viewport.outputHeight), // canvas destination height.
+        );
+    }
+
+    private onInit(ctx: CanvasRenderingContext2D) {
+        // Initialize and calculate render dimensions first prior creation of the offscreen canvas.
+        this.onResize(ctx);
+
+        // Create an offscreen canvas to render to that uses logical pixels at a fixed aspect ratio
+        // for the game to draw on.
+        this.offscreenCanvas = new OffscreenCanvas(this.viewport.renderWidth, this.viewport.renderHeight);
+
+        // Let the game perform any needed initialize logic.
+        this.onStart();
+    }
+
+    /**
+     * Inform the game canvas that it was resized, and should update itself as needed.
+     * @param ctx The canvas rendering context that was resized.
+     */
+    onResize(ctx: CanvasRenderingContext2D) {
+        // Get the size of the canvas bounding rectangle. This size is reported as CSS pixels, which
+        // are logical units that are independent of DPI scaling.
+        const canvas = ctx.canvas;
+        const canvasRect = canvas.getBoundingClientRect();
+
+        // Query the window's device pixel ratio, which indicates the number of
+        // physical pixels drawn per logical CSS pixel.
+        const {devicePixelRatio: ratio = 1} = window;
+
+        // Scale the canvas's back buffer to match the device pixel ratio. This ensures the canvas
+        // will draw at the device's native DPI rather than use up scaling which can result in
+        // unpleasant blurry artifacts on things with sharp edges.
+        canvas.width = Math.round(canvasRect.right * ratio) - Math.round(canvasRect.left * ratio);
+        canvas.height = Math.round(canvasRect.bottom * ratio) - Math.round(canvasRect.top * ratio);
+
+        // Tell the canvas to scale all drawing operations by the pixel ratio. Doing this allows the
+        // game to continue rendering at the original logical pixel size, but to have output
+        // (especially text or other non-bitmap output) be crisply drawn.
+        ctx.scale(ratio, ratio);
+
+        // Set the canvas element's CSS width and height to the _logical_ size of the element, not
+        // the physical pixel size. (CSS pixels are logical, not physical).
+        canvas.style.width = canvasRect.width + 'px';
+        canvas.style.height = canvasRect.height + 'px';
+
+        // Cache the logical pixel size for the game to use. The game should always use the logical
+        // pixel size, and let the engine worry about up scaling.
+        this.viewport.onCanvasSizeChanged(canvasRect.width, canvasRect.height, devicePixelRatio);
+
+        console.log(
+            "canvas resized: devicePixelRatio = %d, canvas.width = %d, canvas.height = %d, styleWidth = %d, styleHeight = %d, gameCanvasWidth = %d, gameCanvasHeight = %d",
+            devicePixelRatio,
+            canvas.width,
+            canvas.height,
+            canvas.style.width,
+            canvas.style.height,
+            this.viewport.outputWidth,
+            this.viewport.outputHeight,
         );
     }
 
