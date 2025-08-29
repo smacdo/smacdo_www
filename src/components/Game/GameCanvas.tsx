@@ -62,7 +62,7 @@ export abstract class BaseGame {
 
     private onInit(ctx: CanvasRenderingContext2D) {
         // Initialize and calculate render dimensions first prior creation of the offscreen canvas.
-        this.onResize(ctx);
+        this.onResize(ctx, ctx.canvas.getBoundingClientRect());
 
         // Create an offscreen canvas to render to that uses logical pixels at a fixed aspect ratio
         // for the game to draw on.
@@ -76,11 +76,10 @@ export abstract class BaseGame {
      * Inform the game canvas that it was resized, and should update itself as needed.
      * @param ctx The canvas rendering context that was resized.
      */
-    onResize(ctx: CanvasRenderingContext2D) {
+    onResize(ctx: CanvasRenderingContext2D, canvasRect: DOMRect) { // TODO: Don't pass ctx
         // Get the size of the canvas bounding rectangle. This size is reported as CSS pixels, which
         // are logical units that are independent of DPI scaling.
         const canvas = ctx.canvas;
-        const canvasRect = canvas.getBoundingClientRect();
 
         // Query the window's device pixel ratio, which indicates the number of
         // physical pixels drawn per logical CSS pixel.
@@ -165,7 +164,12 @@ export function GameCanvas({game, ...props}: GameProps) {
     }, []);
 
     // Game canvas set up.
-    return (<Canvas {...props} onDraw={(ctx, nowTime, deltaTime) => {
-        not_null(gameRef.current).onAnimationFrame(ctx, nowTime, deltaTime);
-    }}/>);
+    return (<Canvas {...props}
+                    onDraw={(ctx, nowTime, deltaTime) => {
+                        not_null(gameRef.current).onAnimationFrame(ctx, nowTime, deltaTime);
+                    }}
+                    onResize={(ctx, canvasRect) => {
+                        not_null(gameRef.current).onResize(ctx, canvasRect);
+                    }}
+    />);
 }
