@@ -121,6 +121,19 @@ footer a {
     list-style: none;
 }
 
+/* ── Back link ─────────────────────────────────────────────────────────────── */
+.back-link {
+    display: inline-block;
+    font-size: 0.875rem;
+    color: var(--muted);
+    text-decoration: none;
+    margin-bottom: 1.5rem;
+}
+
+.back-link:hover {
+    color: var(--fg);
+}
+
 /* ── Writing list ──────────────────────────────────────────────────────────── */
 .article-list {
     list-style: none;

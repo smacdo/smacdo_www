@@ -1,29 +1,20 @@
 +++
 title = "About"
+template = "about/section.html"
 +++
 
-# About
+I'm Scott MacDonald — a systems programmer with a background across games, hardware, AR/VR, and research tooling. Most of my career has been spent close to the metal: engines, tools, and the infrastructure that makes interactive experiences run.
 
-I'm Scott MacDonald — a systems programmer and game developer. I build things
-at the intersection of graphics, games, and low-level systems programming.
+Currently a Staff Engineer and Technical Lead at Facebook Reality Labs (Meta), where I've spent nearly seven years building the tools, infrastructure, and developer experience that empower research teams to do their work. I'm embedded directly with those teams — spanning UX research, haptics, and Android devices — but my focus is on making the research possible, not conducting it. Alongside the technical work, I've managed SWE and QA contractors, mentored engineers across junior and mid-level (IC4–IC5), and successfully advocated for two IC promotions.
 
-This site is where I collect my work: games and interactive demos you can play
-in the browser, writing on technical topics I find interesting, and eventually
-some tools.
+## Background
 
-## Work
-
-<!-- TODO: Fill in CV / work history -->
-
-- **Current** — Independent game developer and systems programmer
-- **Meta** — Previously worked on large-scale infrastructure (PHP/Hack)
-
-## Skills
-
-Languages: Rust, C++, Python, TypeScript, PHP/Hack
-
-Areas: game engine development, graphics programming, systems programming,
-WebAssembly, HTML5 Canvas, WebGPU
+- **Midway Games** — shipped PS3, Xbox 360, and PC titles including *Mortal Kombat* and *Wheelman* in Unreal Engine
+- **WMS Gaming** — slot machines and entertainment displays on a custom Linux engine
+- **Disney** — mobile game development in Unity
+- **Microsoft** — interactive HoloLens chatbot experiences in Unity; also contributed to a web app for authoring multi-turn conversational flows with menus and form filling
+- **Hidden Path Entertainment** — prototyped *Brass Tactics*, a tabletop multiplayer RTS for Oculus VR in Unity; also worked on an Unreal multiplayer RTS and a dungeon crawler prototype for VR
+- **Facebook Reality Labs / Meta** — Staff Engineer and Technical Lead; tools, infrastructure, and DevEx for UX research, haptics, and Android devices; managed SWE and QA contractors; mentored and promoted junior–mid-level engineers
 
 ## Find me
 
