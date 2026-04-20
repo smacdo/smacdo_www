@@ -26,7 +26,7 @@
 - Tera templates (Jinja2/Django-like syntax — familiar from Python)
 - Built-in Markdown, RSS feed generation, syntax highlighting, Sass (not used)
 - Output: `public/` directory, served as static files
-- Zola version pinned in CI for reproducible builds (currently `0.19.2`)
+- Zola version pinned in CI for reproducible builds (currently `0.22.1`)
 
 ### CSS: Plain CSS with custom properties
 - No Sass — one less build step, simpler mental model
@@ -191,7 +191,7 @@ steps:
 
   - name: Install Zola
     run: |
-      ZOLA_VERSION="0.19.2"
+      ZOLA_VERSION="0.22.1"
       wget -qO- https://github.com/getzola/zola/releases/download/v${ZOLA_VERSION}/zola-v${ZOLA_VERSION}-x86_64-unknown-linux-gnu.tar.gz \
         | tar xz -C /usr/local/bin/
 

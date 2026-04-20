@@ -2,12 +2,12 @@ base_url = "https://smacdo.com"
 title = "smacdo.com"
 description = "Scott MacDonald — systems programmer and game developer"
 compile_sass = false
-generate_feed = true
-feed_filename = "atom.xml"
+generate_feeds = true
+feed_filenames = ["atom.xml"]
 
-[markdown]
-highlight_code = true
-highlight_theme = "base16-ocean-dark"
+[markdown.highlighting]
+enabled = true
+theme = "ayu-dark"
 
 [extra]
 author = "Scott MacDonald"
