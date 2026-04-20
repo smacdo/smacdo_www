@@ -1,0 +1,245 @@
+/* ── Variables (light theme defaults) ─────────────────────────────────────── */
+:root {
+    --bg:     #ffffff;
+    --fg:     #1a1a1a;
+    --muted:  #666666;
+    --border: #cccccc;
+    --link:   #0055cc;
+}
+
+[data-theme="dark"] {
+    --bg:     #1e1e2e;
+    --fg:     #cdd6f4;
+    --muted:  #a6adc8;
+    --border: #45475a;
+    --link:   #89b4fa;
+}
+
+/* ── Reset ─────────────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* ── Base ──────────────────────────────────────────────────────────────────── */
+html {
+    background-color: var(--bg);
+    color: var(--fg);
+}
+
+body {
+    font-family: system-ui, sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    line-height: 1.6;
+}
+
+a {
+    color: var(--link);
+}
+
+h1, h2, h3, h4 {
+    line-height: 1.3;
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+p {
+    margin-bottom: 1rem;
+}
+
+/* ── Header / Nav ──────────────────────────────────────────────────────────── */
+header {
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 2rem;
+}
+
+header nav {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1rem 0;
+}
+
+#site-name {
+    font-weight: bold;
+    margin-right: auto;
+    text-decoration: none;
+    color: var(--fg);
+}
+
+.nav-links {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: var(--fg);
+}
+
+.nav-links a:hover {
+    text-decoration: underline;
+}
+
+#theme-toggle {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--fg);
+    cursor: pointer;
+    padding: 0.25rem 0.6rem;
+    border-radius: 4px;
+    font-size: 1rem;
+    line-height: 1;
+}
+
+#theme-toggle:hover {
+    border-color: var(--fg);
+}
+
+/* ── Footer ────────────────────────────────────────────────────────────────── */
+footer {
+    border-top: 1px solid var(--border);
+    padding: 1.5rem 0;
+    margin-top: 3rem;
+    font-size: 0.875rem;
+    color: var(--muted);
+    text-align: center;
+}
+
+footer a {
+    color: var(--muted);
+}
+
+/* ── Home page ─────────────────────────────────────────────────────────────── */
+.home-links {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+    list-style: none;
+}
+
+/* ── Writing list ──────────────────────────────────────────────────────────── */
+.article-list {
+    list-style: none;
+    margin-top: 1.5rem;
+}
+
+.article-list li {
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.article-list li:first-child {
+    border-top: 1px solid var(--border);
+}
+
+.article-list a {
+    font-size: 1.1rem;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.article-list a:hover {
+    text-decoration: underline;
+}
+
+.article-list time {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--muted);
+    margin-top: 0.2rem;
+}
+
+.article-list p {
+    color: var(--muted);
+    font-size: 0.95rem;
+    margin: 0.4rem 0 0;
+}
+
+/* ── Article ───────────────────────────────────────────────────────────────── */
+.article-header time {
+    color: var(--muted);
+    font-size: 0.875rem;
+    display: block;
+    margin-top: 0.25rem;
+    margin-bottom: 1.5rem;
+}
+
+article p, article li {
+    max-width: 65ch;
+}
+
+article code {
+    font-family: monospace;
+    font-size: 0.9em;
+    background: var(--border);
+    padding: 0.1em 0.3em;
+    border-radius: 3px;
+}
+
+article pre {
+    background: var(--border);
+    padding: 1rem;
+    border-radius: 4px;
+    overflow-x: auto;
+    margin-bottom: 1rem;
+}
+
+article pre code {
+    background: none;
+    padding: 0;
+}
+
+/* ── Games gallery ─────────────────────────────────────────────────────────── */
+.game-list {
+    list-style: none;
+    margin-top: 1.5rem;
+}
+
+.game-list li {
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.game-list li:first-child {
+    border-top: 1px solid var(--border);
+}
+
+.game-list a {
+    font-size: 1.1rem;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.game-list a:hover {
+    text-decoration: underline;
+}
+
+.game-list p {
+    color: var(--muted);
+    font-size: 0.95rem;
+    margin: 0.4rem 0 0;
+}
+
+/* ── Game page ─────────────────────────────────────────────────────────────── */
+.game-description {
+    color: var(--muted);
+    margin-bottom: 1.5rem;
+}
+
+#game-container {
+    width: 100%;
+    aspect-ratio: 9 / 16;
+    max-width: 480px;
+    background: #000;
+    margin-bottom: 1.5rem;
+}
+
+#game-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}

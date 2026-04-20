@@ -1,1 +1,0 @@
-export {BaseGame, GameCanvas} from "./GameCanvas.tsx";

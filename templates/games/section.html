@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Games &amp; Demos — smacdo.com{% endblock title %}
+
+{% block content %}
+<h1>Games &amp; Demos</h1>
+{% if section.pages %}
+<ul class="game-list">
+    {% for page in section.pages %}
+    <li>
+        <a href="{{ page.permalink }}">{{ page.title }}</a>
+        {% if page.description %}
+        <p>{{ page.description }}</p>
+        {% endif %}
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>No games yet. Check back soon.</p>
+{% endif %}
+{% endblock content %}

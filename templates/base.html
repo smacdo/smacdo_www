@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}smacdo.com{% endblock title %}</title>
+    <link rel="stylesheet" href="{{ get_url(path='css/style.css') }}">
+    <script>
+        (function () {
+            const stored = localStorage.getItem('theme');
+            if (stored) {
+                document.documentElement.setAttribute('data-theme', stored);
+            } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
+    </script>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="/" id="site-name">smacdo.com</a>
+            <div class="nav-links">
+                <a href="/about/">About</a>
+                <a href="/writing/">Writing</a>
+                <a href="/games/">Games</a>
+                <a href="/tools/">Tools</a>
+            </div>
+            <button id="theme-toggle" aria-label="Toggle dark mode">◐</button>
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}{% endblock content %}
+    </main>
+
+    <footer>
+        <p>
+            <a href="https://github.com/smacdo" target="_blank" rel="noopener">GitHub</a>
+            &nbsp;·&nbsp;
+            &copy; {{ now() | date(format="%Y") }} Scott MacDonald
+        </p>
+    </footer>
+
+    <script src="{{ get_url(path='js/theme.js') }}"></script>
+</body>
+</html>

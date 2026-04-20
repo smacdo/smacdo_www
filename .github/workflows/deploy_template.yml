@@ -28,23 +28,29 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      - name: Install Zola
+        run: |
+          ZOLA_VERSION="0.19.2"
+          wget -qO- https://github.com/getzola/zola/releases/download/v${ZOLA_VERSION}/zola-v${ZOLA_VERSION}-x86_64-unknown-linux-gnu.tar.gz \
+            | tar xz -C /usr/local/bin/
+
       - name: Setup Node
         uses: actions/setup-node@v4
-
-      - name: Install dependencies
-        run: npm ci
+        with:
+          node-version: '22'
+          cache: 'npm'
 
       - name: Build project
-        run: npm run build
+        run: make build
 
-      - name: Test project
-        run: npm test
+      - name: Check internal links
+        run: zola check
 
       - name: Upload build artifact for deployment
         uses: actions/upload-artifact@v4
         with:
           name: deployment-files
-          path: ./dist
+          path: ./public
 
   deploy:
     name: Deploy to ${{ inputs.deployment_name }}
@@ -74,8 +80,8 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: deployment-files
-          path: ./dist
+          path: ./public
       - name: Deploy
         run: |
-          rsync --recursive --verbose --archive --compress --delay-updates --delete-after \
-             ./dist/ ${{ secrets.SSH_USER }}@remote-host:/${{ secrets.DEPLOY_DIR }}/
+          rsync --recursive --archive --compress --delay-updates --delete-after --itemize-changes \
+             ./public/ ${{ secrets.SSH_USER }}@remote-host:/${{ secrets.DEPLOY_DIR }}/
