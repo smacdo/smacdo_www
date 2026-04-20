@@ -1,4 +1,4 @@
-import {clamp, not_null} from "./utils.tsx";
+import {clamp, not_null} from "./utils.ts";
 
 describe('clamp', () => {
     test('returns the number if it is between min and max', () => {

@@ -1,4 +1,4 @@
-import {clamp} from "../utils.tsx";
+import {clamp} from "../utils.ts";
 import {vector_distance} from "./math.ts";
 
 /** A bounding region. */

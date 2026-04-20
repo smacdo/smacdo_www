@@ -1,4 +1,4 @@
-import {not_null} from "../utils.tsx";
+import {not_null} from "../utils.ts";
 
 export abstract class ResourceLoader<T> {
     resources = new Map<string, T>();

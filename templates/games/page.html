@@ -14,4 +14,8 @@
 </div>
 
 {{ page.content | safe }}
+
+{% if page.extra.loader == "ts" %}
+<script src="/js/demos/{{ page.slug }}.js" defer></script>
+{% endif %}
 {% endblock content %}

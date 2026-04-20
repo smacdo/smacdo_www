@@ -1,5 +1,5 @@
 import {ResourceLoader} from "./resources.ts";
-import {not_null} from "../utils.tsx";
+import {not_null} from "../utils.ts";
 import {vi} from "vitest";
 
 type ResolveRejectPair<T> = {

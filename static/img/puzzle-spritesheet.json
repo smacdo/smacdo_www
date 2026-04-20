@@ -1,0 +1,470 @@
+{
+    "ballBlue": {
+        "x": 1,
+        "y": 1,
+        "w": 22,
+        "h": 22
+    },
+    "ballGrey": {
+        "x": 25,
+        "y": 1,
+        "w": 22,
+        "h": 22
+    },
+    "buttonDefault": {
+        "x": 49,
+        "y": 1,
+        "w": 190,
+        "h": 49
+    },
+    "buttonDefault_bottom": {
+        "x": 241,
+        "y": 1,
+        "w": 12,
+        "h": 12
+    },
+    "buttonDefault_bottomleft": {
+        "x": 255,
+        "y": 1,
+        "w": 12,
+        "h": 12
+    },
+    "buttonDefault_bottomright": {
+        "x": 269,
+        "y": 1,
+        "w": 12,
+        "h": 12
+    },
+    "buttonDefault_left": {
+        "x": 283,
+        "y": 1,
+        "w": 12,
+        "h": 12
+    },
+    "buttonDefault_mid": {
+        "x": 297,
+        "y": 1,
+        "w": 12,
+        "h": 12
+    },
+    "buttonDefault_right": {
+        "x": 311,
+        "y": 1,
+        "w": 12,
+        "h": 12
+    },
+    "buttonDefault_top": {
+        "x": 325,
+        "y": 1,
+        "w": 12,
+        "h": 12
+    },
+    "buttonDefault_topleft": {
+        "x": 339,
+        "y": 1,
+        "w": 12,
+        "h": 12
+    },
+    "buttonDefault_topright": {
+        "x": 353,
+        "y": 1,
+        "w": 12,
+        "h": 12
+    },
+    "buttonSelected": {
+        "x": 1,
+        "y": 52,
+        "w": 190,
+        "h": 49
+    },
+    "buttonSelected_bottom": {
+        "x": 241,
+        "y": 15,
+        "w": 12,
+        "h": 12
+    },
+    "buttonSelected_bottomleft": {
+        "x": 255,
+        "y": 15,
+        "w": 12,
+        "h": 12
+    },
+    "buttonSelected_bottomright": {
+        "x": 269,
+        "y": 15,
+        "w": 12,
+        "h": 12
+    },
+    "buttonSelected_left": {
+        "x": 283,
+        "y": 15,
+        "w": 12,
+        "h": 12
+    },
+    "buttonSelected_mid": {
+        "x": 297,
+        "y": 15,
+        "w": 12,
+        "h": 12
+    },
+    "buttonSelected_right": {
+        "x": 311,
+        "y": 15,
+        "w": 12,
+        "h": 12
+    },
+    "buttonSelected_top": {
+        "x": 325,
+        "y": 15,
+        "w": 12,
+        "h": 12
+    },
+    "buttonSelected_topleft": {
+        "x": 339,
+        "y": 15,
+        "w": 12,
+        "h": 12
+    },
+    "buttonSelected_topright": {
+        "x": 353,
+        "y": 15,
+        "w": 12,
+        "h": 12
+    },
+    "element_blue_diamond": {
+        "x": 241,
+        "y": 29,
+        "w": 48,
+        "h": 48
+    },
+    "element_blue_diamond_glossy": {
+        "x": 291,
+        "y": 29,
+        "w": 48,
+        "h": 48
+    },
+    "element_blue_polygon": {
+        "x": 193,
+        "y": 79,
+        "w": 48,
+        "h": 46
+    },
+    "element_blue_polygon_glossy": {
+        "x": 243,
+        "y": 79,
+        "w": 48,
+        "h": 46
+    },
+    "element_blue_rectangle": {
+        "x": 293,
+        "y": 79,
+        "w": 64,
+        "h": 32
+    },
+    "element_blue_rectangle_glossy": {
+        "x": 1,
+        "y": 113,
+        "w": 64,
+        "h": 32
+    },
+    "element_blue_square": {
+        "x": 67,
+        "y": 113,
+        "w": 32,
+        "h": 32
+    },
+    "element_blue_square_glossy": {
+        "x": 101,
+        "y": 113,
+        "w": 32,
+        "h": 32
+    },
+    "element_green_diamond": {
+        "x": 135,
+        "y": 113,
+        "w": 48,
+        "h": 48
+    },
+    "element_green_diamond_glossy": {
+        "x": 293,
+        "y": 113,
+        "w": 48,
+        "h": 48
+    },
+    "element_green_polygon": {
+        "x": 1,
+        "y": 163,
+        "w": 48,
+        "h": 46
+    },
+    "element_green_polygon_glossy": {
+        "x": 51,
+        "y": 163,
+        "w": 48,
+        "h": 46
+    },
+    "element_green_rectangle": {
+        "x": 101,
+        "y": 163,
+        "w": 64,
+        "h": 32
+    },
+    "element_green_rectangle_glossy": {
+        "x": 167,
+        "y": 163,
+        "w": 64,
+        "h": 32
+    },
+    "element_green_square": {
+        "x": 233,
+        "y": 163,
+        "w": 32,
+        "h": 32
+    },
+    "element_green_square_glossy": {
+        "x": 267,
+        "y": 163,
+        "w": 32,
+        "h": 32
+    },
+    "element_grey_diamond": {
+        "x": 301,
+        "y": 163,
+        "w": 48,
+        "h": 48
+    },
+    "element_grey_diamond_glossy": {
+        "x": 1,
+        "y": 213,
+        "w": 48,
+        "h": 48
+    },
+    "element_grey_polygon": {
+        "x": 51,
+        "y": 213,
+        "w": 48,
+        "h": 46
+    },
+    "element_grey_polygon_glossy": {
+        "x": 101,
+        "y": 213,
+        "w": 48,
+        "h": 46
+    },
+    "element_grey_rectangle": {
+        "x": 151,
+        "y": 213,
+        "w": 64,
+        "h": 32
+    },
+    "element_grey_rectangle_glossy": {
+        "x": 217,
+        "y": 213,
+        "w": 64,
+        "h": 32
+    },
+    "element_grey_square": {
+        "x": 283,
+        "y": 213,
+        "w": 32,
+        "h": 32
+    },
+    "element_grey_square_glossy": {
+        "x": 317,
+        "y": 213,
+        "w": 32,
+        "h": 32
+    },
+    "element_purple_cube_glossy": {
+        "x": 151,
+        "y": 247,
+        "w": 32,
+        "h": 32
+    },
+    "element_purple_diamond": {
+        "x": 185,
+        "y": 247,
+        "w": 48,
+        "h": 48
+    },
+    "element_purple_diamond_glossy": {
+        "x": 235,
+        "y": 247,
+        "w": 48,
+        "h": 48
+    },
+    "element_purple_polygon": {
+        "x": 285,
+        "y": 247,
+        "w": 48,
+        "h": 46
+    },
+    "element_purple_polygon_glossy": {
+        "x": 1,
+        "y": 295,
+        "w": 48,
+        "h": 46
+    },
+    "element_purple_rectangle": {
+        "x": 51,
+        "y": 295,
+        "w": 64,
+        "h": 32
+    },
+    "element_purple_rectangle_glossy": {
+        "x": 117,
+        "y": 295,
+        "w": 64,
+        "h": 32
+    },
+    "element_purple_square": {
+        "x": 285,
+        "y": 295,
+        "w": 32,
+        "h": 32
+    },
+    "element_red_diamond": {
+        "x": 367,
+        "y": 1,
+        "w": 48,
+        "h": 48
+    },
+    "element_red_diamond_glossy": {
+        "x": 359,
+        "y": 51,
+        "w": 48,
+        "h": 48
+    },
+    "element_red_polygon": {
+        "x": 359,
+        "y": 101,
+        "w": 48,
+        "h": 46
+    },
+    "element_red_polygon_glossy": {
+        "x": 351,
+        "y": 149,
+        "w": 48,
+        "h": 46
+    },
+    "element_red_rectangle": {
+        "x": 351,
+        "y": 197,
+        "w": 64,
+        "h": 32
+    },
+    "element_red_rectangle_glossy": {
+        "x": 351,
+        "y": 231,
+        "w": 64,
+        "h": 32
+    },
+    "element_red_square": {
+        "x": 335,
+        "y": 265,
+        "w": 32,
+        "h": 32
+    },
+    "element_red_square_glossy": {
+        "x": 369,
+        "y": 265,
+        "w": 32,
+        "h": 32
+    },
+    "element_yellow_diamond": {
+        "x": 183,
+        "y": 299,
+        "w": 48,
+        "h": 48
+    },
+    "element_yellow_diamond_glossy": {
+        "x": 233,
+        "y": 299,
+        "w": 48,
+        "h": 48
+    },
+    "element_yellow_polygon": {
+        "x": 319,
+        "y": 299,
+        "w": 48,
+        "h": 46
+    },
+    "element_yellow_polygon_glossy": {
+        "x": 1,
+        "y": 347,
+        "w": 48,
+        "h": 46
+    },
+    "element_yellow_rectangle": {
+        "x": 51,
+        "y": 347,
+        "w": 64,
+        "h": 32
+    },
+    "element_yellow_rectangle_glossy": {
+        "x": 117,
+        "y": 347,
+        "w": 64,
+        "h": 32
+    },
+    "element_yellow_square": {
+        "x": 369,
+        "y": 299,
+        "w": 32,
+        "h": 32
+    },
+    "element_yellow_square_glossy": {
+        "x": 283,
+        "y": 333,
+        "w": 32,
+        "h": 32
+    },
+    "paddleBlu": {
+        "x": 1,
+        "y": 265,
+        "w": 104,
+        "h": 24
+    },
+    "paddleRed": {
+        "x": 183,
+        "y": 367,
+        "w": 104,
+        "h": 24
+    },
+    "particleCartoonStar": {
+        "x": 341,
+        "y": 51,
+        "w": 10,
+        "h": 10
+    },
+    "particleSmallStar": {
+        "x": 1,
+        "y": 149,
+        "w": 10,
+        "h": 10
+    },
+    "particleStar": {
+        "x": 107,
+        "y": 265,
+        "w": 20,
+        "h": 21
+    },
+    "selectorA": {
+        "x": 369,
+        "y": 333,
+        "w": 38,
+        "h": 38
+    },
+    "selectorB": {
+        "x": 289,
+        "y": 373,
+        "w": 38,
+        "h": 38
+    },
+    "selectorC": {
+        "x": 329,
+        "y": 373,
+        "w": 32,
+        "h": 32
+    }
+}

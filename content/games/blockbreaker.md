@@ -7,6 +7,7 @@ weight = 10
 [extra]
 platforms = ["web"]
 status = "demo"
+loader = "ts"
 +++
 
 Use **A/D** or **arrow keys** to move the paddle. Press **Space** to launch the ball.
