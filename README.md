@@ -8,7 +8,7 @@ TypeScript demos are compiled with [esbuild](https://esbuild.github.io/).
 
 ## Prerequisites
 
-- [Zola](https://www.getzola.org/documentation/getting-started/installation/) 0.19.2
+- [Zola](https://www.getzola.org/documentation/getting-started/installation/) 0.22.1
 - [Node.js](https://nodejs.org/) 22+ (for esbuild, used to compile TypeScript demos)
 
 On macOS:

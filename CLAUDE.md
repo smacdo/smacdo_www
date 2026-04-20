@@ -51,7 +51,7 @@ content/        Markdown pages and sections (Zola)
 templates/      Tera HTML templates (Zola)
 static/         Assets copied as-is into public/ (CSS, JS, images)
 src/lib/gamebox/  Physics/math library (TypeScript, no framework deps)
-src/demos/      TypeScript canvas demos (compiled by esbuild) — Phase 3
+src/demos/      TypeScript canvas demos (compiled by esbuild)
 public/         Generated output — gitignored, do not edit
 ```
 
@@ -64,6 +64,22 @@ public/         Generated output — gitignored, do not edit
 - Section pages use `templates/[section-name]/section.html`
 - Individual pages use `templates/[section-name]/page.html`
 - Front matter is TOML between `+++` delimiters
+
+**Critical: Zola does NOT auto-discover subdirectory templates.** Every section's
+`_index.md` must explicitly declare which templates to use:
+
+```toml
+template = "writing/section.html"      # the section list page
+page_template = "writing/page.html"    # all pages within this section
+```
+
+Without these keys, Zola falls back to its built-in "Welcome to Zola!" placeholder.
+
+## Static Assets
+
+- Use **root-relative paths** for CSS and JS in templates: `/css/style.css`, `/js/theme.js`
+- Do NOT use Zola's `get_url()` for static assets — it generates absolute URLs from
+  `base_url` in `config.toml`, which breaks staging and any non-production host
 
 ## CSS
 
@@ -83,7 +99,7 @@ public/         Generated output — gitignored, do not edit
 - Dual collision system: AABB for broad phase, precise bounds (Circle/AABB) for narrow phase
 - Asset loading via `ImageLoader` with callback-based resource management
 - Game logic operates on logical canvas dimensions (`this.canvasWidth/canvasHeight`)
-- `src/lib/utils.tsx` provides `not_null` and `clamp` — imported by gamebox files
+- `src/lib/utils.ts` provides `not_null` and `clamp` — imported by gamebox files
 
 ## WASM Games
 
