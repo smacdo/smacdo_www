@@ -1,31 +1,58 @@
 # smacdo.com
 
-This is the code powering https://smacdo.com/, and represents my first attempt at doing web
-programming since I graduated from college in the 2000s. I'm not familiar with Typescript, React or
-really any part of the web frontend so feel free to send me any feedback about how it could be
-better.
+Source for [smacdo.com](https://smacdo.com/) — a personal site with a games/demos gallery,
+long-form writing, and an about page.
 
-All changes to the master branch are built, tested and pushed
-to [staging.smacdo.com](https://staging.smacdo.com).
-A production push to [smacdo.com](https://smacdo.com) happens when a new `releases-v*` tag is
-created on the master branch.
+Built with [Zola](https://www.getzola.org/), a static site generator written in Rust.
+TypeScript demos are compiled with [esbuild](https://esbuild.github.io/).
 
-# References
+## Prerequisites
 
-Some links that helped while working on `smacdo.com`:
+- [Zola](https://www.getzola.org/documentation/getting-started/installation/) 0.19.2
+- [Node.js](https://nodejs.org/) 22+ (for esbuild, used to compile TypeScript demos)
 
-## Setup
+On macOS:
 
-- [React: Navigation Without React-Router](https://ncoughlin.com/posts/react-navigation-without-react-router)
-- [Vite + React + Ts + vitest + React Testing Library boilerplate](https://www.reddit.com/r/reactjs/comments/1hkf4vf/vite_react_ts_vitest_react_testing_library/)
+```bash
+brew install zola
+brew install node
+```
 
-## Canvas
+## Development
 
-- [Canvas with React JS](https://medium.com/@pdx.lucasm/canvas-with-react-js-32e133c05258)
-- [Creating a VAnilla JS Canvas](https://medium.com/@ruse.marshall/converting-a-vanilla-js-canvas-animation-to-react-78443bad6d7b)
-- [Ensuring our Canvas Looks Good on Retina High DPI Screens](https://www.kirupa.com/canvas/canvas_high_dpi_retina.htm)
+Install JS dependencies (esbuild only):
 
-## Infra
+```bash
+npm install
+```
 
-- [Deploying to a server via SSH and Rsync in a Github Action
-  ](https://zellwk.com/blog/github-actions-deploy/)
+Start a local dev server with live reload at `http://127.0.0.1:1111`:
+
+```bash
+make serve
+```
+
+## Build
+
+Produces a static site in `public/`:
+
+```bash
+make build
+```
+
+## References
+
+Collected links and resources are in [docs/references.md](docs/references.md).
+
+## Deployment
+
+All pushes to `master` are built and deployed to
+[staging.smacdo.com](https://staging.smacdo.com) via GitHub Actions.
+
+A production deploy to [smacdo.com](https://smacdo.com) is triggered by creating a tag
+matching `releases-v*` on the master branch:
+
+```bash
+git tag releases-v1
+git push origin releases-v1
+```
