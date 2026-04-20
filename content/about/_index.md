@@ -5,7 +5,7 @@ template = "about/section.html"
 
 I'm Scott MacDonald — a systems programmer with a background across games, hardware, AR/VR, and research tooling. Most of my career has been spent close to the metal: engines, tools, and the infrastructure that makes interactive experiences run.
 
-Currently a Staff Engineer and Technical Lead at Facebook Reality Labs (Meta), where I've spent nearly seven years building the tools, infrastructure, and developer experience that empower research teams to do their work. I'm embedded directly with those teams — spanning UX research, haptics, and Android devices — but my focus is on making the research possible, not conducting it. Alongside the technical work, I've managed SWE and QA contractors, mentored engineers across junior and mid-level (IC4–IC5), and successfully advocated for two IC promotions.
+Currently a Staff Engineer and Technical Lead at Facebook Reality Labs (Meta), where I've spent nearly seven years building the tools, infrastructure, and developer experience that empower research teams to do their work. I lead an infra team that super charges research -- spanning UXR (user experience research), haptics, and Android device bring up.  Alongside the technical work, I've managed SWE and QA contractors, mentored SWE engineers across junior through senior levels, and successfully advocated for IC promotions.
 
 ## Background
 
