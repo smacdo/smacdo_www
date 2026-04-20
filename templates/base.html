@@ -4,6 +4,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}smacdo.com{% endblock title %}</title>
+
+    {% if page is defined %}
+        {% set og_title = page.title ~ " — smacdo.com" %}
+        {% set og_description = page.description | default(value=config.description) %}
+        {% set og_url = page.permalink %}
+        {% set og_type = "article" %}
+    {% elif section is defined %}
+        {% if section.title == config.title %}
+            {% set og_title = config.title %}
+        {% else %}
+            {% set og_title = section.title ~ " — smacdo.com" %}
+        {% endif %}
+        {% set og_description = section.description | default(value=config.description) %}
+        {% set og_url = section.permalink %}
+        {% set og_type = "website" %}
+    {% else %}
+        {% set og_title = config.title %}
+        {% set og_description = config.description %}
+        {% set og_url = config.base_url %}
+        {% set og_type = "website" %}
+    {% endif %}
+
+    <meta name="description" content="{{ og_description }}">
+    <meta property="og:site_name" content="{{ config.title }}">
+    <meta property="og:title" content="{{ og_title }}">
+    <meta property="og:description" content="{{ og_description }}">
+    <meta property="og:type" content="{{ og_type }}">
+    <meta property="og:url" content="{{ og_url }}">
+
     <link rel="stylesheet" href="/css/style.css">
     <script>
         (function () {
