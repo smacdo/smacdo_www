@@ -47,30 +47,36 @@
 </head>
 <body>
     <header>
+        <canvas id="sky-canvas" aria-hidden="true"></canvas>
         <nav>
-            <a href="/" id="site-name">smacdo.com</a>
-            <div class="nav-links">
-                <a href="/about/">About</a>
-                <a href="/writing/">Writing</a>
-                <a href="/games/">Games</a>
-                <a href="/tools/">Tools</a>
+            <div class="nav-pill">
+                <a href="/" id="site-name">smacdo.com</a>
+                <div class="nav-links">
+                    <a href="/about/">About</a>
+                    <a href="/writing/">Writing</a>
+                    <a href="/games/">Games</a>
+                    <a href="/tools/">Tools</a>
+                </div>
+                <button id="theme-toggle" aria-label="Toggle dark mode">◐</button>
             </div>
-            <button id="theme-toggle" aria-label="Toggle dark mode">◐</button>
         </nav>
     </header>
 
-    <main>
-        {% block content %}{% endblock content %}
-    </main>
+    <div class="page-body">
+        <main>
+            {% block content %}{% endblock content %}
+        </main>
 
-    <footer>
-        <p>
-            <a href="https://github.com/smacdo" target="_blank" rel="noopener">GitHub</a>
-            &nbsp;·&nbsp;
-            &copy; {{ now() | date(format="%Y") }} Scott MacDonald
-        </p>
-    </footer>
+        <footer>
+            <p>
+                <a href="https://github.com/smacdo" target="_blank" rel="noopener">GitHub</a>
+                &nbsp;·&nbsp;
+                &copy; {{ now() | date(format="%Y") }} Scott MacDonald
+            </p>
+        </footer>
+    </div>
 
     <script src="/js/theme.js"></script>
+    <script src="/js/site.js" defer></script>
 </body>
 </html>

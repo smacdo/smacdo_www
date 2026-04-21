@@ -141,30 +141,31 @@ smacdo.com repo/
 
 ## Implementation Phases
 
-### Phase 1: Zola Foundation
-- [ ] Initialize Zola project (`config.toml`)
-- [ ] Create directory structure (`content/`, `templates/`, `static/`)
-- [ ] Remove React codebase (keep `src/lib/gamebox/` TypeScript source files)
-- [ ] Create `base.html` template with header, nav, footer
-- [ ] Create home page template and stub content
-- [ ] Implement dark/light theme toggle in vanilla JS
-- [ ] Create `Makefile` with `build`, `serve`, `clean` targets
-- [ ] Create minimal `package.json` with esbuild as only dependency
-- [ ] Update `deploy_template.yml`: install pinned Zola binary, add `zola check`, fix output path
+### Phase 1: Zola Foundation ✅
+- [x] Initialize Zola project (`config.toml`)
+- [x] Create directory structure (`content/`, `templates/`, `static/`)
+- [x] Remove React codebase (keep `src/lib/gamebox/` TypeScript source files)
+- [x] Create `base.html` template with header, nav, footer
+- [x] Create home page template and stub content
+- [x] Implement dark/light theme toggle in vanilla JS
+- [x] Create `Makefile` with `build`, `serve`, `clean` targets
+- [x] Create minimal `package.json` with esbuild as only dependency
+- [x] Update `deploy_template.yml`: install pinned Zola binary, add `npm ci`, fix output path
 
-### Phase 2: Content Sections
-- [ ] About page template + stub bio and CV content
-- [ ] Writing section: list template, article template
-- [ ] Enable RSS feed in Zola config
-- [ ] Games section: gallery list template, game page template with canvas container
-- [ ] Tools placeholder page
-- [ ] Wire up all nav links
+### Phase 2: Content Sections ✅
+- [x] About page template + bio and CV content
+- [x] Writing section: list template, article template
+- [x] Enable RSS feed in Zola config
+- [x] Games section: gallery list template, game page template with canvas container
+- [x] Tools placeholder page
+- [x] Wire up all nav links
+- [x] 404 page template + `.htaccess`
 
-### Phase 3: JS Demo Infrastructure
-- [ ] Strip React wrappers from gamebox library (pure TypeScript, no framework deps)
-- [ ] Add esbuild compilation step to Makefile
-- [ ] Create `canvas-demo` as minimal working example (canvas init, resize, animation loop)
-- [ ] Migrate BlockBreaker to standalone TS demo (no React, no custom router)
+### Phase 3: JS Demo Infrastructure ✅
+- [x] Strip React wrappers from gamebox library (pure TypeScript, no framework deps)
+- [x] Add esbuild compilation step to Makefile
+- [x] Migrate BlockBreaker to standalone TS demo (BaseGame + game-runner.ts, no React)
+- [x] Recover BlockBreaker source from git history after Phase 1 deletion
 
 ### Phase 4: WASM Integration
 - [ ] Finalize WASM embedding contract (URL structure, JS API)
@@ -172,11 +173,77 @@ smacdo.com repo/
 - [ ] Document the contract for the Rust game repository
 
 ### Phase 5: Visual Polish
-- [ ] Catppuccin Mocha (dark) and Latte (light) CSS custom properties
-- [ ] Typography: Oxanium (headings), Inter (body), JetBrains Mono (code)
-- [ ] Parallax canvas header (clouds, stars, night/day per theme)
-- [ ] Games gallery card design (thumbnail, hover-to-play, download links)
-- [ ] Full article typography and reading comfort
+
+#### 5a: Colors + Fonts
+- [ ] Update CSS variables to full Catppuccin Latte (light) + Mocha (dark) palette
+  - Light: bg `#eff1f5`, fg `#4c4f69`, muted `#6c6f85`, border `#ccd0da`, link `#1e66f5`
+  - Dark theme is already Mocha — verify and tune
+  - Add `--accent` variable (Catppuccin mauve `#cba6f7` dark / `#8839ef` light)
+- [ ] Self-host fonts (download `.woff2` to `static/fonts/`, add `@font-face`)
+  - **Inter** — body text
+  - **Oxanium** — headings (`h1`–`h4`)
+  - **JetBrains Mono** — `code`, `pre`
+
+#### 5b: Full-bleed Header Restructure
+- [ ] Move `max-width` + `padding` from `body` to a `.page-body` inner wrapper
+- [ ] `<header>` and `<footer>` become full browser-width
+- [ ] Nav content inside header stays centered at 800px
+- [ ] Nav gets semi-transparent dark pill background (readable against any sky)
+- [ ] Update `base.html` and `style.css` accordingly
+
+#### 5c: Sky Canvas — Core
+New file: `src/site/header.ts` compiled to `public/js/site.js` (new esbuild entry).
+- [ ] Add esbuild entry to `package.json` build script
+- [ ] Add `<canvas id="sky-canvas">` inside `<header>` in `base.html`
+- [ ] Add `<script src="/js/site.js" defer>` to `base.html`
+- [ ] Canvas is absolutely positioned, fills header, behind nav (z-index)
+- [ ] **Time system**: `Date` → fractional hour → angle `θ = π/2 − (hour−12)/12 * π`
+- [ ] **Sun/moon shared circle**: sun at θ, moon at θ + π; only draw whichever is above horizon
+- [ ] **Sky gradient** (6 interpolated states using Catppuccin palette):
+  - Night: deep indigo → near-black
+  - Predawn: dark blue
+  - Dawn/Dusk: peach + mauve horizon glow
+  - Day: Catppuccin sky/sapphire blues
+- [ ] Bottom edge fades to `var(--bg)` via gradient (any sky → any theme, seamless)
+- [ ] Sun: glowing circle with soft corona
+- [ ] Moon: crescent (offset fill technique)
+- [ ] Stars: scattered dots, fade in at dusk / out at dawn, subtle per-star twinkle
+
+#### 5d: Clouds + Drag Interaction
+- [ ] **Clouds**: 4–5 layered objects, ambient left-to-right drift, wrap at edges
+  - Opacity scales with daylight (invisible at night)
+  - Drawn as overlapping soft circles (white/light gray)
+- [ ] **Drag interaction** (mouse + touch):
+  - Pointer down on sun or moon → enter drag mode
+  - Drag projected onto the arc circle: `θ = atan2(horizonY − y, x − centerX)`
+  - Dragging one body updates θ; the other follows automatically at θ + π
+  - Dragging sun below horizon naturally causes moon to rise
+  - Position frozen after drag; real-time clock paused
+  - Double-click / double-tap → unfreeze, return to real time
+
+#### 5e: Foreground Silhouette v1 (hills + trees)
+- [ ] Rolling hill silhouette at bottom of canvas using a bezier/sine path
+- [ ] Simple triangle trees rising from the hills
+- [ ] Dark fill (slightly lighter than pure black, matches Mocha surface colors)
+- [ ] Sits just above the gradient fade zone
+
+#### 5f: Foreground Silhouette v2 (castle — compare and pick)
+- [ ] Alternative castle/urban skyline silhouette
+- [ ] Side-by-side comparison with hills version; keep the winner
+
+#### 5g: Typography + Reading Polish (can be done independently of canvas)
+- [ ] Article line-height, font-size, and measure tuning
+- [ ] Heading hierarchy with Oxanium weights
+- [ ] Code block styling with JetBrains Mono + Catppuccin syntax highlight theme
+
+### Follow-up / Future
+
+- [ ] **Scroll parallax clouds** — experiment with clouds shifting on page scroll (keep ambient drift as fallback)
+- [ ] Games gallery card design (thumbnail, hover effect, download links)
+- [ ] First real Writing article
+- [ ] Rust port of BlockBreaker (separate repo, replaces TS demo)
+- [ ] Trees, castle/buildings added to foreground silhouette over time
+- [ ] Tools page (scope TBD)
 
 ---
 

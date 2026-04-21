@@ -2,7 +2,8 @@
   "name": "smacdo-www",
   "private": true,
   "scripts": {
-    "build:demos": "npx esbuild src/demos/blockbreaker/demo.ts --bundle --outfile=public/js/demos/blockbreaker.js"
+    "build:demos": "npx esbuild src/demos/blockbreaker/demo.ts --bundle --outfile=public/js/demos/blockbreaker.js",
+    "build:site": "npx esbuild src/site/header.ts --bundle --outfile=public/js/site.js"
   },
   "devDependencies": {
     "esbuild": "^0.25.0"
