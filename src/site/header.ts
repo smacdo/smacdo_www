@@ -232,6 +232,99 @@ function drawClouds(ctx: CanvasRenderingContext2D, clouds: Cloud[], w: number, h
     ctx.restore();
 }
 
+// ── Terrain silhouette ────────────────────────────────────────────────────────
+
+interface HillSeg {
+    x0: number; y0: number;
+    cx1: number; cy1: number;
+    cx2: number; cy2: number;
+    x3: number; y3: number;
+}
+
+// Normalized cubic bezier segments (fractions of w / h) for the rolling hills
+const HILL_SEGS: HillSeg[] = [
+    { x0: 0,    y0: 0.86, cx1: 0.08, cy1: 0.56, cx2: 0.22, cy2: 0.62, x3: 0.30, y3: 0.80 },
+    { x0: 0.30, y0: 0.80, cx1: 0.38, cy1: 0.95, cx2: 0.45, cy2: 0.62, x3: 0.55, y3: 0.70 },
+    { x0: 0.55, y0: 0.70, cx1: 0.65, cy1: 0.78, cx2: 0.76, cy2: 0.54, x3: 0.86, y3: 0.66 },
+    { x0: 0.86, y0: 0.66, cx1: 0.93, cy1: 0.75, cx2: 1.00, cy2: 0.82, x3: 1.00, y3: 0.84 },
+];
+
+function bezierAt(s: HillSeg, t: number): { x: number; y: number; dx: number; dy: number } {
+    const mt = 1 - t, mt2 = mt * mt, mt3 = mt2 * mt, t2 = t * t, t3 = t2 * t;
+    return {
+        x:  mt3*s.x0 + 3*t*mt2*s.cx1 + 3*t2*mt*s.cx2 + t3*s.x3,
+        y:  mt3*s.y0 + 3*t*mt2*s.cy1 + 3*t2*mt*s.cy2 + t3*s.y3,
+        dx: 3*(mt2*(s.cx1-s.x0) + 2*t*mt*(s.cx2-s.cx1) + t2*(s.x3-s.cx2)),
+        dy: 3*(mt2*(s.cy1-s.y0) + 2*t*mt*(s.cy2-s.cy1) + t2*(s.y3-s.cy2)),
+    };
+}
+
+// Binary-search the bezier to find hill surface y and tangent angle at nx (0–1)
+function hillSample(nx: number): { y: number; angle: number } {
+    for (const seg of HILL_SEGS) {
+        if (nx < seg.x0 || nx > seg.x3 + 1e-6) continue;
+        let lo = 0, hi = 1;
+        for (let i = 0; i < 24; i++) {
+            const mid = (lo + hi) * 0.5;
+            if (bezierAt(seg, mid).x < nx) lo = mid; else hi = mid;
+        }
+        const { y, dx, dy } = bezierAt(seg, (lo + hi) * 0.5);
+        return { y, angle: Math.atan2(dy, dx) };
+    }
+    return { y: 0.80, angle: 0 };
+}
+
+// Draw a pine tree in local coords: base at (0,0), tip at (0,−tH), then rotated by caller
+function drawPineTree(ctx: CanvasRenderingContext2D, tH: number): void {
+    const tW = tH * 0.38;
+    ctx.beginPath();
+    ctx.moveTo(0, -tH);
+    ctx.lineTo( tW * 0.60, -tH * 0.48);
+    ctx.lineTo(-tW * 0.60, -tH * 0.48);
+    ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(0, -tH * 0.72);
+    ctx.lineTo( tW, 0);
+    ctx.lineTo(-tW, 0);
+    ctx.closePath();
+    ctx.fill();
+}
+
+function drawSilhouette(ctx: CanvasRenderingContext2D, w: number, h: number): void {
+    ctx.save();
+    ctx.fillStyle = 'rgba(17,17,27,0.93)';
+
+    // Hill path driven by HILL_SEGS data
+    ctx.beginPath();
+    ctx.moveTo(0, h);
+    ctx.lineTo(HILL_SEGS[0].x0 * w, HILL_SEGS[0].y0 * h);
+    for (const s of HILL_SEGS) {
+        ctx.bezierCurveTo(s.cx1*w, s.cy1*h, s.cx2*w, s.cy2*h, s.x3*w, s.y3*h);
+    }
+    ctx.lineTo(w, h);
+    ctx.closePath();
+    ctx.fill();
+
+    // Pine trees planted on the hill surface, perpendicular to slope
+    // [normalized-x, height as fraction of canvas height]
+    const trees: [number, number][] = [
+        [0.06, 0.09], [0.13, 0.11], [0.20, 0.09],
+        [0.48, 0.11], [0.53, 0.09],
+        [0.77, 0.13], [0.83, 0.11], [0.91, 0.09],
+    ];
+    for (const [nx, hFrac] of trees) {
+        const { y, angle } = hillSample(nx);
+        ctx.save();
+        ctx.translate(nx * w, y * h);
+        ctx.rotate(angle);
+        drawPineTree(ctx, hFrac * h);
+        ctx.restore();
+    }
+
+    ctx.restore();
+}
+
 // ── Main draw loop ────────────────────────────────────────────────────────────
 
 const SUN_R = 18;
@@ -403,6 +496,9 @@ function init(): void {
         // Clouds — fade in with daylight, invisible at night
         updateClouds(clouds, dt);
         drawClouds(ctx, clouds, w, h, 1 - n);
+
+        // Terrain silhouette
+        drawSilhouette(ctx, w, h);
 
         // Bottom fade to page background
         const fade = ctx.createLinearGradient(0, h * 0.5, 0, h);

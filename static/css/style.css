@@ -104,8 +104,8 @@ header {
     margin-bottom: 2rem;
     overflow: hidden;
     display: flex;
-    align-items: center;
-    padding: 0 1.5rem;
+    align-items: flex-start;
+    padding: 1rem 1.5rem;
 }
 
 #sky-canvas {
