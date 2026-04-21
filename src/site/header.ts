@@ -249,18 +249,16 @@ const HILL_SEGS: HillSeg[] = [
     { x0: 0.86, y0: 0.66, cx1: 0.93, cy1: 0.75, cx2: 1.00, cy2: 0.82, x3: 1.00, y3: 0.84 },
 ];
 
-function bezierAt(s: HillSeg, t: number): { x: number; y: number; dx: number; dy: number } {
+function bezierAt(s: HillSeg, t: number): { x: number; y: number } {
     const mt = 1 - t, mt2 = mt * mt, mt3 = mt2 * mt, t2 = t * t, t3 = t2 * t;
     return {
-        x:  mt3*s.x0 + 3*t*mt2*s.cx1 + 3*t2*mt*s.cx2 + t3*s.x3,
-        y:  mt3*s.y0 + 3*t*mt2*s.cy1 + 3*t2*mt*s.cy2 + t3*s.y3,
-        dx: 3*(mt2*(s.cx1-s.x0) + 2*t*mt*(s.cx2-s.cx1) + t2*(s.x3-s.cx2)),
-        dy: 3*(mt2*(s.cy1-s.y0) + 2*t*mt*(s.cy2-s.cy1) + t2*(s.y3-s.cy2)),
+        x: mt3*s.x0 + 3*t*mt2*s.cx1 + 3*t2*mt*s.cx2 + t3*s.x3,
+        y: mt3*s.y0 + 3*t*mt2*s.cy1 + 3*t2*mt*s.cy2 + t3*s.y3,
     };
 }
 
-// Binary-search the bezier to find hill surface y and tangent angle at nx (0–1)
-function hillSample(nx: number): { y: number; angle: number } {
+// Binary-search the bezier to find hill surface y at nx (0–1)
+function hillSample(nx: number): { y: number } {
     for (const seg of HILL_SEGS) {
         if (nx < seg.x0 || nx > seg.x3 + 1e-6) continue;
         let lo = 0, hi = 1;
@@ -268,25 +266,34 @@ function hillSample(nx: number): { y: number; angle: number } {
             const mid = (lo + hi) * 0.5;
             if (bezierAt(seg, mid).x < nx) lo = mid; else hi = mid;
         }
-        const { y, dx, dy } = bezierAt(seg, (lo + hi) * 0.5);
-        return { y, angle: Math.atan2(dy, dx) };
+        const { y } = bezierAt(seg, (lo + hi) * 0.5);
+        return { y };
     }
-    return { y: 0.80, angle: 0 };
+    return { y: 0.80 };
 }
 
-// Draw a pine tree in local coords: base at (0,0), tip at (0,−tH), then rotated by caller
-function drawPineTree(ctx: CanvasRenderingContext2D, tH: number): void {
+// Draw a pine tree upright: base at (bx, by), growing straight up by tH pixels
+function drawPineTree(ctx: CanvasRenderingContext2D, bx: number, by: number, tH: number): void {
     const tW = tH * 0.38;
+    const trunkW = tH * 0.06;
+    const trunkH = tH * 0.18;
+
+    // Trunk
+    ctx.fillRect(bx - trunkW / 2, by - trunkH, trunkW, trunkH);
+
+    // Lower tier (wide base)
     ctx.beginPath();
-    ctx.moveTo(0, -tH);
-    ctx.lineTo( tW * 0.60, -tH * 0.48);
-    ctx.lineTo(-tW * 0.60, -tH * 0.48);
+    ctx.moveTo(bx, by - tH);
+    ctx.lineTo(bx + tW * 0.60, by - tH * 0.48);
+    ctx.lineTo(bx - tW * 0.60, by - tH * 0.48);
     ctx.closePath();
     ctx.fill();
+
+    // Upper tier (overlapping, narrower)
     ctx.beginPath();
-    ctx.moveTo(0, -tH * 0.72);
-    ctx.lineTo( tW, 0);
-    ctx.lineTo(-tW, 0);
+    ctx.moveTo(bx, by - tH * 0.72);
+    ctx.lineTo(bx + tW, by - trunkH);
+    ctx.lineTo(bx - tW, by - trunkH);
     ctx.closePath();
     ctx.fill();
 }
@@ -306,7 +313,7 @@ function drawSilhouette(ctx: CanvasRenderingContext2D, w: number, h: number): vo
     ctx.closePath();
     ctx.fill();
 
-    // Pine trees planted on the hill surface, perpendicular to slope
+    // Pine trees growing vertically from the hill surface
     // [normalized-x, height as fraction of canvas height]
     const trees: [number, number][] = [
         [0.06, 0.09], [0.13, 0.11], [0.20, 0.09],
@@ -314,12 +321,8 @@ function drawSilhouette(ctx: CanvasRenderingContext2D, w: number, h: number): vo
         [0.77, 0.13], [0.83, 0.11], [0.91, 0.09],
     ];
     for (const [nx, hFrac] of trees) {
-        const { y, angle } = hillSample(nx);
-        ctx.save();
-        ctx.translate(nx * w, y * h);
-        ctx.rotate(angle);
-        drawPineTree(ctx, hFrac * h);
-        ctx.restore();
+        const { y } = hillSample(nx);
+        drawPineTree(ctx, nx * w, y * h, hFrac * h);
     }
 
     ctx.restore();
