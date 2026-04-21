@@ -151,6 +151,82 @@ function drawMoon(ctx: CanvasRenderingContext2D, x: number, y: number, r: number
     ctx.drawImage(moonImg, x - size / 2, y - size / 2);
 }
 
+// ── Clouds ────────────────────────────────────────────────────────────────────
+
+interface CloudPuff {
+    dx: number;  // offset from cloud center, in canvas-height units
+    dy: number;
+    r: number;   // radius in canvas-height units
+}
+
+interface Cloud {
+    x: number;      // 0–1 normalized horizontal position (wraps)
+    y: number;      // 0–1 normalized vertical position
+    speed: number;  // canvas-widths per second
+    puffs: CloudPuff[];
+    span: number;   // half-width in canvas-height units (for wrap margin)
+}
+
+function makeCloud(x: number): Cloud {
+    const baseR = 0.055 + Math.random() * 0.065; // 0.055–0.12 * h
+    const count = 4 + Math.floor(Math.random() * 3);
+    const puffs: CloudPuff[] = [{ dx: 0, dy: 0, r: baseR }];
+    let span = baseR;
+
+    for (let i = 1; i < count; i++) {
+        const dx = (Math.random() - 0.5) * baseR * 2.8;
+        const dy = (Math.random() - 0.5) * baseR * 0.7;
+        const r  = baseR * (0.5 + Math.random() * 0.75);
+        puffs.push({ dx, dy, r });
+        span = Math.max(span, Math.abs(dx) + r);
+    }
+
+    return {
+        x,
+        y: 0.06 + Math.random() * 0.42,
+        speed: 0.004 + Math.random() * 0.008,
+        puffs,
+        span,
+    };
+}
+
+function makeClouds(): Cloud[] {
+    return Array.from({ length: 5 }, (_, i) =>
+        makeCloud(i / 5 + Math.random() * 0.18)
+    );
+}
+
+function updateClouds(clouds: Cloud[], dt: number): void {
+    for (const c of clouds) {
+        c.x += c.speed * dt;
+        // wrap: when the right edge passes x=1, teleport to just off the left
+        if (c.x - c.span > 1) c.x = -c.span;
+    }
+}
+
+function drawClouds(ctx: CanvasRenderingContext2D, clouds: Cloud[], w: number, h: number, alpha: number): void {
+    if (alpha < 0.01) return;
+    ctx.save();
+    for (const c of clouds) {
+        const cx = c.x * w;
+        const cy = c.y * h;
+        for (const p of c.puffs) {
+            const px = cx + p.dx * h;
+            const py = cy + p.dy * h;
+            const r  = p.r  * h;
+            const g  = ctx.createRadialGradient(px, py, 0, px, py, r);
+            g.addColorStop(0,   `rgba(255,255,255,${(alpha * 0.52).toFixed(3)})`);
+            g.addColorStop(0.5, `rgba(255,255,255,${(alpha * 0.32).toFixed(3)})`);
+            g.addColorStop(1,   'rgba(255,255,255,0)');
+            ctx.beginPath();
+            ctx.arc(px, py, r, 0, Math.PI * 2);
+            ctx.fillStyle = g;
+            ctx.fill();
+        }
+    }
+    ctx.restore();
+}
+
 // ── Main draw loop ────────────────────────────────────────────────────────────
 
 const SUN_R = 18;
@@ -163,6 +239,8 @@ function init(): void {
     const ctx = canvas.getContext('2d')!;
     const stars = makeStars(180);
     const moonImg = buildMoonCanvas(MOON_R);
+    const clouds = makeClouds();
+    let lastTs = 0;
 
     let bgColor = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
 
@@ -189,6 +267,9 @@ function init(): void {
     resize();
 
     function draw(timestamp: number): void {
+        const dt = lastTs === 0 ? 0 : (timestamp - lastTs) / 1000;
+        lastTs = timestamp;
+
         const now = new Date();
         const hour = now.getHours() + now.getMinutes() / 60 + now.getSeconds() / 3600;
         const w = cssW, h = cssH;
@@ -222,6 +303,10 @@ function init(): void {
 
         if (Math.sin(sunAngle) > -0.08) drawSun(ctx, sunX, sunY, SUN_R);
         if (Math.sin(moonAngle) > -0.08) drawMoon(ctx, moonX, moonY, MOON_R, moonImg);
+
+        // Clouds — fade in with daylight, invisible at night
+        updateClouds(clouds, dt);
+        drawClouds(ctx, clouds, w, h, 1 - n);
 
         // Bottom fade to page background
         const fade = ctx.createLinearGradient(0, h * 0.5, 0, h);
