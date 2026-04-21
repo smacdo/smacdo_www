@@ -63,6 +63,11 @@ function nightness(hour: number): number {
     return Math.max(0, -Math.sin(angle));
 }
 
+// Inverse of: sunAngle = π/2 − (hour − 12) / 12 × π
+function angleToHour(angle: number): number {
+    return 12 + 12 * (Math.PI / 2 - angle) / Math.PI;
+}
+
 // ── Stars ─────────────────────────────────────────────────────────────────────
 
 function makeStars(count: number): Star[] {
@@ -242,6 +247,16 @@ function init(): void {
     const clouds = makeClouds();
     let lastTs = 0;
 
+    // Drag / freeze state
+    let frozen = false;
+    let frozenAngle = 0;       // always the SUN angle; moon = frozenAngle + π
+    let dragging = false;
+    let grabbedMoon = false;   // true when the drag started on the moon
+    let lastTapMs = 0;
+
+    // Last-frame celestial positions for hit testing in event handlers
+    let sunPx = 0, sunPy = 0, moonPx = 0, moonPy = 0;
+
     let bgColor = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
 
     new MutationObserver(() => {
@@ -266,12 +281,92 @@ function init(): void {
     new ResizeObserver(resize).observe(canvas.parentElement!);
     resize();
 
+    // ── Drag interaction ──────────────────────────────────────────────────────
+
+    const HIT_R = Math.max(SUN_R, MOON_R) * 3.5;
+    canvas.style.touchAction = 'none';
+
+    function toCanvas(e: PointerEvent): { x: number; y: number } {
+        const rect = canvas!.getBoundingClientRect();
+        return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+    }
+
+    function dist2(ax: number, ay: number, bx: number, by: number): number {
+        return (ax - bx) ** 2 + (ay - by) ** 2;
+    }
+
+    function computeAngle(x: number, y: number): number {
+        return Math.atan2(cssH * 1.08 - y, x - cssW / 2);
+    }
+
+    canvas.addEventListener('pointerdown', (e) => {
+        // Double-tap on touch to unfreeze
+        if (e.pointerType === 'touch') {
+            const now = performance.now();
+            if (now - lastTapMs < 350 && frozen) {
+                frozen = false;
+                dragging = false;
+                canvas!.style.cursor = '';
+                return;
+            }
+            lastTapMs = now;
+        }
+
+        const { x, y } = toCanvas(e);
+        const hitSun  = dist2(x, y, sunPx,  sunPy)  < HIT_R * HIT_R;
+        const hitMoon = dist2(x, y, moonPx, moonPy) < HIT_R * HIT_R;
+        if (!hitSun && !hitMoon) return;
+
+        e.preventDefault();
+        dragging = true;
+        frozen = true;
+        grabbedMoon = hitMoon && !hitSun;
+        canvas!.setPointerCapture(e.pointerId);
+        canvas!.style.cursor = 'grabbing';
+
+        const raw = computeAngle(x, y);
+        frozenAngle = grabbedMoon ? raw - Math.PI : raw;
+    });
+
+    canvas.addEventListener('pointermove', (e) => {
+        const { x, y } = toCanvas(e);
+        if (dragging) {
+            const raw = computeAngle(x, y);
+            frozenAngle = grabbedMoon ? raw - Math.PI : raw;
+            return;
+        }
+        // Hover cursor
+        const over = dist2(x, y, sunPx, sunPy) < HIT_R * HIT_R
+                  || dist2(x, y, moonPx, moonPy) < HIT_R * HIT_R;
+        canvas!.style.cursor = over ? 'grab' : '';
+    });
+
+    canvas.addEventListener('pointerup', () => {
+        if (dragging) {
+            dragging = false;
+            canvas!.style.cursor = '';
+        }
+    });
+
+    canvas.addEventListener('pointercancel', () => {
+        dragging = false;
+        canvas!.style.cursor = '';
+    });
+
+    canvas.addEventListener('dblclick', () => {
+        frozen = false;
+        dragging = false;
+        canvas!.style.cursor = '';
+    });
+
     function draw(timestamp: number): void {
         const dt = lastTs === 0 ? 0 : (timestamp - lastTs) / 1000;
         lastTs = timestamp;
 
-        const now = new Date();
-        const hour = now.getHours() + now.getMinutes() / 60 + now.getSeconds() / 3600;
+        const clockHour = (() => { const d = new Date(); return d.getHours() + d.getMinutes() / 60 + d.getSeconds() / 3600; })();
+        const sunAngle  = frozen ? frozenAngle : Math.PI / 2 - ((clockHour - 12) / 12) * Math.PI;
+        const hour      = frozen ? angleToHour(frozenAngle) : clockHour;
+        const moonAngle = sunAngle + Math.PI;
         const w = cssW, h = cssH;
 
         ctx.clearRect(0, 0, w, h);
@@ -293,13 +388,14 @@ function init(): void {
         const horizonY = h * 1.08;
         const arcR = h * 0.98;
         const cx = w / 2;
-        const sunAngle = Math.PI / 2 - ((hour - 12) / 12) * Math.PI;
-        const moonAngle = sunAngle + Math.PI;
 
         const sunX = cx + arcR * Math.cos(sunAngle);
         const sunY = horizonY - arcR * Math.sin(sunAngle);
         const moonX = cx + arcR * Math.cos(moonAngle);
         const moonY = horizonY - arcR * Math.sin(moonAngle);
+
+        // Store for hit testing
+        sunPx = sunX; sunPy = sunY; moonPx = moonX; moonPy = moonY;
 
         if (Math.sin(sunAngle) > -0.08) drawSun(ctx, sunX, sunY, SUN_R);
         if (Math.sin(moonAngle) > -0.08) drawMoon(ctx, moonX, moonY, MOON_R, moonImg);
