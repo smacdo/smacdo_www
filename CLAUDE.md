@@ -110,10 +110,15 @@ Chrome's GPU process accumulates the memory without bound.
 
 Pattern: create at init, rebuild only when canvas size or inputs change.
 
-**To detect GPU memory leaks:** open Chrome Task Manager (Window menu → Task Manager) and watch
-the "GPU Memory" column for the tab while the page runs. No code instrumentation needed — if it
-climbs without bound, something is allocating per-frame. Chrome DevTools Performance tab also
-records JS heap + GPU rasterization over time for more detailed analysis.
+**To detect GPU memory leaks (automated):** static analysis — grep for GPU resource constructors
+(`createLinearGradient`, `createRadialGradient`, `createPattern`, `createImageBitmap`,
+`new OffscreenCanvas`, WebGL buffer/texture calls) inside `requestAnimationFrame` callbacks or
+functions called from them. Any allocation not guarded by a cache check or one-time flag is a bug.
+
+**To verify at runtime (human):** Chrome Task Manager (Window menu → Task Manager) shows a
+"GPU Memory" column per tab. If it climbs without bound while the page runs, something is
+allocating per-frame. Claude Code cannot access this — it is a Chrome-internal metric not
+exposed to page JavaScript.
 
 ## WASM Games
 
