@@ -33,7 +33,7 @@
     <meta property="og:type" content="{{ og_type }}">
     <meta property="og:url" content="{{ og_url }}">
 
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/style.css?v={{ now() | date(format='%Y%m%d%H%M%S') }}">
     <script>
         (function () {
             const stored = localStorage.getItem('theme');
@@ -76,7 +76,7 @@
         </footer>
     </div>
 
-    <script src="/js/theme.js"></script>
-    <script src="/js/site.js" defer></script>
+    <script src="/js/theme.js?v={{ now() | date(format='%Y%m%d%H%M%S') }}"></script>
+    <script src="/js/site.js?v={{ now() | date(format='%Y%m%d%H%M%S') }}" defer></script>
 </body>
 </html>
