@@ -96,25 +96,38 @@ function drawStars(ctx: CanvasRenderingContext2D, stars: Star[], w: number, h: n
     ctx.restore();
 }
 
-// ── Sun ───────────────────────────────────────────────────────────────────────
+// ── Sun (pre-rendered to offscreen canvas) ────────────────────────────────────
 
-function drawSun(ctx: CanvasRenderingContext2D, x: number, y: number, r: number): void {
-    const corona = ctx.createRadialGradient(x, y, r * 0.6, x, y, r * 3.5);
+function buildSunCanvas(r: number): HTMLCanvasElement {
+    const glowR = r * 3.5;
+    const size = Math.ceil(glowR * 2) + 4;
+    const c = document.createElement('canvas');
+    c.width = size; c.height = size;
+    const sc = c.getContext('2d')!;
+    const cx = size / 2, cy = size / 2;
+
+    const corona = sc.createRadialGradient(cx, cy, r * 0.6, cx, cy, glowR);
     corona.addColorStop(0, 'rgba(255,220,80,0.55)');
     corona.addColorStop(1, 'rgba(255,220,80,0)');
-    ctx.beginPath();
-    ctx.arc(x, y, r * 3.5, 0, Math.PI * 2);
-    ctx.fillStyle = corona;
-    ctx.fill();
+    sc.beginPath();
+    sc.arc(cx, cy, glowR, 0, Math.PI * 2);
+    sc.fillStyle = corona;
+    sc.fill();
 
-    const disc = ctx.createRadialGradient(x, y, 0, x, y, r);
+    const disc = sc.createRadialGradient(cx, cy, 0, cx, cy, r);
     disc.addColorStop(0, '#ffffff');
     disc.addColorStop(0.5, '#fff9d6');
     disc.addColorStop(1, '#ffd700');
-    ctx.beginPath();
-    ctx.arc(x, y, r, 0, Math.PI * 2);
-    ctx.fillStyle = disc;
-    ctx.fill();
+    sc.beginPath();
+    sc.arc(cx, cy, r, 0, Math.PI * 2);
+    sc.fillStyle = disc;
+    sc.fill();
+
+    return c;
+}
+
+function drawSun(ctx: CanvasRenderingContext2D, x: number, y: number, sunImg: HTMLCanvasElement): void {
+    ctx.drawImage(sunImg, x - sunImg.width / 2, y - sunImg.height / 2);
 }
 
 // ── Moon (crescent via offscreen canvas) ──────────────────────────────────────
@@ -122,10 +135,18 @@ function drawSun(ctx: CanvasRenderingContext2D, x: number, y: number, r: number)
 function buildMoonCanvas(r: number): HTMLCanvasElement {
     const size = r * 8;
     const c = document.createElement('canvas');
-    c.width = size;
-    c.height = size;
+    c.width = size; c.height = size;
     const mc = c.getContext('2d')!;
     const cx = size / 2, cy = size / 2;
+
+    // Glow (drawn first so crescent cutout removes both glow and disc there)
+    const glow = mc.createRadialGradient(cx, cy, r, cx, cy, r * 3);
+    glow.addColorStop(0, 'rgba(205,214,244,0.25)');
+    glow.addColorStop(1, 'rgba(205,214,244,0)');
+    mc.beginPath();
+    mc.arc(cx, cy, r * 3, 0, Math.PI * 2);
+    mc.fillStyle = glow;
+    mc.fill();
 
     // Disc
     mc.beginPath();
@@ -144,14 +165,6 @@ function buildMoonCanvas(r: number): HTMLCanvasElement {
 }
 
 function drawMoon(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, moonImg: HTMLCanvasElement): void {
-    const glow = ctx.createRadialGradient(x, y, r, x, y, r * 3);
-    glow.addColorStop(0, 'rgba(205,214,244,0.25)');
-    glow.addColorStop(1, 'rgba(205,214,244,0)');
-    ctx.beginPath();
-    ctx.arc(x, y, r * 3, 0, Math.PI * 2);
-    ctx.fillStyle = glow;
-    ctx.fill();
-
     const size = r * 8;
     ctx.drawImage(moonImg, x - size / 2, y - size / 2);
 }
@@ -170,6 +183,11 @@ interface Cloud {
     speed: number;  // canvas-widths per second
     puffs: CloudPuff[];
     span: number;   // half-width in canvas-height units (for wrap margin)
+    // Bounding box of all puffs in canvas-height units (for offscreen sizing)
+    bbx0: number; bby0: number;
+    bbx1: number; bby1: number;
+    offscreen: HTMLCanvasElement | null;
+    offscreenH: number;  // h value when offscreen was last rendered
 }
 
 function makeCloud(x: number): Cloud {
@@ -177,6 +195,7 @@ function makeCloud(x: number): Cloud {
     const count = 4 + Math.floor(Math.random() * 3);
     const puffs: CloudPuff[] = [{ dx: 0, dy: 0, r: baseR }];
     let span = baseR;
+    let bbx0 = -baseR, bby0 = -baseR, bbx1 = baseR, bby1 = baseR;
 
     for (let i = 1; i < count; i++) {
         const dx = (Math.random() - 0.5) * baseR * 2.8;
@@ -184,6 +203,8 @@ function makeCloud(x: number): Cloud {
         const r  = baseR * (0.5 + Math.random() * 0.75);
         puffs.push({ dx, dy, r });
         span = Math.max(span, Math.abs(dx) + r);
+        bbx0 = Math.min(bbx0, dx - r); bby0 = Math.min(bby0, dy - r);
+        bbx1 = Math.max(bbx1, dx + r); bby1 = Math.max(bby1, dy + r);
     }
 
     return {
@@ -192,7 +213,35 @@ function makeCloud(x: number): Cloud {
         speed: 0.004 + Math.random() * 0.008,
         puffs,
         span,
+        bbx0, bby0, bbx1, bby1,
+        offscreen: null,
+        offscreenH: 0,
     };
+}
+
+function renderCloudOffscreen(cloud: Cloud, h: number): void {
+    const pad = 2;
+    const cw = Math.ceil((cloud.bbx1 - cloud.bbx0) * h) + pad * 2;
+    const ch = Math.ceil((cloud.bby1 - cloud.bby0) * h) + pad * 2;
+    if (!cloud.offscreen) cloud.offscreen = document.createElement('canvas');
+    cloud.offscreen.width = cw;
+    cloud.offscreen.height = ch;
+    cloud.offscreenH = h;
+    const oc = cloud.offscreen.getContext('2d')!;
+    oc.clearRect(0, 0, cw, ch);
+    for (const p of cloud.puffs) {
+        const px = (p.dx - cloud.bbx0) * h + pad;
+        const py = (p.dy - cloud.bby0) * h + pad;
+        const r  = p.r * h;
+        const g  = oc.createRadialGradient(px, py, 0, px, py, r);
+        g.addColorStop(0,   'rgba(255,255,255,0.52)');
+        g.addColorStop(0.5, 'rgba(255,255,255,0.32)');
+        g.addColorStop(1,   'rgba(255,255,255,0)');
+        oc.beginPath();
+        oc.arc(px, py, r, 0, Math.PI * 2);
+        oc.fillStyle = g;
+        oc.fill();
+    }
 }
 
 function makeClouds(): Cloud[] {
@@ -212,22 +261,10 @@ function updateClouds(clouds: Cloud[], dt: number): void {
 function drawClouds(ctx: CanvasRenderingContext2D, clouds: Cloud[], w: number, h: number, alpha: number): void {
     if (alpha < 0.01) return;
     ctx.save();
+    ctx.globalAlpha = alpha;
     for (const c of clouds) {
-        const cx = c.x * w;
-        const cy = c.y * h;
-        for (const p of c.puffs) {
-            const px = cx + p.dx * h;
-            const py = cy + p.dy * h;
-            const r  = p.r  * h;
-            const g  = ctx.createRadialGradient(px, py, 0, px, py, r);
-            g.addColorStop(0,   `rgba(255,255,255,${(alpha * 0.52).toFixed(3)})`);
-            g.addColorStop(0.5, `rgba(255,255,255,${(alpha * 0.32).toFixed(3)})`);
-            g.addColorStop(1,   'rgba(255,255,255,0)');
-            ctx.beginPath();
-            ctx.arc(px, py, r, 0, Math.PI * 2);
-            ctx.fillStyle = g;
-            ctx.fill();
-        }
+        if (!c.offscreen || c.offscreenH !== h) renderCloudOffscreen(c, h);
+        ctx.drawImage(c.offscreen!, c.x * w + c.bbx0 * h - 2, c.y * h + c.bby0 * h - 2);
     }
     ctx.restore();
 }
@@ -339,9 +376,14 @@ function init(): void {
 
     const ctx = canvas.getContext('2d')!;
     const stars = makeStars(180);
+    const sunImg = buildSunCanvas(SUN_R);
     const moonImg = buildMoonCanvas(MOON_R);
     const clouds = makeClouds();
     let lastTs = 0;
+
+    // Cached gradients — recreated only when inputs change
+    let skyGradKey = '', skyGrad: CanvasGradient | null = null;
+    let fadeGradKey = '', fadeGrad: CanvasGradient | null = null;
 
     // Drag / freeze state
     let frozen = false;
@@ -372,6 +414,9 @@ function init(): void {
         canvas!.style.height = cssH + 'px';
         ctx.resetTransform();
         ctx.scale(dpr, dpr);
+        // Invalidate cached gradients and cloud offscreens on resize
+        skyGradKey = ''; fadeGradKey = '';
+        for (const c of clouds) c.offscreenH = 0;
     }
 
     new ResizeObserver(resize).observe(canvas.parentElement!);
@@ -467,13 +512,17 @@ function init(): void {
 
         ctx.clearRect(0, 0, w, h);
 
-        // Sky gradient
+        // Sky gradient — recreate only when colors or canvas height change
         const sky = getSkyAt(hour);
-        const skyGrad = ctx.createLinearGradient(0, 0, 0, h);
-        skyGrad.addColorStop(0, rgba(sky.top));
-        skyGrad.addColorStop(0.55, rgba(sky.mid));
-        skyGrad.addColorStop(1, rgba(sky.bot));
-        ctx.fillStyle = skyGrad;
+        const newSkyKey = `${h}|${rgba(sky.top)}|${rgba(sky.mid)}|${rgba(sky.bot)}`;
+        if (newSkyKey !== skyGradKey) {
+            skyGrad = ctx.createLinearGradient(0, 0, 0, h);
+            skyGrad.addColorStop(0, rgba(sky.top));
+            skyGrad.addColorStop(0.55, rgba(sky.mid));
+            skyGrad.addColorStop(1, rgba(sky.bot));
+            skyGradKey = newSkyKey;
+        }
+        ctx.fillStyle = skyGrad!;
         ctx.fillRect(0, 0, w, h);
 
         // Stars
@@ -493,7 +542,7 @@ function init(): void {
         // Store for hit testing
         sunPx = sunX; sunPy = sunY; moonPx = moonX; moonPy = moonY;
 
-        if (Math.sin(sunAngle) > -0.08) drawSun(ctx, sunX, sunY, SUN_R);
+        if (Math.sin(sunAngle) > -0.08) drawSun(ctx, sunX, sunY, sunImg);
         if (Math.sin(moonAngle) > -0.08) drawMoon(ctx, moonX, moonY, MOON_R, moonImg);
 
         // Clouds — fade in with daylight, invisible at night
@@ -503,11 +552,15 @@ function init(): void {
         // Terrain silhouette
         drawSilhouette(ctx, w, h);
 
-        // Bottom fade to page background
-        const fade = ctx.createLinearGradient(0, h * 0.5, 0, h);
-        fade.addColorStop(0, 'rgba(0,0,0,0)');
-        fade.addColorStop(1, bgColor);
-        ctx.fillStyle = fade;
+        // Bottom fade — recreate only when bg color or canvas height change
+        const newFadeKey = `${h}|${bgColor}`;
+        if (newFadeKey !== fadeGradKey) {
+            fadeGrad = ctx.createLinearGradient(0, h * 0.5, 0, h);
+            fadeGrad.addColorStop(0, 'rgba(0,0,0,0)');
+            fadeGrad.addColorStop(1, bgColor);
+            fadeGradKey = newFadeKey;
+        }
+        ctx.fillStyle = fadeGrad!;
         ctx.fillRect(0, 0, w, h);
 
         requestAnimationFrame(draw);
