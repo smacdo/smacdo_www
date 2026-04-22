@@ -101,6 +101,20 @@ Without these keys, Zola falls back to its built-in "Welcome to Zola!" placehold
 - Game logic operates on logical canvas dimensions (`this.canvasWidth/canvasHeight`)
 - `src/lib/utils.ts` provides `not_null` and `clamp` — imported by gamebox files
 
+## Canvas Performance Rules
+
+**Never allocate GPU-backed objects inside a `requestAnimationFrame` loop.** GPU resources
+(`CanvasGradient`, offscreen canvases, `ImageBitmap`, WebGL buffers/textures, etc.) must be
+created once and reused. The JS heap stays small so GC never feels pressure to collect, but
+Chrome's GPU process accumulates the memory without bound.
+
+Pattern: create at init, rebuild only when canvas size or inputs change.
+
+**To detect GPU memory leaks:** open Chrome Task Manager (Window menu → Task Manager) and watch
+the "GPU Memory" column for the tab while the page runs. No code instrumentation needed — if it
+climbs without bound, something is allocating per-frame. Chrome DevTools Performance tab also
+records JS heap + GPU rasterization over time for more detailed analysis.
+
 ## WASM Games
 
 - Built in a separate Rust repository
