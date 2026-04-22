@@ -41,12 +41,12 @@
 
 /* ── Variables (light theme = Catppuccin Latte) ────────────────────────────── */
 :root {
-    --bg:     #e6e9ef;
-    --fg:     #4c4f69;
-    --muted:  #6c6f85;
-    --border: #ccd0da;
-    --link:   #1e66f5;
-    --accent: #8839ef;
+    --bg:     #f9f6f0;
+    --fg:     #26221e;
+    --muted:  #78726c;
+    --border: #d8d2c8;
+    --link:   #2557a7;
+    --accent: #8b5e3c;
 }
 
 [data-theme="dark"] {
