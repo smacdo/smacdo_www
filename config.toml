@@ -6,8 +6,8 @@ generate_feeds = true
 feed_filenames = ["atom.xml"]
 
 [markdown.highlighting]
-enabled = true
-theme = "ayu-dark"
+light_theme = "catppuccin-latte"
+dark_theme = "catppuccin-mocha"
 
 [extra]
 author = "Scott MacDonald"
