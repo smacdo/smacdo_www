@@ -122,7 +122,29 @@ exposed to page JavaScript.
 
 ## WASM Games
 
-- Built in a separate Rust repository
-- CI in that repo rsyncs build artifacts to the web server
-- URL contract: `/games/[slug]/loader.js` exports `init(canvas: HTMLCanvasElement): Promise<void>`
-- The games page template provides the canvas container; loader.js initializes into it
+- Built in the `turboprop` repo; CI publishes artifacts to `~/turboprop-demos/<slug>/` on the server
+- Discovery: the games section page fetches `/demos/metadata.json` at runtime to list available demos
+- Each game page sets `loader = "wasm"` in front matter; `templates/games/page.html` imports
+  `/demos/<slug>/loader.js` and calls `load(canvas)`
+- Canvas element must have `id="game-canvas"` — turboprop-graphics finds it by ID at startup
+- Assets are fetched from `/demos/<slug>/content/`; `loader.js` sets
+  `window.__turboprop_content_base` before calling `init()` so turboprop knows where to look
+
+## Deployment
+
+**Staging** deploys automatically on every push to `master`.
+
+**Production** requires a `releases-vN` tag:
+```bash
+git tag releases-v8
+git push origin releases-v8
+```
+Then approve the pending deployment in GitHub Actions (Settings → Environments → production).
+
+**Server scripts** (`deploy-www.sh`) live at `~/deploy/bin/` on both `smacdo_prod` and
+`smacdo_staging`. They are sourced from the `turboprop` repo's `server/` directory and must be
+updated manually on both servers when changed — there is no automated pipeline for the scripts
+themselves.
+
+**`+FollowSymLinks` in `.htaccess`** is required for Apache to serve `/demos/` through the
+`~/smacdo.com/demos → ~/turboprop-demos` symlink. Do not remove it.
