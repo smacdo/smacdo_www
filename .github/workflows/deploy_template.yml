@@ -84,7 +84,7 @@ jobs:
           path: ./public
       - name: Stage website
         run: |
-          rsync --recursive --archive --compress --delay-updates --itemize-changes \
+          rsync --recursive --archive --compress --delay-updates --itemize-changes --mkpath \
             ./public/ ${{ secrets.SSH_USER }}@remote-host:~/deploy/staging/www/
 
       - name: Promote to live
