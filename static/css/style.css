@@ -358,8 +358,8 @@ article pre code {
 
 #game-container {
     width: 100%;
-    aspect-ratio: 9 / 16;
-    max-width: 480px;
+    aspect-ratio: 16 / 9;
+    max-width: 960px;
     background: #000;
     margin-bottom: 1.5rem;
 }
