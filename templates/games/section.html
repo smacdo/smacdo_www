@@ -18,4 +18,23 @@
 {% else %}
 <p>No games yet. Check back soon.</p>
 {% endif %}
+
+<div id="wasm-demos"></div>
+<script type="module">
+  const resp = await fetch('/demos/metadata.json');
+  if (!resp.ok) return;
+  const { demos } = await resp.json();
+  if (!demos || demos.length === 0) return;
+  const container = document.getElementById('wasm-demos');
+  const ul = document.createElement('ul');
+  ul.className = 'game-list';
+  for (const d of demos) {
+    const li = document.createElement('li');
+    li.innerHTML = `<a href="/games/${d.slug}/">${d.title}</a>`
+      + (d.version ? ` <span class="version-badge">${d.version}</span>` : '')
+      + (d.description ? `<p>${d.description}</p>` : '');
+    ul.appendChild(li);
+  }
+  container.appendChild(ul);
+</script>
 {% endblock content %}

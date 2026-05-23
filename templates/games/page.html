@@ -15,7 +15,12 @@
 
 {{ page.content | safe }}
 
-{% if page.extra.loader == "ts" %}
+{% if page.extra.loader == "wasm" %}
+<script type="module">
+  const m = await import('/demos/{{ page.slug }}/loader.js');
+  await m.load(document.getElementById('game-canvas'));
+</script>
+{% elif page.extra.loader == "ts" %}
 <script src="/js/demos/{{ page.slug }}.js" defer></script>
 {% endif %}
 {% endblock content %}

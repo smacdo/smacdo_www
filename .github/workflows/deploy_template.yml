@@ -9,8 +9,6 @@ on:
         required: true
         type: string
     secrets:
-      DEPLOY_DIR:
-        required: true
       SSH_HOST:
         required: true
       SSH_KEY:
@@ -84,7 +82,13 @@ jobs:
         with:
           name: deployment-files
           path: ./public
-      - name: Deploy
+      - name: Stage website
         run: |
-          rsync --recursive --archive --compress --delay-updates --delete-after --itemize-changes \
-             ./public/ ${{ secrets.SSH_USER }}@remote-host:/${{ secrets.DEPLOY_DIR }}/
+          rsync --recursive --archive --compress --delay-updates --itemize-changes \
+            ./public/ ${{ secrets.SSH_USER }}@remote-host:~/deploy/staging/www/
+
+      - name: Promote to live
+        run: |
+          # deploy-www.sh rsyncs staging → doc root with --delete-after --exclude demos/
+          # so WASM artifacts in ~/turboprop-demos/ (symlinked as demos/) are never wiped.
+          ssh ${{ secrets.SSH_USER }}@remote-host "~/deploy/bin/deploy-www.sh"

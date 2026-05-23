@@ -14,7 +14,6 @@ jobs:
       deployment_name: staging.smacdo.com
       environment: staging
     secrets:
-      DEPLOY_DIR: ${{ secrets.STAGING_DEPLOY_DIR }}
       SSH_HOST: ${{ secrets.STAGING_SSH_HOST }}
       SSH_KEY: ${{ secrets.STAGING_SSH_KEY }}
       SSH_USER: ${{ secrets.STAGING_SSH_USER }}
