@@ -1,3 +1,11 @@
 ErrorDocument 404 /404.html
 Options -Indexes +FollowSymLinks
 AddType application/wasm .wasm
+
+# loader.js and version.json change with every demo release — must not be cached.
+# The generated WASM/JS bundle files can be cached long-term (their content changes
+# when wasm-pack rebuilds them, but the Cloudflare CDN caches the correct version
+# after each deploy, so no issue there).
+<FilesMatch "^(loader\.js|version\.json|metadata\.json)$">
+    Header set Cache-Control "no-store"
+</FilesMatch>
