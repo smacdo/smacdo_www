@@ -12,6 +12,10 @@
     - UI can be rendered at native resolution if game desires
         - Provide `onDrawUI` which draws directly to canvas at DPR adjusted dims
 
+## Demos
+- Rename /games/ to /demos/
+- Show version and publish date on the demo page (demos/name-of-demo)
+
 ## Viewport
 
 - Add option to use canvas width or height when determining output size.

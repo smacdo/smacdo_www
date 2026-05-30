@@ -9,7 +9,27 @@
       "Bash(git rm *)",
       "Bash(zola --version)",
       "Bash(make build *)",
-      "Bash(zola build *)"
+      "Bash(zola build *)",
+      "Bash(npm install *)",
+      "Bash(zola check *)",
+      "Bash(gh run *)",
+      "Bash(curl -s -A \"Mozilla/5.0 \\(Windows NT 10.0; Win64; x64\\) AppleWebKit/537.36 \\(KHTML, like Gecko\\) Chrome/120.0.0.0 Safari/537.36\" \"https://fonts.googleapis.com/css2?family=Oxanium:wght@400;700&display=swap\")",
+      "Bash(curl -s -A \"Mozilla/5.0 \\(Windows NT 10.0; Win64; x64\\) AppleWebKit/537.36 \\(KHTML, like Gecko\\) Chrome/120.0.0.0 Safari/537.36\" \"https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&display=swap\")",
+      "Bash(zola serve *)",
+      "Bash(npm run *)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:api.github.com)",
+      "Bash(pkill -f \"http.server\")",
+      "Bash(python3 -m http.server 9876 --directory /Users/scottmacdonald/repos/smacdo_www/public)",
+      "Bash(git checkout *)",
+      "Bash(curl -s https://staging.smacdo.com/css/style.css)",
+      "Bash(curl -s https://staging.smacdo.com/)",
+      "Bash(curl -s -I https://staging.smacdo.com/css/style.css)",
+      "Bash(curl *)",
+      "Bash(git push *)",
+      "Bash(python3 -m http.server 8080 --directory public)",
+      "Bash(pkill -f \"python3 -m http.server 8080\")"
     ],
     "deny": []
   }
