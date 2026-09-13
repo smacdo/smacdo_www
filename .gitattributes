@@ -1,0 +1,12 @@
+# Check every text file out with LF on all platforms, overriding Git for Windows'
+# core.autocrlf default. Without this, a Windows working tree gets CRLF while the
+# repository stores LF, and Prettier — which reads the files on disk and defaults to
+# endOfLine "lf" — reports every file as badly formatted even though the committed
+# content is correct. It also keeps the Makefile free of CRLF, which some versions of
+# make will not tolerate.
+* text=auto eol=lf
+
+# Never line-ending convert binary assets. `text=auto` already detects these, but
+# declaring them makes the intent explicit.
+*.png   binary
+*.woff2 binary
