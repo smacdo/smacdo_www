@@ -12,14 +12,28 @@ alone without re-deriving the research below. **Update the status table as phase
 | Phase | Description                                 | State |
 | ----- | ------------------------------------------- | ----- |
 | 0     | Prep: commit this plan, install filter-repo | DONE  |
-| 1     | Graft toybox history (commit 1)             | TODO  |
-| 2     | Reorganize + strip scaffolding (commit 2)   | TODO  |
+| 1     | Graft toybox history (commit 1)             | DONE  |
+| 2     | Reorganize + strip scaffolding (commit 2)   | DONE  |
 | 3     | Wire into build/lint/typecheck (commit 3)   | TODO  |
 | 4     | Reformat to project style (commit 4)        | TODO  |
 | 5     | Page + code adaptation (commit 5)           | TODO  |
 | 6     | Bookkeeping (commit 6)                      | TODO  |
 
 Nothing is pushed by any phase. See [Guardrails](#guardrails).
+
+### Deviations from the plan as written
+
+- **Phase 1** needed `git clone --no-local` (not plain `git clone`): filter-repo refuses to rewrite
+  a local clone that reuses the source's object store, since it is not "freshly packed".
+- **Phase 1** installed `git-filter-repo` to the Python _user_ scripts directory, not
+  `C:\Python313\Scripts`. The binary is at
+  `C:/Users/smacd/AppData/Roaming/Python/Python313/Scripts/git-filter-repo.exe`, and the
+  `git filter-repo` subcommand form does not resolve; invoke the exe by full path.
+- **Phase 2** removed `demo.js`'s `import "./style.css"` (planned for Phase 5). Deleting
+  `style.css` and keeping its import would have left a commit that cannot build; the deletion and
+  the import removal are one change.
+- **Phase 1's** commit predates this status table, so Phases 1 and 2 are both marked here in the
+  Phase 2 commit.
 
 ## Context
 

@@ -1,4 +1,3 @@
-import "./style.css";
 import { Game } from "./game.js";
 import { Input } from "./input.js";
 

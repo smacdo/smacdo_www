@@ -1,5 +1,5 @@
 import DEFAULT_LEVEL from "./levels/level1.js";
-import { TILE_WALL, SokobanGame } from "./sokoban_game.js";
+import { TILE_WALL, SokobanGame } from "./sokoban-game.js";
 
 export class Game {
   /**
