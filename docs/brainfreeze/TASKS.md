@@ -46,8 +46,9 @@ a feature.
 - [ ] Decide how Input listeners are disposed when a game is unmounted/recreated. Now
       live rather than hypothetical: the demo runs inside a multi-page site. Current
       listeners are attached to `window` at construction and live for the page lifetime.
-- [ ] Recheck restart followed by undo after the history-reset fix (user confirmed;
-      source now clears stateSnapshots).
+- [x] Recheck restart followed by undo after the history-reset fix. Independently verified
+      2026-09-13 by exercising the rules headlessly after the migration: restart resets the
+      player and a following undo returns false, so the snapshot history is genuinely cleared.
 
 The smacdo_www migration is complete; see [MIGRATION.md](MIGRATION.md) for the record.
 

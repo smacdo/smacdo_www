@@ -21,6 +21,17 @@ alone without re-deriving the research below. **Update the status table as phase
 
 Nothing is pushed by any phase. See [Guardrails](#guardrails).
 
+All phases are complete. Verified end to end afterwards: `npm run build` and `zola check` pass
+with zola 0.22.1 (the CI pin), all three game pages render correctly, and the game rules were
+exercised headlessly — 19 assertions covering movement, wall and diagonal rejection, pushing,
+undo, restart, source-level immutability, and a full ten-move solve of level 1, all passing. That
+check ran from a scratch directory and was deliberately not committed, since adding test
+infrastructure needs its own task; it would be a reasonable starting point for the Vitest task in
+[TASKS.md](TASKS.md).
+
+The one outstanding item is a human browser check of `/games/brainfreeze/`: board square and
+uncropped, WASD/R/Z responsive, no console errors.
+
 ### Changed after the migration
 
 The phase instructions below are kept as written, as a record of what was done. Two things have
