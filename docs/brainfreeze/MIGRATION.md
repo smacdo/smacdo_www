@@ -29,8 +29,16 @@ check ran from a scratch directory and was deliberately not committed, since add
 infrastructure needs its own task; it would be a reasonable starting point for the Vitest task in
 [TASKS.md](TASKS.md).
 
-The one outstanding item is a human browser check of `/games/brainfreeze/`: board square and
-uncropped, WASD/R/Z responsive, no console errors.
+The browser check is also done, driven headlessly over the Chrome DevTools Protocol against the
+built output: the board renders square and uncropped with all eight rows visible (the old clipping
+bug is gone), real key events drive the game — the same ten-move solution solves it in the browser
+and raises the win banner, and `z` reverts exactly one move — and the page logs no errors or
+exceptions. The migration is therefore complete and verified.
+
+Minor observations from that run, none blocking and none acted on: `game.js` logs "game started"
+to the console on every load; the win banner's `fillRect` sets no `fillStyle`, so it inherits the
+player's yellow from the preceding draw and is drawn at fixed pixel coordinates that overlap the
+top rows; and the site as a whole serves no favicon.
 
 ### Changed after the migration
 
