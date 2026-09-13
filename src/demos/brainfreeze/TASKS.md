@@ -14,6 +14,11 @@ a feature.
       double-quote and semicolon style unless the user chooses otherwise.
 - [ ] Add Vitest run/watch commands when preparing for game-rule tests; avoid
       creating placeholder tests just to exercise the runner.
+- [ ] Add Vitest unit tests for SokobanGame movement: valid cardinal steps,
+      invalid arguments throwing without state changes, coordinate bounds and row
+      wrapping, walls, successful pushes, blocked pushes (walls, boxes, board edges),
+      goal occupancy, and independence from the original level data. Extend coverage
+      to undo, restart, and completion as those features are implemented (PLAN.md).
 - [ ] Simplify .gitignore. Remove unrelated Vite-repository patterns and duplicates;
       reconcile `.vscode/*` plus the extensions.json exception with the later rule
       that ignores the whole `.vscode` directory. Preserve intended generated-file

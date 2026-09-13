@@ -1,4 +1,5 @@
-import DEAULT_LEVEL from "./levels/level1.js";
+import DEFAULT_LEVEL from "./levels/level1.js";
+import { TILE_WALL, SokobanGame } from "./sokoban_game.js";
 
 export class Game {
   /**
@@ -11,7 +12,7 @@ export class Game {
     this.previousTimestamp = null;
 
     // Gameplay state.
-    this.level = structuredClone(DEAULT_LEVEL);
+    this.gameState = new SokobanGame(DEFAULT_LEVEL);
   }
 
   /** Starts the game. */
@@ -49,27 +50,18 @@ export class Game {
    */
   update(_deltaTime) {
     // TODO: use deltaTime and perform movement animation.
-    // TODO: implement movement collision.
-    // TODO: implement crate pushing.
-    // TODO: implement winning.
 
-    if (this.input.isKeyPressed("w") && this.level.player[1] > 0) {
-      this.level.player[1] -= 1;
+    if (this.input.isKeyPressed("w")) {
+      this.gameState.move(0, -1);
     }
-    if (
-      this.input.isKeyPressed("s") &&
-      this.level.player[1] < this.level.tiles.length
-    ) {
-      this.level.player[1] += 1;
+    if (this.input.isKeyPressed("s")) {
+      this.gameState.move(0, 1);
     }
-    if (this.input.isKeyPressed("a") && this.level.player[0] > 0) {
-      this.level.player[0] -= 1;
+    if (this.input.isKeyPressed("a")) {
+      this.gameState.move(-1, 0);
     }
-    if (
-      this.input.isKeyPressed("d") &&
-      this.level.player[0] < this.level.colsPerRow
-    ) {
-      this.level.player[0] += 1;
+    if (this.input.isKeyPressed("d")) {
+      this.gameState.move(1, 0);
     }
   }
 
@@ -80,8 +72,6 @@ export class Game {
     //const canvas = this.canvasContext.canvas;
 
     // Style configuration.
-    const TILE_WALL = 0;
-
     const WALL_COLOR = "white";
     const FLOOR_COLOR = "gray";
     const PLAYER_COLOR = "yellow";
@@ -101,12 +91,12 @@ export class Game {
     }
 
     // Draw the tile map.
-    const colCount = this.level.colsPerRow;
-    const rowCount = this.level.tiles.length / colCount;
+    const colCount = this.gameState.colCount();
+    const rowCount = this.gameState.tilemap().length / colCount;
 
     for (let y = 0; y < rowCount; y++) {
       for (let x = 0; x < colCount; x++) {
-        const tile = this.level.tiles.at(colCount * y + x);
+        const tile = this.gameState.tilemap().at(colCount * y + x);
         this.canvasContext.fillStyle =
           tile === TILE_WALL ? WALL_COLOR : FLOOR_COLOR;
 
@@ -132,51 +122,63 @@ export class Game {
       }
     }
 
-    // Draw sprites.
-    const spriteWidth = 48;
-    const spriteHeight = 48;
-    const spriteOffsetX = (tileWidth - spriteWidth) / 2;
-    const spriteOffsetY = (tileHeight - spriteHeight) / 2;
+    // Draw goals.
+    const goalWidth = 56;
+    const goalHeight = 56;
+    const goalOffsetX = (tileWidth - goalWidth) / 2;
+    const goalOffsetY = (tileHeight - goalHeight) / 2;
 
-    const goal_count = this.level.goals.length;
+    const goals = this.gameState.goals();
+    const goal_count = goals.length;
 
     for (let i = 0; i < goal_count; i++) {
-      const goalX = this.level.goals[i][0];
-      const goalY = this.level.goals[i][1];
+      const goalX = goals[i][0];
+      const goalY = goals[i][1];
 
-      this.canvasContext.fillStyle = GOAL_EMPTY_COLOR;
+      this.canvasContext.fillStyle = this.gameState.isBoxAt(goalX, goalY)
+        ? GOAL_FULL_COLOR
+        : GOAL_EMPTY_COLOR;
       this.canvasContext.fillRect(
-        goalX * tileWidth + spriteOffsetX,
-        goalY * tileHeight + spriteOffsetY,
-        spriteWidth,
-        spriteHeight,
+        goalX * tileWidth + goalOffsetX,
+        goalY * tileHeight + goalOffsetY,
+        goalWidth,
+        goalHeight,
       );
     }
 
-    const box_count = this.level.boxes.length;
+    // Draw boxes.
+    const boxWidth = 32;
+    const boxHeight = 32;
+    const boxOffsetX = (tileWidth - boxWidth) / 2;
+    const boxOffsetY = (tileHeight - boxHeight) / 2;
+
+    const boxes = this.gameState.boxes();
+    const box_count = boxes.length;
 
     for (let i = 0; i < box_count; i++) {
-      const boxX = this.level.boxes[i][0];
-      const boxY = this.level.boxes[i][1];
+      const boxX = boxes[i][0];
+      const boxY = boxes[i][1];
 
       this.canvasContext.fillStyle = BOX_COLOR;
       this.canvasContext.fillRect(
-        boxX * tileWidth + spriteOffsetX,
-        boxY * tileHeight + spriteOffsetY,
-        spriteWidth,
-        spriteHeight,
+        boxX * tileWidth + boxOffsetX,
+        boxY * tileHeight + boxOffsetY,
+        boxWidth,
+        boxHeight,
       );
     }
 
-    const playerX = this.level.player[0];
-    const playerY = this.level.player[1];
+    // Draw the player.
+    const player = this.gameState.player();
+    const playerX = player[0];
+    const playerY = player[1];
 
     this.canvasContext.fillStyle = PLAYER_COLOR;
     this.canvasContext.fillRect(
-      playerX * tileWidth + spriteOffsetX,
-      playerY * tileHeight + spriteOffsetY,
-      spriteWidth,
-      spriteHeight,
+      playerX * tileWidth + goalOffsetX,
+      playerY * tileHeight + goalOffsetY,
+      goalWidth,
+      goalHeight,
     );
 
     /*
