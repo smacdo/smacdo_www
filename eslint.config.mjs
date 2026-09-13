@@ -19,6 +19,16 @@ export default defineConfig([
         },
     },
     {
+        files: ["src/**/*.js"],
+        extends: [js.configs.recommended],
+        rules: {
+            "no-unused-vars": ["error", { args: "all", argsIgnorePattern: "^_" }],
+        },
+        languageOptions: {
+            globals: globals.browser,
+        },
+    },
+    {
         files: ["static/js/**/*.js"],
         extends: [js.configs.recommended],
         rules: {

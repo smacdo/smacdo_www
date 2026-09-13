@@ -3,6 +3,7 @@
 build:
 	zola build
 	npm run build:demos
+	npm run build:brainfreeze
 	npm run build:site
 
 serve:
