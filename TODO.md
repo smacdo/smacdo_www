@@ -1,6 +1,31 @@
 # TODO
 
-- Add linter rule to break lines longer than 100 characters.
+## Improvement walkthrough (2026-09-12)
+
+User implements; assistant guides and reviews. Start at item 1; each item is a separate checkpoint.
+
+1. [ ] Add TypeScript as a dev dependency, a browser-oriented `tsconfig.json`, and a
+   `typecheck` script (`tsc --noEmit`). Resolve production-source diagnostics and add CI checking.
+   Existing test files need separate runner/type setup; do not silently treat them as checked.
+2. [ ] Add typescript-eslint recommended linting and Prettier for TS, JS, CSS, and Markdown.
+   Use a 100-character wrapping target; keep bulk formatting separate from behavior changes.
+3. [ ] Coordinate Zola serving and TypeScript rebuilds in one dev command. Account for Zola
+   regenerating `public/` and removing bundles, not just TypeScript file changes.
+4. [ ] Align local/CI Node versions, document `npm ci`, and provide one shared local/PR check
+   command. Assess restoring existing tests as a separate task.
+5. [ ] Fix illegal top-level `return` statements in `templates/games/section.html`.
+   Consider moving gallery discovery into checked TypeScript; handle missing metadata gracefully.
+6. [ ] Include `public/.htaccess` in the deployment artifact; upload-artifact v4 excludes
+   hidden files by default. Verify the downloaded artifact contains it.
+7. [ ] Fix premature resolution in `httpGetImage` (`src/lib/gamebox/resources.ts`) and
+   release its object URL after image load/error.
+8. [ ] Bound fixed-step catch-up in `BaseGame` and reset runner timing when resuming.
+
+Baseline: `make build` passes; the gallery module fails Node's syntax check with
+`Illegal return statement`. No browser or live-server validation performed in this review.
+
+## Earlier engine backlog
+
 - Resize the canvas and game when the window changes dimensions.
 - A game should declare its target dimensions (width, height), aspect ratio requirements (lock to
   vertical, horizontal, or none), and then the engine will handle implementation.

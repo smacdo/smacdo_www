@@ -141,6 +141,10 @@ smacdo.com repo/
 
 ## Implementation Phases
 
+Status reconciled against source on 2026-09-12. Checked items indicate implementation present,
+not fresh browser or deployment verification. The current guided improvement sequence is in
+[TODO.md](TODO.md#improvement-walkthrough-2026-09-12), beginning with TypeScript checking.
+
 ### Phase 1: Zola Foundation ✅
 - [x] Initialize Zola project (`config.toml`)
 - [x] Create directory structure (`content/`, `templates/`, `static/`)
@@ -169,8 +173,12 @@ smacdo.com repo/
 
 ### Phase 4: WASM Integration
 - [ ] Finalize WASM embedding contract (URL structure, JS API)
-- [ ] Update game page template to load and initialize WASM via loader.js
-- [ ] Document the contract for the Rust game repository
+- [x] Update game page template to load and initialize WASM via loader.js
+- [x] Document the implemented contract in [games and graphics](docs/games-and-graphics.md#wasm-games)
+
+Current implementation uses `/demos/<slug>/loader.js` and `load(canvas)`, with content under
+`/demos/<slug>/content/`. Final cross-repository agreement remains unverified. Gallery discovery
+exists but has a syntax error tracked in TODO.md.
 
 ### Phase 5: Visual Polish
 
@@ -179,41 +187,44 @@ smacdo.com repo/
   - Light: bg `#eff1f5`, fg `#4c4f69`, muted `#6c6f85`, border `#ccd0da`, link `#1e66f5`
   - Dark theme is already Mocha — verify and tune
   - Add `--accent` variable (Catppuccin mauve `#cba6f7` dark / `#8839ef` light)
-- [ ] Self-host fonts (download `.woff2` to `static/fonts/`, add `@font-face`)
+- [x] Self-host fonts (download `.woff2` to `static/fonts/`, add `@font-face`)
   - **Inter** — body text
   - **Oxanium** — headings (`h1`–`h4`)
   - **JetBrains Mono** — `code`, `pre`
 
+Current light colors use warm ink/paper rather than Latte; the palette item remains open.
+Both themes already define `--accent`.
+
 #### 5b: Full-bleed Header Restructure
-- [ ] Move `max-width` + `padding` from `body` to a `.page-body` inner wrapper
+- [x] Move `max-width` + `padding` from `body` to a `.page-body` inner wrapper
 - [ ] `<header>` and `<footer>` become full browser-width
-- [ ] Nav content inside header stays centered at 800px
-- [ ] Nav gets semi-transparent dark pill background (readable against any sky)
-- [ ] Update `base.html` and `style.css` accordingly
+- [x] Nav content inside header stays centered at 800px
+- [x] Nav gets semi-transparent dark pill background (readable against any sky)
+- [ ] Complete remaining template/style restructure: footer is still inside `.page-body`
 
 #### 5c: Sky Canvas — Core
-New file: `src/site/header.ts` compiled to `public/js/site.js` (new esbuild entry).
-- [ ] Add esbuild entry to `package.json` build script
-- [ ] Add `<canvas id="sky-canvas">` inside `<header>` in `base.html`
-- [ ] Add `<script src="/js/site.js" defer>` to `base.html`
-- [ ] Canvas is absolutely positioned, fills header, behind nav (z-index)
-- [ ] **Time system**: `Date` → fractional hour → angle `θ = π/2 − (hour−12)/12 * π`
-- [ ] **Sun/moon shared circle**: sun at θ, moon at θ + π; only draw whichever is above horizon
-- [ ] **Sky gradient** (6 interpolated states using Catppuccin palette):
+Implemented in `src/site/header.ts`, compiled to `public/js/site.js`.
+- [x] Add esbuild entry to `package.json` build script
+- [x] Add `<canvas id="sky-canvas">` inside `<header>` in `base.html`
+- [x] Add `<script src="/js/site.js" defer>` to `base.html`
+- [x] Canvas is absolutely positioned, fills header, behind nav (z-index)
+- [x] **Time system**: `Date` → fractional hour → angle `θ = π/2 − (hour−12)/12 * π`
+- [x] **Sun/moon shared circle**: sun at θ, moon at θ + π; visibility includes a small horizon margin
+- [x] **Sky gradient** (interpolated keyframes using Catppuccin palette):
   - Night: deep indigo → near-black
   - Predawn: dark blue
   - Dawn/Dusk: peach + mauve horizon glow
   - Day: Catppuccin sky/sapphire blues
-- [ ] Bottom edge fades to `var(--bg)` via gradient (any sky → any theme, seamless)
-- [ ] Sun: glowing circle with soft corona
-- [ ] Moon: crescent (offset fill technique)
-- [ ] Stars: scattered dots, fade in at dusk / out at dawn, subtle per-star twinkle
+- [x] Bottom edge fades to `var(--bg)` via gradient (any sky → any theme, seamless)
+- [x] Sun: glowing circle with soft corona
+- [x] Moon: crescent (offset fill technique)
+- [x] Stars: scattered dots, fade in at dusk / out at dawn, subtle per-star twinkle
 
 #### 5d: Clouds + Drag Interaction
-- [ ] **Clouds**: 4–5 layered objects, ambient left-to-right drift, wrap at edges
+- [x] **Clouds**: 4–5 layered objects, ambient left-to-right drift, wrap at edges
   - Opacity scales with daylight (invisible at night)
   - Drawn as overlapping soft circles (white/light gray)
-- [ ] **Drag interaction** (mouse + touch):
+- [x] **Drag interaction** (mouse + touch):
   - Pointer down on sun or moon → enter drag mode
   - Drag projected onto the arc circle: `θ = atan2(horizonY − y, x − centerX)`
   - Dragging one body updates θ; the other follows automatically at θ + π
@@ -222,10 +233,10 @@ New file: `src/site/header.ts` compiled to `public/js/site.js` (new esbuild entr
   - Double-click / double-tap → unfreeze, return to real time
 
 #### 5e: Foreground Silhouette v1 (hills + trees)
-- [ ] Rolling hill silhouette at bottom of canvas using a bezier/sine path
-- [ ] Simple triangle trees rising from the hills
-- [ ] Dark fill (slightly lighter than pure black, matches Mocha surface colors)
-- [ ] Sits just above the gradient fade zone
+- [x] Rolling hill silhouette at bottom of canvas using a bezier/sine path
+- [x] Simple triangle trees rising from the hills
+- [x] Dark fill (slightly lighter than pure black, matches Mocha surface colors)
+- [x] Sits just above the gradient fade zone
 
 #### 5f: Foreground Silhouette v2 (castle — compare and pick)
 - [ ] Alternative castle/urban skyline silhouette
@@ -233,7 +244,7 @@ New file: `src/site/header.ts` compiled to `public/js/site.js` (new esbuild entr
 
 #### 5g: Typography + Reading Polish (can be done independently of canvas)
 - [ ] Article line-height, font-size, and measure tuning
-- [ ] Heading hierarchy with Oxanium weights
+- [x] Heading hierarchy with Oxanium weights
 - [ ] Code block styling with JetBrains Mono + Catppuccin syntax highlight theme
 
 ### Follow-up / Future
@@ -286,6 +297,10 @@ In the deploy job: change rsync source from `./dist/` to `./public/`, and change
 ---
 
 ## WASM Embedding Contract
+
+The example below is the original proposal, retained for context, and is not the deployed URL/API
+contract. See [the implemented contract](docs/games-and-graphics.md#wasm-games) for current paths
+and loader behavior.
 
 The Rust game repo's CI publishes to the server at:
 
