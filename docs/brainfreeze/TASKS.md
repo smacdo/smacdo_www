@@ -28,24 +28,28 @@ a feature.
 ## Starter cleanup
 
 - [x] Remove unused counter.js demo.
-- [ ] Remove remaining unused Vite demo files after checking references: starter
-      images/logos, and public icons. Review the favicon reference before deleting it.
+- [x] Remove remaining unused Vite demo files. Done during the migration: the starter
+      images/logos, public icons, and the whole Vite scaffolding were dropped.
 
 ## Gameplay and integration follow-ups
 
-- [ ] Fix canvas clipping: 8 rows at 64 pixels need 512 pixels of height; canvas
-      height is currently 480. No DPI/scaling framework is required for this fix.
+- [ ] Convert the demo to TypeScript progressively, one file at a time. The existing JSDoc
+      already passes the repository's strict `tsconfig.json`, so this needs no up-front cleanup.
+
+- [x] Fix canvas clipping: 8 rows at 64 pixels need 512 pixels of height; canvas
+      height was 480. Fixed during the migration — `demo.js` now sizes the canvas bitmap to
+      512x512 rather than relying on markup attributes.
 - [ ] Validate level data at construction: positive integer column count dividing
       tile count, recognized tiles, equal nonzero box/goal counts, integer in-bounds
       floor positions, unique boxes/goals, and no player/box overlap. Reachability
       analysis is deferred (PLAN.md).
-- [ ] Decide how Input listeners are disposed when a game is unmounted/recreated;
-      especially relevant when integrating into smacdo_www. Current listeners live
-      for the page lifetime.
+- [ ] Decide how Input listeners are disposed when a game is unmounted/recreated. Now
+      live rather than hypothetical: the demo runs inside a multi-page site. Current
+      listeners are attached to `window` at construction and live for the page lifetime.
 - [ ] Recheck restart followed by undo after the history-reset fix (user confirmed;
       source now clears stateSnapshots).
 
-The smacdo_www migration is larger planned work tracked in PLAN.md, not a one-shot.
+The smacdo_www migration is complete; see [MIGRATION.md](MIGRATION.md) for the record.
 
 ## Completed
 

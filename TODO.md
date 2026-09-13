@@ -57,7 +57,11 @@ Baseline: `make build` passes; the gallery module fails Node's syntax check with
 
 ## Demos
 
-- Rename /games/ to /demos/
+- Rename /games/ to /demos/ — **blocked by hosting.** `deploy-www.sh` rsyncs with
+  `--exclude demos/` so the `~/smacdo.com/demos` → `~/turboprop-demos` symlink survives, so a
+  Zola-built `/demos/` page would work locally and never reach the doc root. Moving the section
+  means changing that deploy script (it lives in the turboprop repo) and the WASM URL contract
+  together. Verified 2026-09-13; see docs/brainfreeze/MIGRATION.md finding F1.
 - Show version and publish date on the demo page (demos/name-of-demo)
 
 ## Viewport

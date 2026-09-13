@@ -17,7 +17,7 @@ alone without re-deriving the research below. **Update the status table as phase
 | 3     | Wire into build/lint/typecheck (commit 3)   | DONE  |
 | 4     | Reformat to project style (commit 4)        | DONE  |
 | 5     | Page + code adaptation (commit 5)           | DONE  |
-| 6     | Bookkeeping (commit 6)                      | TODO  |
+| 6     | Bookkeeping (commit 6)                      | DONE  |
 
 Nothing is pushed by any phase. See [Guardrails](#guardrails).
 

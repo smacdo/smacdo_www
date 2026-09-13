@@ -7,23 +7,26 @@ and development progress, without asking separately for documentation edits.
 
 ## Goal
 
-Build a small complete Sokoban game, then try a different prototype to test which
+Build Brainfreeze, a small complete Sokoban-style puzzle game, then try a different
+prototype to test which
 fundamentals deserve to become reusable core code.
 
-## Pause and handoff — 2026-09-13
+## Migrated into smacdo_www — 2026-09-13
 
-Game development is paused while the user waits for usage to reset. Next intended
-work is grafting Toybox into the user's other Git project, `smacdo_www`. No target
-repository inspection, migration, or Git operation has started. Resume by agreeing
-on the target location, integration approach, and whether/how to preserve history;
-inspect its stack and instructions when authorized. Carry over the learning-first
-workflow, game progress, and backlog. Do not assume deployment or history rewriting
-is authorized. Unit tests were the suggested next game task, now deferred behind
-this pivot.
+The graft is complete. Toybox now lives in this repository as the Brainfreeze demo, published at
+`/games/brainfreeze/`, with all 15 of its original commits preserved and its paths rewritten under
+`src/demos/brainfreeze/`. The standalone `toybox` repository is untouched and remains the original.
 
-Latest review: lint, formatting, and build passed; browser checks exercised undo.
-Restart now clears undo history in source, and the user reports the fix works;
-that final fix has not been independently rerun. No persistent unit tests exist yet.
+Settled during migration: the name (Brainfreeze, since Sokoban is a trademark and an own name
+suits the site better), the location, history preservation via `git filter-repo`, a single
+reformatting commit to this repo's Prettier style, and docs living here in `docs/brainfreeze/`.
+Build, typecheck, lint, and formatting are wired up and passing. Full record, including verified
+findings worth not re-deriving: [MIGRATION.md](MIGRATION.md).
+
+Next: the progressive TypeScript refactor, file by file. Unit tests remain the suggested next
+_game_ task and are still deferred. Folding this into the site's own `src/lib/gamebox/` engine is
+blocked pending a decision on whether that engine is being removed or rewritten — see
+[MIGRATION.md](MIGRATION.md).
 
 ## Milestones
 
@@ -71,7 +74,7 @@ been manually and programmatically checked; permanent Vitest coverage is pending
 Done when the level can be solved, restarted, and undone without browser-dependent
 game rules.
 
-### 3. Complete the Sokoban MVP
+### 3. Complete the Brainfreeze MVP
 
 - Multiple hardcoded JavaScript levels and progression through a small LevelManager.
 - Simple title, gameplay, and level-complete flow.

@@ -1,67 +1,74 @@
-# Toybox
+# Brainfreeze
 
-A small 2D browser-game project for learning modern JavaScript and Canvas.
-The first game is Sokoban. A later, different prototype will help evaluate which
-parts of the code are actually reusable.
+A small 2D browser game for learning modern JavaScript and Canvas, playable at
+`/games/brainfreeze/`. It is a Sokoban-style puzzle: push every crate onto a goal square. A later,
+different prototype will help evaluate which parts of the code are actually reusable.
+
+Originally built as the standalone `toybox` project and grafted into this repository — with its
+full commit history — in September 2026. See [MIGRATION.md](MIGRATION.md) for how that was done
+and which decisions are locked.
 
 ## Current state
 
-One hardcoded Sokoban level supports grid movement, crate pushing, goal highlighting,
-completion detection, restart, and snapshot undo. Controls: WASD to move, R to
-restart, Z to undo. Game uses a continuous frame loop with discrete input actions;
-SokobanGame owns browser-independent rules and state.
+One hardcoded level supports grid movement, crate pushing, goal highlighting, completion
+detection, restart, and snapshot undo. Controls: WASD to move, R to restart, Z to undo. The game
+uses a continuous frame loop with discrete input actions; `sokoban-game.js` owns browser-independent
+rules and state.
 
-Lint, formatting, and build passed at the latest review; gameplay has been checked
-in a browser and with temporary logic checks. Permanent unit tests and level-data
-validation remain pending. The 512-pixel-tall board is partly clipped by the
-480-pixel canvas; see TASKS.md. The latest restart-history fix is user-confirmed
-and present in source, but has not yet been independently rechecked.
+Still vanilla JavaScript with JSDoc types, not TypeScript. The annotations already pass this
+repository's strict `tsconfig.json`, so the planned conversion can proceed file by file rather than
+as one blocking cleanup.
 
-Development is paused ahead of a planned integration into `smacdo_www`. Migration
-has not started; see PLAN.md for the handoff and outstanding decisions.
+Typecheck, lint, formatting, and the esbuild bundle all pass. Permanent unit tests and level-data
+validation remain pending; see [TASKS.md](TASKS.md).
 
-## Run locally
+## Working on it
 
-Install Node.js LTS with npm, then run these commands in the project root:
+From the repository root:
 
 ```sh
-npm install
-npm run dev
+npm ci                      # once
+npm run build:brainfreeze   # compile the demo bundle
+make serve                  # Zola dev server at http://127.0.0.1:1111
 ```
 
-Open the Local URL printed by Vite, usually http://localhost:5173. Keep the
-terminal running while developing; press Ctrl+C to stop the server.
+Then open http://127.0.0.1:1111/games/brainfreeze/.
 
-To build and locally preview the production output:
+`make serve` runs only Zola and does **not** compile JavaScript, so rerun `npm run
+build:brainfreeze` after editing any file under `src/demos/brainfreeze/`. If Zola regenerates
+`public/`, the bundle is removed and must be rebuilt. `make build` does the whole site at once.
+
+Checks, all from the repository root: `npm run typecheck`, `npm run lint`, and `npm run format`.
+Note that `npm run format:check` cannot pass on a Windows checkout for line-ending reasons
+unrelated to this game — see finding F8 in [MIGRATION.md](MIGRATION.md) — so check only the paths
+you touched:
 
 ```sh
-npm run build
-npm run preview
+npx prettier --check "src/demos/brainfreeze/**/*.js"
 ```
-
-Preview serves the existing build, so rebuild after changes.
 
 ## Files to know
 
-- `index.html`: page shell and canvas element.
-- `src/main.js`: canvas setup and creation of Game/Input.
-- `src/game.js`: frame loop, input-to-action mapping, and Canvas rendering.
-- `src/sokoban_game.js`: movement rules, completion, restart, and undo.
-- `src/input.js`: held/pressed keyboard state and focus-loss handling.
-- `src/level.js`: shared JSDoc level type.
-- `src/levels/level1.js`: hardcoded level definition.
-- `src/style.css`: page and canvas styling.
-- `jsconfig.json`: editor checking for JavaScript, including Vite asset imports.
-- `package.json`: dependencies and npm commands.
+All paths relative to `src/demos/brainfreeze/`:
 
-The stack is vanilla JavaScript with ES modules, Vite, and Canvas 2D. Run
-`npm run lint` for ESLint, `npm run format:check` to check formatting, or
-`npm run format` to apply Prettier formatting. Vitest setup is still pending.
-Browser inspection through Playwright MCP is an optional local
-assistant tool, not a game dependency. Its configuration lives outside this repo.
+- `demo.js`: entry point — finds the canvas the page template provides, sizes it, starts the game.
+- `game.js`: frame loop, input-to-action mapping, and Canvas rendering.
+- `sokoban-game.js`: movement rules, completion, restart, and undo. No browser APIs.
+- `input.js`: held/pressed keyboard state and focus-loss handling.
+- `level.js`: shared JSDoc level type.
+- `levels/level1.js`: the hardcoded level definition.
+
+Outside that directory:
+
+- `content/games/brainfreeze.md`: the page, its description, and its declared aspect ratio.
+- `templates/games/page.html`: supplies the `#game-canvas` element the demo attaches to.
+- `package.json`: the `build:brainfreeze` esbuild script.
 
 ## Development notes
 
-- [Working with an assistant](AGENTS.md)
+- [Project constraints](constraints.md) — what not to reach for, and why.
 - [Milestones and architecture](PLAN.md)
 - [Standalone tasks](TASKS.md)
+- [Migration record](MIGRATION.md)
+
+Repository-wide collaboration rules live in the root [AGENTS.md](../../AGENTS.md).

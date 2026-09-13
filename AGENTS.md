@@ -148,7 +148,8 @@ content/        Markdown pages and sections (Zola)
 templates/      Tera HTML templates (Zola)
 static/         Assets copied as-is into public/ (CSS, JS, images)
 src/lib/gamebox/  Physics/math library (TypeScript, no framework deps)
-src/demos/      TypeScript canvas demos (compiled by esbuild)
+src/demos/      Canvas demos compiled by esbuild (TypeScript; brainfreeze is still JavaScript)
+docs/brainfreeze/ Brainfreeze demo docs: constraints, plan, tasks, migration record
 src/site/       Site interactions → public/js/site.js
 public/         Generated output — gitignored, do not edit
 ```
@@ -167,7 +168,7 @@ public/         Generated output — gitignored, do not edit
 - Existing TypeScript tests are not wired to a test runner or an `npm test` command. Do not
   report a build as passing tests or add test infrastructure without a task that requires it.
 - `make serve` starts only Zola; it does not compile TypeScript. After TypeScript changes, run
-  `npm run build:site` or `npm run build:demos` as appropriate. If Zola regenerates `public/`,
+  `npm run build:site`, `npm run build:demos`, or `npm run build:brainfreeze` as appropriate. If Zola regenerates `public/`,
   rebuild the bundles before checking browser behavior.
 
 ## Development Notes
