@@ -1,4 +1,4 @@
-import {not_null} from "../utils.ts";
+import { not_null } from "../utils.ts";
 
 /**
  * A viewport TODO: document me properly!
@@ -94,7 +94,9 @@ export class Viewport {
         }
 
         if (wasResized) {
-            console.debug(`Viewport resized; canvasWidth = ${this.#canvasWidth}, canvasHeight = ${this.#canvasHeight}, outputWidth = ${this.#outputWidth}, outputHeight = ${this.#outputHeight}, aspectRatio = ${this.aspectRatio}`);
+            console.debug(
+                `Viewport resized; canvasWidth = ${this.#canvasWidth}, canvasHeight = ${this.#canvasHeight}, outputWidth = ${this.#outputWidth}, outputHeight = ${this.#outputHeight}, aspectRatio = ${this.aspectRatio}`,
+            );
         }
     }
 
@@ -108,15 +110,16 @@ export class Viewport {
      */
     drawDebugOverlay(ctx: CanvasRenderingContext2D) {
         // Draw the full canvas region.
-        ctx.fillStyle = '#FF00FF';
+        ctx.fillStyle = "#FF00FF";
         ctx.fillRect(0, 0, not_null(this.#canvasWidth), not_null(this.#canvasHeight));
 
         // Draw the output zone (the "drawable" region for the game).
-        ctx.fillStyle = '#00FF00'; // '#F0F0A';
+        ctx.fillStyle = "#00FF00"; // '#F0F0A';
         ctx.fillRect(
             not_null(this.outputOffsetX),
             not_null(this.outputOffsetY),
             not_null(this.outputWidth),
-            not_null(this.outputHeight));
+            not_null(this.outputHeight),
+        );
     }
 }

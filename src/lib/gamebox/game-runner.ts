@@ -1,5 +1,5 @@
-import {not_null} from "../utils.ts";
-import {BaseGame} from "./base-game.ts";
+import { not_null } from "../utils.ts";
+import { BaseGame } from "./base-game.ts";
 
 export function runGame(canvas: HTMLCanvasElement, game: BaseGame): void {
     const ctx = not_null(canvas.getContext("2d"), "canvas does not support 2d context");

@@ -13,7 +13,10 @@ export function clamp(v: number, min: number, max: number) {
  * @param value A value which should be defined and not null.
  * @param message An optional exception message when the value is undefined or null.
  */
-export function not_null<T>(value: T | null | undefined, message = "Value cannot be null or undefined"): T {
+export function not_null<T>(
+    value: T | null | undefined,
+    message = "Value cannot be null or undefined",
+): T {
     if (value === null || value === undefined) {
         throw new Error(message);
     }

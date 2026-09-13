@@ -10,25 +10,25 @@ interface SkyKeyframe {
 }
 
 interface Star {
-    x: number;      // 0–1 normalized
-    y: number;      // 0–1 normalized
-    r: number;      // radius px
-    phase: number;  // twinkle offset
-    speed: number;  // twinkle speed
+    x: number; // 0–1 normalized
+    y: number; // 0–1 normalized
+    r: number; // radius px
+    phase: number; // twinkle offset
+    speed: number; // twinkle speed
 }
 
 // ── Sky palette (Catppuccin Mocha + dawn/dusk tones) ──────────────────────────
 
 const KEYFRAMES: SkyKeyframe[] = [
-    { hour: 0,  top: [17,  17,  27],   mid: [30,  30,  46],   bot: [30,  30,  46]  }, // midnight
-    { hour: 4,  top: [24,  24,  37],   mid: [36,  39,  58],   bot: [49,  50,  68]  }, // pre-dawn
-    { hour: 6,  top: [69,  71,  90],   mid: [250, 179, 135],  bot: [235, 160, 172] }, // dawn
-    { hour: 8,  top: [30,  102, 245],  mid: [116, 199, 236],  bot: [137, 220, 235] }, // morning
-    { hour: 12, top: [30,  102, 245],  mid: [116, 199, 236],  bot: [137, 220, 235] }, // midday
-    { hour: 17, top: [30,  102, 245],  mid: [116, 199, 236],  bot: [137, 220, 235] }, // late afternoon
-    { hour: 18, top: [69,  71,  90],   mid: [250, 179, 135],  bot: [235, 160, 172] }, // dusk
-    { hour: 20, top: [24,  24,  37],   mid: [36,  39,  58],   bot: [49,  50,  68]  }, // evening
-    { hour: 24, top: [17,  17,  27],   mid: [30,  30,  46],   bot: [30,  30,  46]  }, // midnight (wrap)
+    { hour: 0, top: [17, 17, 27], mid: [30, 30, 46], bot: [30, 30, 46] }, // midnight
+    { hour: 4, top: [24, 24, 37], mid: [36, 39, 58], bot: [49, 50, 68] }, // pre-dawn
+    { hour: 6, top: [69, 71, 90], mid: [250, 179, 135], bot: [235, 160, 172] }, // dawn
+    { hour: 8, top: [30, 102, 245], mid: [116, 199, 236], bot: [137, 220, 235] }, // morning
+    { hour: 12, top: [30, 102, 245], mid: [116, 199, 236], bot: [137, 220, 235] }, // midday
+    { hour: 17, top: [30, 102, 245], mid: [116, 199, 236], bot: [137, 220, 235] }, // late afternoon
+    { hour: 18, top: [69, 71, 90], mid: [250, 179, 135], bot: [235, 160, 172] }, // dusk
+    { hour: 20, top: [24, 24, 37], mid: [36, 39, 58], bot: [49, 50, 68] }, // evening
+    { hour: 24, top: [17, 17, 27], mid: [30, 30, 46], bot: [30, 30, 46] }, // midnight (wrap)
 ];
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -48,10 +48,15 @@ function rgba(c: RGB, a = 1): string {
 function getSkyAt(hour: number): { top: RGB; mid: RGB; bot: RGB } {
     hour = ((hour % 24) + 24) % 24;
     for (let i = 0; i < KEYFRAMES.length - 1; i++) {
-        const a = KEYFRAMES[i], b = KEYFRAMES[i + 1];
+        const a = KEYFRAMES[i],
+            b = KEYFRAMES[i + 1];
         if (hour >= a.hour && hour < b.hour) {
             const t = (hour - a.hour) / (b.hour - a.hour);
-            return { top: lerpRGB(a.top, b.top, t), mid: lerpRGB(a.mid, b.mid, t), bot: lerpRGB(a.bot, b.bot, t) };
+            return {
+                top: lerpRGB(a.top, b.top, t),
+                mid: lerpRGB(a.mid, b.mid, t),
+                bot: lerpRGB(a.bot, b.bot, t),
+            };
         }
     }
     return { top: KEYFRAMES[0].top, mid: KEYFRAMES[0].mid, bot: KEYFRAMES[0].bot };
@@ -65,7 +70,7 @@ function nightness(hour: number): number {
 
 // Inverse of: sunAngle = π/2 − (hour − 12) / 12 × π
 function angleToHour(angle: number): number {
-    return 12 + 12 * (Math.PI / 2 - angle) / Math.PI;
+    return 12 + (12 * (Math.PI / 2 - angle)) / Math.PI;
 }
 
 // ── Stars ─────────────────────────────────────────────────────────────────────
@@ -84,7 +89,14 @@ function makeStars(count: number): Star[] {
     return out;
 }
 
-function drawStars(ctx: CanvasRenderingContext2D, stars: Star[], w: number, h: number, alpha: number, t: number): void {
+function drawStars(
+    ctx: CanvasRenderingContext2D,
+    stars: Star[],
+    w: number,
+    h: number,
+    alpha: number,
+    t: number,
+): void {
     ctx.save();
     for (const s of stars) {
         const twinkle = 0.6 + 0.4 * Math.sin(t * s.speed * 0.001 + s.phase);
@@ -101,23 +113,25 @@ function drawStars(ctx: CanvasRenderingContext2D, stars: Star[], w: number, h: n
 function buildSunCanvas(r: number): HTMLCanvasElement {
     const glowR = r * 3.5;
     const size = Math.ceil(glowR * 2) + 4;
-    const c = document.createElement('canvas');
-    c.width = size; c.height = size;
-    const sc = c.getContext('2d')!;
-    const cx = size / 2, cy = size / 2;
+    const c = document.createElement("canvas");
+    c.width = size;
+    c.height = size;
+    const sc = c.getContext("2d")!;
+    const cx = size / 2,
+        cy = size / 2;
 
     const corona = sc.createRadialGradient(cx, cy, r * 0.6, cx, cy, glowR);
-    corona.addColorStop(0, 'rgba(255,220,80,0.55)');
-    corona.addColorStop(1, 'rgba(255,220,80,0)');
+    corona.addColorStop(0, "rgba(255,220,80,0.55)");
+    corona.addColorStop(1, "rgba(255,220,80,0)");
     sc.beginPath();
     sc.arc(cx, cy, glowR, 0, Math.PI * 2);
     sc.fillStyle = corona;
     sc.fill();
 
     const disc = sc.createRadialGradient(cx, cy, 0, cx, cy, r);
-    disc.addColorStop(0, '#ffffff');
-    disc.addColorStop(0.5, '#fff9d6');
-    disc.addColorStop(1, '#ffd700');
+    disc.addColorStop(0, "#ffffff");
+    disc.addColorStop(0.5, "#fff9d6");
+    disc.addColorStop(1, "#ffd700");
     sc.beginPath();
     sc.arc(cx, cy, r, 0, Math.PI * 2);
     sc.fillStyle = disc;
@@ -126,7 +140,12 @@ function buildSunCanvas(r: number): HTMLCanvasElement {
     return c;
 }
 
-function drawSun(ctx: CanvasRenderingContext2D, x: number, y: number, sunImg: HTMLCanvasElement): void {
+function drawSun(
+    ctx: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    sunImg: HTMLCanvasElement,
+): void {
     ctx.drawImage(sunImg, x - sunImg.width / 2, y - sunImg.height / 2);
 }
 
@@ -134,15 +153,17 @@ function drawSun(ctx: CanvasRenderingContext2D, x: number, y: number, sunImg: HT
 
 function buildMoonCanvas(r: number): HTMLCanvasElement {
     const size = r * 8;
-    const c = document.createElement('canvas');
-    c.width = size; c.height = size;
-    const mc = c.getContext('2d')!;
-    const cx = size / 2, cy = size / 2;
+    const c = document.createElement("canvas");
+    c.width = size;
+    c.height = size;
+    const mc = c.getContext("2d")!;
+    const cx = size / 2,
+        cy = size / 2;
 
     // Glow (drawn first so crescent cutout removes both glow and disc there)
     const glow = mc.createRadialGradient(cx, cy, r, cx, cy, r * 3);
-    glow.addColorStop(0, 'rgba(205,214,244,0.25)');
-    glow.addColorStop(1, 'rgba(205,214,244,0)');
+    glow.addColorStop(0, "rgba(205,214,244,0.25)");
+    glow.addColorStop(1, "rgba(205,214,244,0)");
     mc.beginPath();
     mc.arc(cx, cy, r * 3, 0, Math.PI * 2);
     mc.fillStyle = glow;
@@ -151,20 +172,26 @@ function buildMoonCanvas(r: number): HTMLCanvasElement {
     // Disc
     mc.beginPath();
     mc.arc(cx, cy, r, 0, Math.PI * 2);
-    mc.fillStyle = 'rgba(205,214,244,0.95)';
+    mc.fillStyle = "rgba(205,214,244,0.95)";
     mc.fill();
 
     // Crescent cutout
-    mc.globalCompositeOperation = 'destination-out';
+    mc.globalCompositeOperation = "destination-out";
     mc.beginPath();
     mc.arc(cx + r * 0.42, cy - r * 0.12, r * 0.88, 0, Math.PI * 2);
-    mc.fillStyle = 'rgba(0,0,0,1)';
+    mc.fillStyle = "rgba(0,0,0,1)";
     mc.fill();
 
     return c;
 }
 
-function drawMoon(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, moonImg: HTMLCanvasElement): void {
+function drawMoon(
+    ctx: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    r: number,
+    moonImg: HTMLCanvasElement,
+): void {
     const size = r * 8;
     ctx.drawImage(moonImg, x - size / 2, y - size / 2);
 }
@@ -172,22 +199,24 @@ function drawMoon(ctx: CanvasRenderingContext2D, x: number, y: number, r: number
 // ── Clouds ────────────────────────────────────────────────────────────────────
 
 interface CloudPuff {
-    dx: number;  // offset from cloud center, in canvas-height units
+    dx: number; // offset from cloud center, in canvas-height units
     dy: number;
-    r: number;   // radius in canvas-height units
+    r: number; // radius in canvas-height units
 }
 
 interface Cloud {
-    x: number;      // 0–1 normalized horizontal position (wraps)
-    y: number;      // 0–1 normalized vertical position
-    speed: number;  // canvas-widths per second
+    x: number; // 0–1 normalized horizontal position (wraps)
+    y: number; // 0–1 normalized vertical position
+    speed: number; // canvas-widths per second
     puffs: CloudPuff[];
-    span: number;   // half-width in canvas-height units (for wrap margin)
+    span: number; // half-width in canvas-height units (for wrap margin)
     // Bounding box of all puffs in canvas-height units (for offscreen sizing)
-    bbx0: number; bby0: number;
-    bbx1: number; bby1: number;
+    bbx0: number;
+    bby0: number;
+    bbx1: number;
+    bby1: number;
     offscreen: HTMLCanvasElement | null;
-    offscreenH: number;  // h value when offscreen was last rendered
+    offscreenH: number; // h value when offscreen was last rendered
 }
 
 function makeCloud(x: number): Cloud {
@@ -195,16 +224,21 @@ function makeCloud(x: number): Cloud {
     const count = 4 + Math.floor(Math.random() * 3);
     const puffs: CloudPuff[] = [{ dx: 0, dy: 0, r: baseR }];
     let span = baseR;
-    let bbx0 = -baseR, bby0 = -baseR, bbx1 = baseR, bby1 = baseR;
+    let bbx0 = -baseR,
+        bby0 = -baseR,
+        bbx1 = baseR,
+        bby1 = baseR;
 
     for (let i = 1; i < count; i++) {
         const dx = (Math.random() - 0.5) * baseR * 2.8;
         const dy = (Math.random() - 0.5) * baseR * 0.7;
-        const r  = baseR * (0.5 + Math.random() * 0.75);
+        const r = baseR * (0.5 + Math.random() * 0.75);
         puffs.push({ dx, dy, r });
         span = Math.max(span, Math.abs(dx) + r);
-        bbx0 = Math.min(bbx0, dx - r); bby0 = Math.min(bby0, dy - r);
-        bbx1 = Math.max(bbx1, dx + r); bby1 = Math.max(bby1, dy + r);
+        bbx0 = Math.min(bbx0, dx - r);
+        bby0 = Math.min(bby0, dy - r);
+        bbx1 = Math.max(bbx1, dx + r);
+        bby1 = Math.max(bby1, dy + r);
     }
 
     return {
@@ -213,7 +247,10 @@ function makeCloud(x: number): Cloud {
         speed: 0.004 + Math.random() * 0.008,
         puffs,
         span,
-        bbx0, bby0, bbx1, bby1,
+        bbx0,
+        bby0,
+        bbx1,
+        bby1,
         offscreen: null,
         offscreenH: 0,
     };
@@ -223,20 +260,20 @@ function renderCloudOffscreen(cloud: Cloud, h: number): void {
     const pad = 2;
     const cw = Math.ceil((cloud.bbx1 - cloud.bbx0) * h) + pad * 2;
     const ch = Math.ceil((cloud.bby1 - cloud.bby0) * h) + pad * 2;
-    if (!cloud.offscreen) cloud.offscreen = document.createElement('canvas');
+    if (!cloud.offscreen) cloud.offscreen = document.createElement("canvas");
     cloud.offscreen.width = cw;
     cloud.offscreen.height = ch;
     cloud.offscreenH = h;
-    const oc = cloud.offscreen.getContext('2d')!;
+    const oc = cloud.offscreen.getContext("2d")!;
     oc.clearRect(0, 0, cw, ch);
     for (const p of cloud.puffs) {
         const px = (p.dx - cloud.bbx0) * h + pad;
         const py = (p.dy - cloud.bby0) * h + pad;
-        const r  = p.r * h;
-        const g  = oc.createRadialGradient(px, py, 0, px, py, r);
-        g.addColorStop(0,   'rgba(255,255,255,0.52)');
-        g.addColorStop(0.5, 'rgba(255,255,255,0.32)');
-        g.addColorStop(1,   'rgba(255,255,255,0)');
+        const r = p.r * h;
+        const g = oc.createRadialGradient(px, py, 0, px, py, r);
+        g.addColorStop(0, "rgba(255,255,255,0.52)");
+        g.addColorStop(0.5, "rgba(255,255,255,0.32)");
+        g.addColorStop(1, "rgba(255,255,255,0)");
         oc.beginPath();
         oc.arc(px, py, r, 0, Math.PI * 2);
         oc.fillStyle = g;
@@ -245,9 +282,7 @@ function renderCloudOffscreen(cloud: Cloud, h: number): void {
 }
 
 function makeClouds(): Cloud[] {
-    return Array.from({ length: 5 }, (_, i) =>
-        makeCloud(i / 5 + Math.random() * 0.18)
-    );
+    return Array.from({ length: 5 }, (_, i) => makeCloud(i / 5 + Math.random() * 0.18));
 }
 
 function updateClouds(clouds: Cloud[], dt: number): void {
@@ -258,7 +293,13 @@ function updateClouds(clouds: Cloud[], dt: number): void {
     }
 }
 
-function drawClouds(ctx: CanvasRenderingContext2D, clouds: Cloud[], w: number, h: number, alpha: number): void {
+function drawClouds(
+    ctx: CanvasRenderingContext2D,
+    clouds: Cloud[],
+    w: number,
+    h: number,
+    alpha: number,
+): void {
     if (alpha < 0.01) return;
     ctx.save();
     ctx.globalAlpha = alpha;
@@ -272,25 +313,33 @@ function drawClouds(ctx: CanvasRenderingContext2D, clouds: Cloud[], w: number, h
 // ── Terrain silhouette ────────────────────────────────────────────────────────
 
 interface HillSeg {
-    x0: number; y0: number;
-    cx1: number; cy1: number;
-    cx2: number; cy2: number;
-    x3: number; y3: number;
+    x0: number;
+    y0: number;
+    cx1: number;
+    cy1: number;
+    cx2: number;
+    cy2: number;
+    x3: number;
+    y3: number;
 }
 
 // Normalized cubic bezier segments (fractions of w / h) for the rolling hills
 const HILL_SEGS: HillSeg[] = [
-    { x0: 0,    y0: 0.86, cx1: 0.08, cy1: 0.56, cx2: 0.22, cy2: 0.62, x3: 0.30, y3: 0.80 },
-    { x0: 0.30, y0: 0.80, cx1: 0.38, cy1: 0.95, cx2: 0.45, cy2: 0.62, x3: 0.55, y3: 0.70 },
-    { x0: 0.55, y0: 0.70, cx1: 0.65, cy1: 0.78, cx2: 0.76, cy2: 0.54, x3: 0.86, y3: 0.66 },
-    { x0: 0.86, y0: 0.66, cx1: 0.93, cy1: 0.75, cx2: 1.00, cy2: 0.82, x3: 1.00, y3: 0.84 },
+    { x0: 0, y0: 0.86, cx1: 0.08, cy1: 0.56, cx2: 0.22, cy2: 0.62, x3: 0.3, y3: 0.8 },
+    { x0: 0.3, y0: 0.8, cx1: 0.38, cy1: 0.95, cx2: 0.45, cy2: 0.62, x3: 0.55, y3: 0.7 },
+    { x0: 0.55, y0: 0.7, cx1: 0.65, cy1: 0.78, cx2: 0.76, cy2: 0.54, x3: 0.86, y3: 0.66 },
+    { x0: 0.86, y0: 0.66, cx1: 0.93, cy1: 0.75, cx2: 1.0, cy2: 0.82, x3: 1.0, y3: 0.84 },
 ];
 
 function bezierAt(s: HillSeg, t: number): { x: number; y: number } {
-    const mt = 1 - t, mt2 = mt * mt, mt3 = mt2 * mt, t2 = t * t, t3 = t2 * t;
+    const mt = 1 - t,
+        mt2 = mt * mt,
+        mt3 = mt2 * mt,
+        t2 = t * t,
+        t3 = t2 * t;
     return {
-        x: mt3*s.x0 + 3*t*mt2*s.cx1 + 3*t2*mt*s.cx2 + t3*s.x3,
-        y: mt3*s.y0 + 3*t*mt2*s.cy1 + 3*t2*mt*s.cy2 + t3*s.y3,
+        x: mt3 * s.x0 + 3 * t * mt2 * s.cx1 + 3 * t2 * mt * s.cx2 + t3 * s.x3,
+        y: mt3 * s.y0 + 3 * t * mt2 * s.cy1 + 3 * t2 * mt * s.cy2 + t3 * s.y3,
     };
 }
 
@@ -298,15 +347,17 @@ function bezierAt(s: HillSeg, t: number): { x: number; y: number } {
 function hillSample(nx: number): { y: number } {
     for (const seg of HILL_SEGS) {
         if (nx < seg.x0 || nx > seg.x3 + 1e-6) continue;
-        let lo = 0, hi = 1;
+        let lo = 0,
+            hi = 1;
         for (let i = 0; i < 24; i++) {
             const mid = (lo + hi) * 0.5;
-            if (bezierAt(seg, mid).x < nx) lo = mid; else hi = mid;
+            if (bezierAt(seg, mid).x < nx) lo = mid;
+            else hi = mid;
         }
         const { y } = bezierAt(seg, (lo + hi) * 0.5);
         return { y };
     }
-    return { y: 0.80 };
+    return { y: 0.8 };
 }
 
 // Draw a pine tree upright: base at (bx, by), growing straight up by tH pixels
@@ -321,8 +372,8 @@ function drawPineTree(ctx: CanvasRenderingContext2D, bx: number, by: number, tH:
     // Lower tier (wide base)
     ctx.beginPath();
     ctx.moveTo(bx, by - tH);
-    ctx.lineTo(bx + tW * 0.60, by - tH * 0.48);
-    ctx.lineTo(bx - tW * 0.60, by - tH * 0.48);
+    ctx.lineTo(bx + tW * 0.6, by - tH * 0.48);
+    ctx.lineTo(bx - tW * 0.6, by - tH * 0.48);
     ctx.closePath();
     ctx.fill();
 
@@ -337,14 +388,14 @@ function drawPineTree(ctx: CanvasRenderingContext2D, bx: number, by: number, tH:
 
 function drawSilhouette(ctx: CanvasRenderingContext2D, w: number, h: number): void {
     ctx.save();
-    ctx.fillStyle = 'rgba(17,17,27,0.93)';
+    ctx.fillStyle = "rgba(17,17,27,0.93)";
 
     // Hill path driven by HILL_SEGS data
     ctx.beginPath();
     ctx.moveTo(0, h);
     ctx.lineTo(HILL_SEGS[0].x0 * w, HILL_SEGS[0].y0 * h);
     for (const s of HILL_SEGS) {
-        ctx.bezierCurveTo(s.cx1*w, s.cy1*h, s.cx2*w, s.cy2*h, s.x3*w, s.y3*h);
+        ctx.bezierCurveTo(s.cx1 * w, s.cy1 * h, s.cx2 * w, s.cy2 * h, s.x3 * w, s.y3 * h);
     }
     ctx.lineTo(w, h);
     ctx.closePath();
@@ -353,9 +404,14 @@ function drawSilhouette(ctx: CanvasRenderingContext2D, w: number, h: number): vo
     // Pine trees growing vertically from the hill surface
     // [normalized-x, height as fraction of canvas height]
     const trees: [number, number][] = [
-        [0.06, 0.09], [0.13, 0.11], [0.20, 0.09],
-        [0.48, 0.11], [0.53, 0.09],
-        [0.77, 0.13], [0.83, 0.11], [0.91, 0.09],
+        [0.06, 0.09],
+        [0.13, 0.11],
+        [0.2, 0.09],
+        [0.48, 0.11],
+        [0.53, 0.09],
+        [0.77, 0.13],
+        [0.83, 0.11],
+        [0.91, 0.09],
     ];
     for (const [nx, hFrac] of trees) {
         const { y } = hillSample(nx);
@@ -371,10 +427,10 @@ const SUN_R = 18;
 const MOON_R = 14;
 
 function init(): void {
-    const canvas = document.getElementById('sky-canvas') as HTMLCanvasElement | null;
+    const canvas = document.getElementById("sky-canvas") as HTMLCanvasElement | null;
     if (!canvas) return;
 
-    const ctx = canvas.getContext('2d')!;
+    const ctx = canvas.getContext("2d")!;
     const stars = makeStars(180);
     const sunImg = buildSunCanvas(SUN_R);
     const moonImg = buildMoonCanvas(MOON_R);
@@ -382,26 +438,32 @@ function init(): void {
     let lastTs = 0;
 
     // Cached gradients — recreated only when inputs change
-    let skyGradKey = '', skyGrad: CanvasGradient | null = null;
-    let fadeGradKey = '', fadeGrad: CanvasGradient | null = null;
+    let skyGradKey = "",
+        skyGrad: CanvasGradient | null = null;
+    let fadeGradKey = "",
+        fadeGrad: CanvasGradient | null = null;
 
     // Drag / freeze state
     let frozen = false;
-    let frozenAngle = 0;       // always the SUN angle; moon = frozenAngle + π
+    let frozenAngle = 0; // always the SUN angle; moon = frozenAngle + π
     let dragging = false;
-    let grabbedMoon = false;   // true when the drag started on the moon
+    let grabbedMoon = false; // true when the drag started on the moon
     let lastTapMs = 0;
 
     // Last-frame celestial positions for hit testing in event handlers
-    let sunPx = 0, sunPy = 0, moonPx = 0, moonPy = 0;
+    let sunPx = 0,
+        sunPy = 0,
+        moonPx = 0,
+        moonPy = 0;
 
-    let bgColor = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
+    let bgColor = getComputedStyle(document.documentElement).getPropertyValue("--bg").trim();
 
     new MutationObserver(() => {
-        bgColor = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
-    }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+        bgColor = getComputedStyle(document.documentElement).getPropertyValue("--bg").trim();
+    }).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
 
-    let cssW = 0, cssH = 0;
+    let cssW = 0,
+        cssH = 0;
 
     function resize(): void {
         const header = canvas!.parentElement!;
@@ -410,12 +472,13 @@ function init(): void {
         cssH = header.offsetHeight;
         canvas!.width = cssW * dpr;
         canvas!.height = cssH * dpr;
-        canvas!.style.width = cssW + 'px';
-        canvas!.style.height = cssH + 'px';
+        canvas!.style.width = cssW + "px";
+        canvas!.style.height = cssH + "px";
         ctx.resetTransform();
         ctx.scale(dpr, dpr);
         // Invalidate cached gradients and cloud offscreens on resize
-        skyGradKey = ''; fadeGradKey = '';
+        skyGradKey = "";
+        fadeGradKey = "";
         for (const c of clouds) c.offscreenH = 0;
     }
 
@@ -425,7 +488,7 @@ function init(): void {
     // ── Drag interaction ──────────────────────────────────────────────────────
 
     const HIT_R = Math.max(SUN_R, MOON_R) * 3.5;
-    canvas.style.touchAction = 'none';
+    canvas.style.touchAction = "none";
 
     function toCanvas(e: PointerEvent): { x: number; y: number } {
         const rect = canvas!.getBoundingClientRect();
@@ -440,21 +503,21 @@ function init(): void {
         return Math.atan2(cssH * 1.08 - y, x - cssW / 2);
     }
 
-    canvas.addEventListener('pointerdown', (e) => {
+    canvas.addEventListener("pointerdown", (e) => {
         // Double-tap on touch to unfreeze
-        if (e.pointerType === 'touch') {
+        if (e.pointerType === "touch") {
             const now = performance.now();
             if (now - lastTapMs < 350 && frozen) {
                 frozen = false;
                 dragging = false;
-                canvas!.style.cursor = '';
+                canvas!.style.cursor = "";
                 return;
             }
             lastTapMs = now;
         }
 
         const { x, y } = toCanvas(e);
-        const hitSun  = dist2(x, y, sunPx,  sunPy)  < HIT_R * HIT_R;
+        const hitSun = dist2(x, y, sunPx, sunPy) < HIT_R * HIT_R;
         const hitMoon = dist2(x, y, moonPx, moonPy) < HIT_R * HIT_R;
         if (!hitSun && !hitMoon) return;
 
@@ -463,13 +526,13 @@ function init(): void {
         frozen = true;
         grabbedMoon = hitMoon && !hitSun;
         canvas!.setPointerCapture(e.pointerId);
-        canvas!.style.cursor = 'grabbing';
+        canvas!.style.cursor = "grabbing";
 
         const raw = computeAngle(x, y);
         frozenAngle = grabbedMoon ? raw - Math.PI : raw;
     });
 
-    canvas.addEventListener('pointermove', (e) => {
+    canvas.addEventListener("pointermove", (e) => {
         const { x, y } = toCanvas(e);
         if (dragging) {
             const raw = computeAngle(x, y);
@@ -477,38 +540,43 @@ function init(): void {
             return;
         }
         // Hover cursor
-        const over = dist2(x, y, sunPx, sunPy) < HIT_R * HIT_R
-                  || dist2(x, y, moonPx, moonPy) < HIT_R * HIT_R;
-        canvas!.style.cursor = over ? 'grab' : '';
+        const over =
+            dist2(x, y, sunPx, sunPy) < HIT_R * HIT_R ||
+            dist2(x, y, moonPx, moonPy) < HIT_R * HIT_R;
+        canvas!.style.cursor = over ? "grab" : "";
     });
 
-    canvas.addEventListener('pointerup', () => {
+    canvas.addEventListener("pointerup", () => {
         if (dragging) {
             dragging = false;
-            canvas!.style.cursor = '';
+            canvas!.style.cursor = "";
         }
     });
 
-    canvas.addEventListener('pointercancel', () => {
+    canvas.addEventListener("pointercancel", () => {
         dragging = false;
-        canvas!.style.cursor = '';
+        canvas!.style.cursor = "";
     });
 
-    canvas.addEventListener('dblclick', () => {
+    canvas.addEventListener("dblclick", () => {
         frozen = false;
         dragging = false;
-        canvas!.style.cursor = '';
+        canvas!.style.cursor = "";
     });
 
     function draw(timestamp: number): void {
         const dt = lastTs === 0 ? 0 : (timestamp - lastTs) / 1000;
         lastTs = timestamp;
 
-        const clockHour = (() => { const d = new Date(); return d.getHours() + d.getMinutes() / 60 + d.getSeconds() / 3600; })();
-        const sunAngle  = frozen ? frozenAngle : Math.PI / 2 - ((clockHour - 12) / 12) * Math.PI;
-        const hour      = frozen ? angleToHour(frozenAngle) : clockHour;
+        const clockHour = (() => {
+            const d = new Date();
+            return d.getHours() + d.getMinutes() / 60 + d.getSeconds() / 3600;
+        })();
+        const sunAngle = frozen ? frozenAngle : Math.PI / 2 - ((clockHour - 12) / 12) * Math.PI;
+        const hour = frozen ? angleToHour(frozenAngle) : clockHour;
         const moonAngle = sunAngle + Math.PI;
-        const w = cssW, h = cssH;
+        const w = cssW,
+            h = cssH;
 
         ctx.clearRect(0, 0, w, h);
 
@@ -540,7 +608,10 @@ function init(): void {
         const moonY = horizonY - arcR * Math.sin(moonAngle);
 
         // Store for hit testing
-        sunPx = sunX; sunPy = sunY; moonPx = moonX; moonPy = moonY;
+        sunPx = sunX;
+        sunPy = sunY;
+        moonPx = moonX;
+        moonPy = moonY;
 
         if (Math.sin(sunAngle) > -0.08) drawSun(ctx, sunX, sunY, sunImg);
         if (Math.sin(moonAngle) > -0.08) drawMoon(ctx, moonX, moonY, MOON_R, moonImg);
@@ -556,7 +627,7 @@ function init(): void {
         const newFadeKey = `${h}|${bgColor}`;
         if (newFadeKey !== fadeGradKey) {
             fadeGrad = ctx.createLinearGradient(0, h * 0.5, 0, h);
-            fadeGrad.addColorStop(0, 'rgba(0,0,0,0)');
+            fadeGrad.addColorStop(0, "rgba(0,0,0,0)");
             fadeGrad.addColorStop(1, bgColor);
             fadeGradKey = newFadeKey;
         }
@@ -569,8 +640,8 @@ function init(): void {
     requestAnimationFrame(draw);
 }
 
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
 } else {
     init();
 }

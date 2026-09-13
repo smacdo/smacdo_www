@@ -105,7 +105,7 @@ export function vector_angle(x: number, y: number): number | null {
  * ```
  */
 export function rad_to_degree(rad: number): number {
-    return rad * 180 / Math.PI;
+    return (rad * 180) / Math.PI;
 }
 
 /**
@@ -120,5 +120,5 @@ export function rad_to_degree(rad: number): number {
  * ```
  */
 export function degree_to_rad(degree: number): number {
-    return degree * Math.PI / 180;
+    return (degree * Math.PI) / 180;
 }

@@ -1,4 +1,4 @@
-import {rad_to_degree, vector_angle} from "./math.ts";
+import { rad_to_degree, vector_angle } from "./math.ts";
 
 /**
  * Represents the four cardinal directions.

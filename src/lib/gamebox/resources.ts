@@ -1,4 +1,4 @@
-import {not_null} from "../utils.ts";
+import { not_null } from "../utils.ts";
 
 export abstract class ResourceLoader<T> {
     resources = new Map<string, T>();
@@ -69,7 +69,9 @@ export abstract class ResourceLoader<T> {
 
         try {
             if (this.onStartRequest === undefined) {
-                console.debug(`awaiting resource ${name} from ${url} (${this.requestsPendingCount()} requests pending)`);
+                console.debug(
+                    `awaiting resource ${name} from ${url} (${this.requestsPendingCount()} requests pending)`,
+                );
             } else {
                 this.onStartRequest(name, url, this.requestsPendingCount());
             }
@@ -106,8 +108,8 @@ export class ImageLoader extends ResourceLoader<HTMLImageElement> {
 export async function httpGetImage(url: string): Promise<HTMLImageElement> {
     return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
-        xhr.open('GET', url);
-        xhr.responseType = 'blob';
+        xhr.open("GET", url);
+        xhr.responseType = "blob";
 
         xhr.onload = () => {
             if (xhr.status >= 200 && xhr.status < 300) {
@@ -126,17 +128,22 @@ export async function httpGetImage(url: string): Promise<HTMLImageElement> {
     });
 }
 
-export async function httpGetData<T>(url: string, responseType: XMLHttpRequestResponseType): Promise<T> {
+export async function httpGetData<T>(
+    url: string,
+    responseType: XMLHttpRequestResponseType,
+): Promise<T> {
     return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
-        xhr.open('GET', url);
+        xhr.open("GET", url);
         xhr.responseType = responseType;
 
         xhr.onload = () => {
             if (xhr.status >= 200 && xhr.status < 300) {
                 resolve(xhr.response);
             } else {
-                reject(`failed to load ${responseType} resource from ${url} [HTTP status ${xhr.status}]`);
+                reject(
+                    `failed to load ${responseType} resource from ${url} [HTTP status ${xhr.status}]`,
+                );
             }
         };
 

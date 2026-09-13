@@ -1,5 +1,5 @@
-import {clamp} from "../utils.ts";
-import {vector_distance} from "./math.ts";
+import { clamp } from "../utils.ts";
+import { vector_distance } from "./math.ts";
 
 /** A bounding region. */
 export interface Boundable {
@@ -81,10 +81,15 @@ export class Circle implements Boundable {
  * @param a The first bounding region to test.
  * @param b The second bounding region to test.
  */
-export function resolve_collision(a: AABB | Circle, b: AABB): {
-    x: number,
-    y: number
-} | undefined {
+export function resolve_collision(
+    a: AABB | Circle,
+    b: AABB,
+):
+    | {
+          x: number;
+          y: number;
+      }
+    | undefined {
     if (a instanceof AABB) {
         return resolve_aabb_aabb_collision(a, b);
     } else {
@@ -116,10 +121,15 @@ export function intersects(a: AABB | Circle, b: AABB): boolean {
  * @param a The first AABB to test.
  * @param b The second AABB to test.
  */
-export function resolve_aabb_aabb_collision(a: AABB, b: AABB): {
-    x: number,
-    y: number
-} | undefined {
+export function resolve_aabb_aabb_collision(
+    a: AABB,
+    b: AABB,
+):
+    | {
+          x: number;
+          y: number;
+      }
+    | undefined {
     const intersectX = a.right > b.left && b.right > a.left;
     const intersectY = a.top < b.bottom && b.top < a.bottom;
 
@@ -129,7 +139,7 @@ export function resolve_aabb_aabb_collision(a: AABB, b: AABB): {
         const top = Math.max(a.top, b.top);
         const bottom = Math.min(a.bottom, b.bottom);
 
-        return {x: right - left, y: bottom - top};
+        return { x: right - left, y: bottom - top };
     } else {
         return undefined;
     }
@@ -158,10 +168,15 @@ export function aabb_aabb_intersects(a: AABB, b: AABB): boolean {
  * Degenerate cases:
  *  - Zero sized circle (point) inside AABB -> not colliding.
  */
-export function resolve_circle_rect_collision(a: Circle, b: AABB): {
-    x: number,
-    y: number
-} | undefined {
+export function resolve_circle_rect_collision(
+    a: Circle,
+    b: AABB,
+):
+    | {
+          x: number;
+          y: number;
+      }
+    | undefined {
     // Calculate difference vector from center of `b` (AABB) to `a` (circle).
     const diff_x = a.x - b.x;
     const diff_y = a.y - b.y;
@@ -179,7 +194,7 @@ export function resolve_circle_rect_collision(a: Circle, b: AABB): {
         const r_x = a.x - closest_x;
         const r_y = a.y - closest_y;
 
-        return {x: r_x, y: r_y};
+        return { x: r_x, y: r_y };
     } else {
         return undefined;
     }

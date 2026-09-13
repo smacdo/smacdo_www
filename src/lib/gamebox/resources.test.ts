@@ -1,14 +1,14 @@
-import {ResourceLoader} from "./resources.ts";
-import {not_null} from "../utils.ts";
-import {vi} from "vitest";
+import { ResourceLoader } from "./resources.ts";
+import { not_null } from "../utils.ts";
+import { vi } from "vitest";
 
 type ResolveRejectPair<T> = {
     future?: Promise<T>;
-    resolve: (value: (T | PromiseLike<T>)) => void;
+    resolve: (value: T | PromiseLike<T>) => void;
     reject: (reason?: unknown) => void;
-}
+};
 
-describe('resource loading', () => {
+describe("resource loading", () => {
     const FIRST_URL = "https://example.com/some/file";
     const SECOND_URL = "https://example.com/another/file";
     const THIRD_URL = "https://example.com/hello.txt";
@@ -16,8 +16,7 @@ describe('resource loading', () => {
     class MockTestLoader extends ResourceLoader<number> {
         constructor(public requestFunc: (url: string) => Promise<number>) {
             super();
-            this.onStartRequest = vi.fn().mockImplementation((_name, _url, _pending) => {
-            });
+            this.onStartRequest = vi.fn().mockImplementation((_name, _url, _pending) => {});
         }
 
         override onRequestResource(url: string): Promise<number> {
@@ -26,14 +25,15 @@ describe('resource loading', () => {
     }
 
     class TestLoaderWithControllableFutures extends ResourceLoader<number> {
-        private resolveRejectPairs: Map<string, ResolveRejectPair<number>> = new Map<string, ResolveRejectPair<number>>();
+        private resolveRejectPairs: Map<string, ResolveRejectPair<number>> = new Map<
+            string,
+            ResolveRejectPair<number>
+        >();
         private futures: Map<string, Promise<number>> = new Map<string, Promise<number>>();
 
         constructor() {
             super();
-            this.onStartRequest = vi.fn().mockImplementation((_name, _url, _pending) => {
-                }
-            );
+            this.onStartRequest = vi.fn().mockImplementation((_name, _url, _pending) => {});
         }
 
         async completeRequest(url: string, value?: number): Promise<number> {
@@ -49,7 +49,6 @@ describe('resource loading', () => {
 
             return await future;
         }
-
 
         async failRequest(url: string): Promise<void> {
             expect(this.resolveRejectPairs.has(url)).toBe(true);
@@ -67,7 +66,7 @@ describe('resource loading', () => {
 
         override onRequestResource(url: string): Promise<number> {
             const promise = new Promise<number>((resolve, reject) => {
-                this.resolveRejectPairs.set(url, {resolve: resolve, reject: reject});
+                this.resolveRejectPairs.set(url, { resolve: resolve, reject: reject });
             });
 
             this.futures.set(url, promise);
@@ -75,7 +74,7 @@ describe('resource loading', () => {
         }
     }
 
-    it('should return the number of pending load requests', async () => {
+    it("should return the number of pending load requests", async () => {
         const loader = new TestLoaderWithControllableFutures();
         expect(loader.requestsPendingCount()).toBe(0);
 
@@ -106,23 +105,21 @@ describe('resource loading', () => {
         await thirdRequest;
     });
 
-    it('load should return the loaded resource when the promise completes', async () => {
+    it("load should return the loaded resource when the promise completes", async () => {
         const loader = new MockTestLoader(vi.fn().mockResolvedValue(42));
         expect(await loader.load("first", FIRST_URL)).toBe(42);
     });
 
-    it('load should return undefined when the promise fails', async () => {
+    it("load should return undefined when the promise fails", async () => {
         const loader = new MockTestLoader(vi.fn().mockRejectedValue(1000));
-        loader.onRequestError = vi.fn().mockImplementation(() => {
-        });
+        loader.onRequestError = vi.fn().mockImplementation(() => {});
 
         expect(await loader.load("first", FIRST_URL)).toBe(undefined);
     });
 
-    it('requestLoad calls onLoadedCallback when load ok', async () => {
+    it("requestLoad calls onLoadedCallback when load ok", async () => {
         const loader = new TestLoaderWithControllableFutures();
-        const callback = vi.fn().mockImplementation((_resource) => {
-        });
+        const callback = vi.fn().mockImplementation((_resource) => {});
 
         loader.requestLoad("first", FIRST_URL, callback);
         expect(callback).not.toHaveBeenCalled();
@@ -133,16 +130,13 @@ describe('resource loading', () => {
         expect(callback).toHaveBeenCalledWith(22);
     });
 
-    it('requestLoad does not call onLoadedCallback when load has error', async () => {
+    it("requestLoad does not call onLoadedCallback when load has error", async () => {
         const loader = new TestLoaderWithControllableFutures();
-        loader.onRequestError = vi.fn().mockImplementation(() => {
-        });
+        loader.onRequestError = vi.fn().mockImplementation(() => {});
 
-        const callback = vi.fn().mockImplementation((_resource) => {
-        });
+        const callback = vi.fn().mockImplementation((_resource) => {});
 
         loader.requestLoad("first", FIRST_URL, callback);
-
 
         expect(async () => await expect(loader.failRequest(FIRST_URL)).rejects.toThrow());
         expect(callback).not.toHaveBeenCalled();

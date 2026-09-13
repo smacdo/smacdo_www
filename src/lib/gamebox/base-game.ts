@@ -1,5 +1,5 @@
-import {not_null} from "../utils.ts";
-import {Viewport} from "./viewport.ts";
+import { not_null } from "../utils.ts";
+import { Viewport } from "./viewport.ts";
 
 export abstract class BaseGame {
     readonly timePerUpdateStep: number;
@@ -34,13 +34,14 @@ export abstract class BaseGame {
 
         const offscreenCtx = not_null(
             not_null(this.offscreenCanvas).getContext("2d"),
-            "canvas does not support 2d context"
+            "canvas does not support 2d context",
         );
         this.onDraw(offscreenCtx, this.unconsumedUpdateTime / this.timePerUpdateStep);
 
         ctx.drawImage(
             not_null(this.offscreenCanvas),
-            0, 0,
+            0,
+            0,
             this.viewport.renderWidth,
             this.viewport.renderHeight,
             not_null(this.viewport.outputOffsetX),
@@ -52,21 +53,24 @@ export abstract class BaseGame {
 
     private onInit(ctx: CanvasRenderingContext2D) {
         this.onResize(ctx, ctx.canvas.getBoundingClientRect());
-        this.offscreenCanvas = new OffscreenCanvas(this.viewport.renderWidth, this.viewport.renderHeight);
+        this.offscreenCanvas = new OffscreenCanvas(
+            this.viewport.renderWidth,
+            this.viewport.renderHeight,
+        );
         this.onStart();
     }
 
     onResize(ctx: CanvasRenderingContext2D, canvasRect: DOMRect) {
         const canvas = ctx.canvas;
-        const {devicePixelRatio: ratio = 1} = window;
+        const { devicePixelRatio: ratio = 1 } = window;
 
         canvas.width = Math.round(canvasRect.right * ratio) - Math.round(canvasRect.left * ratio);
         canvas.height = Math.round(canvasRect.bottom * ratio) - Math.round(canvasRect.top * ratio);
 
         ctx.scale(ratio, ratio);
 
-        canvas.style.width = canvasRect.width + 'px';
-        canvas.style.height = canvasRect.height + 'px';
+        canvas.style.width = canvasRect.width + "px";
+        canvas.style.height = canvasRect.height + "px";
 
         this.viewport.onCanvasSizeChanged(canvasRect.width, canvasRect.height);
     }

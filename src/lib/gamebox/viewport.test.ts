@@ -1,4 +1,4 @@
-import {Viewport} from "./viewport.ts";
+import { Viewport } from "./viewport.ts";
 
 describe("viewport", () => {
     it("stores the render width and height used in the constructor", () => {

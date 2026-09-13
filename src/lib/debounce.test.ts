@@ -1,7 +1,7 @@
-import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
-import {debounce} from './debounce';
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { debounce } from "./debounce";
 
-describe('debounce', () => {
+describe("debounce", () => {
     beforeEach(() => {
         vi.useFakeTimers();
     });
@@ -10,7 +10,7 @@ describe('debounce', () => {
         vi.useRealTimers();
     });
 
-    it('should call the function after the specified delay', () => {
+    it("should call the function after the specified delay", () => {
         const mockFn = vi.fn();
         const debouncedFn = debounce(mockFn, 100);
 
@@ -26,18 +26,18 @@ describe('debounce', () => {
         expect(mockFn).toHaveBeenCalledTimes(1);
     });
 
-    it('should pass arguments correctly to the debounced function', () => {
+    it("should pass arguments correctly to the debounced function", () => {
         const mockFn = vi.fn();
         const debouncedFn = debounce(mockFn, 100);
 
-        debouncedFn('arg1', 'arg2', 123);
+        debouncedFn("arg1", "arg2", 123);
 
         vi.advanceTimersByTime(100);
 
-        expect(mockFn).toHaveBeenCalledWith('arg1', 'arg2', 123);
+        expect(mockFn).toHaveBeenCalledWith("arg1", "arg2", 123);
     });
 
-    it('should reset the delay when called multiple times within the delay period', () => {
+    it("should reset the delay when called multiple times within the delay period", () => {
         const mockFn = vi.fn();
         const debouncedFn = debounce(mockFn, 100);
 
@@ -59,7 +59,7 @@ describe('debounce', () => {
         expect(mockFn).toHaveBeenCalledTimes(1);
     });
 
-    it('should only call the function once when called multiple times rapidly', () => {
+    it("should only call the function once when called multiple times rapidly", () => {
         const mockFn = vi.fn();
         const debouncedFn = debounce(mockFn, 100);
 
@@ -75,38 +75,38 @@ describe('debounce', () => {
         expect(mockFn).toHaveBeenCalledTimes(1);
     });
 
-    it('should use the arguments from the last call when called multiple times', () => {
+    it("should use the arguments from the last call when called multiple times", () => {
         const mockFn = vi.fn();
         const debouncedFn = debounce(mockFn, 100);
 
-        debouncedFn('first');
-        debouncedFn('second');
-        debouncedFn('third');
+        debouncedFn("first");
+        debouncedFn("second");
+        debouncedFn("third");
 
         vi.advanceTimersByTime(100);
 
         expect(mockFn).toHaveBeenCalledTimes(1);
-        expect(mockFn).toHaveBeenCalledWith('third');
+        expect(mockFn).toHaveBeenCalledWith("third");
     });
 
-    it('should allow the function to be called again after the delay has passed', () => {
+    it("should allow the function to be called again after the delay has passed", () => {
         const mockFn = vi.fn();
         const debouncedFn = debounce(mockFn, 100);
 
         // First call
-        debouncedFn('first');
+        debouncedFn("first");
         vi.advanceTimersByTime(100);
         expect(mockFn).toHaveBeenCalledTimes(1);
-        expect(mockFn).toHaveBeenLastCalledWith('first');
+        expect(mockFn).toHaveBeenLastCalledWith("first");
 
         // Second call after delay
-        debouncedFn('second');
+        debouncedFn("second");
         vi.advanceTimersByTime(100);
         expect(mockFn).toHaveBeenCalledTimes(2);
-        expect(mockFn).toHaveBeenLastCalledWith('second');
+        expect(mockFn).toHaveBeenLastCalledWith("second");
     });
 
-    it('should handle zero delay', () => {
+    it("should handle zero delay", () => {
         const mockFn = vi.fn();
         const debouncedFn = debounce(mockFn, 0);
 
@@ -119,23 +119,23 @@ describe('debounce', () => {
         expect(mockFn).toHaveBeenCalledTimes(1);
     });
 
-    it('should handle multiple debounced instances independently', () => {
+    it("should handle multiple debounced instances independently", () => {
         const mockFn1 = vi.fn();
         const mockFn2 = vi.fn();
         const debouncedFn1 = debounce(mockFn1, 100);
         const debouncedFn2 = debounce(mockFn2, 200);
 
-        debouncedFn1('fn1');
-        debouncedFn2('fn2');
+        debouncedFn1("fn1");
+        debouncedFn2("fn2");
 
         vi.advanceTimersByTime(100);
         expect(mockFn1).toHaveBeenCalledTimes(1);
-        expect(mockFn1).toHaveBeenCalledWith('fn1');
+        expect(mockFn1).toHaveBeenCalledWith("fn1");
         expect(mockFn2).not.toHaveBeenCalled();
 
         vi.advanceTimersByTime(100); // Total 200ms
         expect(mockFn2).toHaveBeenCalledTimes(1);
-        expect(mockFn2).toHaveBeenCalledWith('fn2');
+        expect(mockFn2).toHaveBeenCalledWith("fn2");
     });
 
     // TODO: Fix this failing test.

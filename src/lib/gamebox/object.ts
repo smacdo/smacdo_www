@@ -1,4 +1,4 @@
-import {AABB, Circle} from "./bounds.ts";
+import { AABB, Circle } from "./bounds.ts";
 
 export class GameObject {
     prevX: number = 0;
@@ -15,7 +15,12 @@ export class GameObject {
             this.aabb = bounds;
             this.preciseBounds = bounds;
         } else {
-            this.aabb = new AABB(bounds.x - bounds.radius, bounds.y - bounds.radius, bounds.radius * 2, bounds.radius * 2);
+            this.aabb = new AABB(
+                bounds.x - bounds.radius,
+                bounds.y - bounds.radius,
+                bounds.radius * 2,
+                bounds.radius * 2,
+            );
             this.preciseBounds = bounds;
         }
     }
