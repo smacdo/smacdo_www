@@ -28,6 +28,10 @@ changed since, so read them as history rather than as current commands:
 
 - The `Makefile` was removed in favour of npm scripts. `make build` is now `npm run build` and
   `make serve` is `npm run serve`; `npm run clean` removes `public/` only.
+- The games page template's aspect-ratio override was rewritten. The original
+  `default(value='16 / 9')` form double-escaped the literal into invalid CSS; it now emits an
+  inline style only when a page declares `extra.aspect`, leaving `style.css` as the single
+  source of the 16/9 default.
 - Finding F8's line-ending problem is fixed — a `.gitattributes` now pins LF, so the repo-wide
   `npm run format:check` works and the scoped-prettier workaround is unnecessary.
 
@@ -96,18 +100,12 @@ Established 2026-09-13 by direct inspection and trial runs. Trust these; do not 
   (`static/css/style.css:384`) with the canvas stretched to 100%/100%. The board is 8×8 tiles at
   64px = 512×512 and would render distorted. Fixing this also closes toybox's "canvas clipping"
   task (8 rows × 64px = 512 > the old hardcoded 480 height).
-- **F6 — local tooling.** `zola` and `make` are **not** on PATH in the agent shell and were not
-  found in scoop/choco/Programs; `make build` and browser verification must be run by the user.
-  `npx tsc`/`eslint`/`prettier` work fine. `npm ci` warns that esbuild's postinstall was blocked,
-  but `npx esbuild --version` works (0.25.12) and `node_modules/@esbuild/win32-x64` is present. Python 3.13 and `pip` are on PATH
-  (`C:\Python313\Scripts\pip.exe`), so `git filter-repo` is installable.
-- **F8 — `npm run format:check` could not pass locally on Windows. Fixed.** `core.autocrlf=true`
-  with no `.gitattributes` gave a CRLF working tree while Prettier defaults to `endOfLine: "lf"`,
-  so all 36 text files were reported as misformatted even though the committed content was correct
-  LF and CI was green. Resolved after the migration by committing a `.gitattributes` with
-  `* text=auto eol=lf` and re-checking out the working tree (`git rm --cached -r . && git reset
---hard`). All 75 text files now report `i/lf w/lf`, and the repo-wide `format:check` passes.
-  Scoped prettier checks are no longer needed as a workaround.
+- **F6 — local tooling. Resolved.** `zola` and `make` were not on PATH during the migration, so
+  `npm run build` could not be run locally. Zola 0.22.1 — matching the CI pin exactly — is now
+  installed via `winget install getzola.zola --version 0.22.1`; the Makefile has since been
+  replaced by npm scripts, so `make` is no longer needed at all. `npm run build` and `zola check`
+  both pass locally. `npm ci` warns that esbuild's postinstall was blocked, but `npx esbuild
+--version` works (0.25.12) and `node_modules/@esbuild/win32-x64` is present.
 - **F7 — slug/filename coupling.** `templates/games/page.html` resolves the demo script as
   `/js/demos/{{ page.slug }}.js`. The content filename and the esbuild output basename must
   match exactly: `brainfreeze.md` ⇒ `brainfreeze.js`.

@@ -9,7 +9,7 @@
 <p class="game-description">{{ page.description }}</p>
 {% endif %}
 
-<div id="game-container" style="aspect-ratio: {{ page.extra.aspect | default(value='16 / 9') }}">
+<div id="game-container"{% if page.extra.aspect %} style="aspect-ratio: {{ page.extra.aspect | safe }}"{% endif %}>
     <canvas id="game-canvas"></canvas>
 </div>
 
