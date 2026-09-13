@@ -27,16 +27,15 @@ validation remain pending; see [TASKS.md](TASKS.md).
 From the repository root:
 
 ```sh
-npm ci                      # once
-npm run build:brainfreeze   # compile the demo bundle
-npm run serve               # Zola dev server at http://127.0.0.1:1111
+npm ci        # once
+npm run dev   # watches the bundles and serves at http://127.0.0.1:1111
 ```
 
 Then open http://127.0.0.1:1111/games/brainfreeze/.
 
-`npm run serve` runs only Zola and does **not** compile JavaScript, so rerun `npm run
-build:brainfreeze` after editing any file under `src/demos/brainfreeze/`. If Zola regenerates
-`public/`, the bundle is removed and must be rebuilt. `npm run build` does the whole site at once.
+Editing anything under `src/demos/brainfreeze/` rebuilds the bundle and reloads the browser
+automatically. `npm run build` does the whole site at once, and `npm run build:brainfreeze`
+just this demo.
 
 Checks, all from the repository root: `npm run typecheck`, `npm run lint`, and
 `npm run format:check` (or `npm run format` to apply).

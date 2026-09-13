@@ -138,19 +138,21 @@ and phased roadmap.
 | Site framework | Zola 0.22.1 (Tera templates, Markdown content)            |
 | CSS            | Plain CSS with custom properties (no Sass, no frameworks) |
 | JavaScript     | TypeScript → esbuild for site interactions and demos      |
-| Build          | `npm run build` (runs Zola then esbuild)                  |
-| Local dev      | `npm run serve` → http://127.0.0.1:1111                   |
+| Build          | `npm run build` (runs esbuild then Zola)                  |
+| Local dev      | `npm run dev` → http://127.0.0.1:1111, with live reload   |
 
 ## Directory Structure
 
 ```
 content/        Markdown pages and sections (Zola)
 templates/      Tera HTML templates (Zola)
-static/         Assets copied as-is into public/ (CSS, JS, images)
+static/         Assets copied as-is into public/ (CSS, images, theme.js)
+static/js/      Generated esbuild bundles land here — gitignored, do not edit
+scripts/        Repository tooling (dev.mjs: watch + serve)
 src/lib/gamebox/  Physics/math library (TypeScript, no framework deps)
 src/demos/      Canvas demos compiled by esbuild (TypeScript; brainfreeze is still JavaScript)
 docs/brainfreeze/ Brainfreeze demo docs: constraints, plan, tasks, migration record
-src/site/       Site interactions → public/js/site.js
+src/site/       Site interactions → static/js/site.js
 public/         Generated output — gitignored, do not edit
 ```
 
@@ -160,18 +162,21 @@ public/         Generated output — gitignored, do not edit
 - Run `npm run typecheck` for TypeScript changes. CI runs it before building; existing
   `*.test.ts` files are excluded pending separate test setup.
 - Install dependencies with `npm ci`, matching CI and the committed lockfile.
-- Run `npm run build` for site code, template, style, or content changes. It runs `zola build`
-  first and the esbuild bundles after, because `zola build` regenerates `public/` and would
-  otherwise wipe them. Keep that order if you add a build step.
+- Run `npm run build` for site code, template, style, or content changes. It runs the esbuild
+  bundles **first** and `zola build` after, because the bundles are written into `static/` and
+  Zola copies that directory into `public/`. Keep that order if you add a build step.
 - Run `zola check` for content or link changes; CI also runs this check.
 - For documentation-only changes, check links and run `git diff --check`.
 - For visual or interactive changes, check narrow and wide layouts, both themes, keyboard
   navigation, and browser console errors. Report any browser checks you could not perform.
 - Existing TypeScript tests are not wired to a test runner or an `npm test` command. Do not
   report a build as passing tests or add test infrastructure without a task that requires it.
-- `npm run serve` starts only Zola; it does not compile TypeScript. After TypeScript changes, run
-  `npm run build:site`, `npm run build:demos`, or `npm run build:brainfreeze` as appropriate. If Zola regenerates `public/`,
-  rebuild the bundles before checking browser behavior.
+- Use `npm run dev` for development. It watches and rebuilds every bundle and runs `zola serve`,
+  so editing a demo reloads the browser automatically, the same as editing a template or style.
+  `npm run serve` runs Zola alone and does not rebuild JavaScript; prefer `npm run dev`.
+- Generated bundles are written to `static/js/` and are gitignored, Prettier-ignored and
+  ESLint-ignored. `static/js/theme.js` is hand-written and is none of those things. Do not edit
+  anything else under `static/js/`; edit the source in `src/` instead.
 
 ## Development Notes
 

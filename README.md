@@ -26,11 +26,15 @@ Install JS dependencies (esbuild only):
 npm install
 ```
 
-Start a local dev server with live reload at `http://127.0.0.1:1111`:
+Start the dev server at `http://127.0.0.1:1111`:
 
 ```bash
-npm run serve
+npm run dev
 ```
+
+This watches the TypeScript and JavaScript bundles and runs Zola together, so editing a demo,
+a template, a stylesheet or a page reloads the browser automatically. Use `npm run serve` if
+you want Zola on its own without the JavaScript watchers.
 
 ## Build
 

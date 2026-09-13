@@ -1,6 +1,12 @@
 # Zola build output
 public
 
+# Generated JavaScript bundles (esbuild writes these into static/ so Zola
+# copies them and live-reloads on rebuild). static/js/theme.js is hand-written.
+static/js/site.js
+static/js/site.js.map
+static/js/demos/
+
 # Node
 node_modules
 *.log

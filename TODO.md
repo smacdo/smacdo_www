@@ -22,8 +22,14 @@ User implements; assistant guides and reviews. Next: item 3; each item is a sepa
        configured to allow unused parameters prefixed with `_`, per user preference.
        Verified: format, lint, and type checks pass locally. CI runs all three before building;
        remote CI not yet run. Formatting includes the `.mjs` ESLint config.
-3. [ ] Coordinate Zola serving and TypeScript rebuilds in one dev command. Account for Zola
-       regenerating `public/` and removing bundles, not just TypeScript file changes.
+3. [x] Coordinate Zola serving and TypeScript rebuilds in one dev command. Done 2026-09-13:
+       `npm run dev` (`scripts/dev.mjs`) watches every bundle through esbuild's JS API and runs
+       `zola serve` alongside, with no new dependency. The bundles are emitted into `static/`
+       rather than `public/`, so Zola copies them and its own live reload fires on a rebuild —
+       verified end to end: editing a source file reloads the browser with the new code.
+       Note the premise here was wrong: `zola serve` does _not_ regenerate `public/` or remove
+       bundles; it rebuilds incrementally. `zola build` does clean the output directory, which
+       is why the build order is now esbuild first, Zola second.
 4. [ ] Align local/CI Node versions, document `npm ci`, and provide one shared local/PR check
        command. Assess restoring existing tests as a separate task.
        Done in part: `npm run format:check` could not pass on Windows, because

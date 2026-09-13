@@ -1,2 +1,4 @@
 public/
 templates/
+static/js/site.js
+static/js/demos/
