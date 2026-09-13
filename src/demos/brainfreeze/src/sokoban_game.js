@@ -1,5 +1,17 @@
 export const TILE_WALL = 1;
 
+/** Captures mutable level state to perform undo. */
+class LevelState {
+  /**
+   * @param {[number, number]} player
+   * @param {Array<[number, number]>} boxes
+   */
+  constructor(player, boxes) {
+    this.player = player;
+    this.boxes = boxes;
+  }
+}
+
 // TODO: Add validation when loading the level that the following invariants hold:
 //  - Goals > 0
 //  - Goals == boxes (in the future we can support unequal counts for varations, but level requires flag).
@@ -16,6 +28,9 @@ export class SokobanGame {
   constructor(level) {
     this.initialLevel = structuredClone(level);
     this.level = structuredClone(level);
+
+    /** @type{Array<LevelState>} */
+    this.stateSnapshots = [];
 
     // TODO: Validate the level.
   }
@@ -69,7 +84,7 @@ export class SokobanGame {
       return false;
     }
 
-    // Check if the move would make the player move into a box.
+    // Check if the move would cause the player to push a box.
     const boxIndex = this.#indexOfBoxAt(newX, newY);
 
     if (boxIndex !== -1) {
@@ -85,8 +100,13 @@ export class SokobanGame {
       ) {
         return false;
       }
+    }
 
-      // Move the box.
+    // Snapshot and push level state onto the undo stack.
+    this.#snapshot();
+
+    // Complete the box move - if the player pushed a box.
+    if (boxIndex !== -1) {
       this.level.boxes[boxIndex][0] += dx;
       this.level.boxes[boxIndex][1] += dy;
     }
@@ -98,9 +118,36 @@ export class SokobanGame {
     return true;
   }
 
+  /** Snapshot the game state for undoing moves. */
+  #snapshot() {
+    this.stateSnapshots.push(
+      new LevelState(
+        structuredClone(this.level.player),
+        structuredClone(this.level.boxes),
+      ),
+    );
+  }
+
+  /** Undo the last move. */
+  undo() {
+    if (this.stateSnapshots.length > 0) {
+      const snapshot = this.stateSnapshots.pop();
+
+      if (snapshot) {
+        this.level.player = snapshot.player;
+        this.level.boxes = snapshot.boxes;
+
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   /** Reset the level to its starting state. */
   restart() {
     this.level = structuredClone(this.initialLevel);
+    this.stateSnapshots = [];
   }
 
   /** Check if the player has completed the level succesfully. */

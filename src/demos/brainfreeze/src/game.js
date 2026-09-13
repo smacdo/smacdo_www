@@ -55,6 +55,8 @@ export class Game {
     if (this.input.isKeyPressed("r")) {
       // TODO: Ask confirmation.
       this.gameState.restart();
+    } else if (this.input.isKeyPressed("z")) {
+      this.gameState.undo();
     } else if (this.input.isKeyPressed("w")) {
       this.gameState.move(0, -1);
     } else if (this.input.isKeyPressed("s")) {
