@@ -28,7 +28,7 @@ Suggested learning sequence:
    elapsed time in seconds and clamp unusually large deltas after tab switching.
 2. Track keyboard keys currently down and pressed this frame. Clear transient
    presses after they have been consumed; handle focus loss to avoid stuck keys.
-3. Parse one text level into static terrain and separate entity positions.
+3. Hardcode one level as JavaScript data: static terrain and separate entity positions.
 4. Draw terrain and entities as primitive shapes through a thin renderer.
 5. Translate input into discrete movement; prevent movement into walls or outside
    the board. Decide when moves repeat instead of letting render rate dictate it.
@@ -49,7 +49,7 @@ game rules.
 
 ### 3. Complete the Sokoban MVP
 
-- Multiple levels and progression through a small LevelManager.
+- Multiple hardcoded JavaScript levels and progression through a small LevelManager.
 - Simple title, gameplay, and level-complete flow.
 - Lightweight SceneManager with replace(); add push()/pop() only if needed.
 - Small debug overlay: start with useful values such as frame time, player tile
@@ -72,7 +72,6 @@ These are candidate responsibilities, not required classes to create immediately
 | GameScene    | Translate input into Sokoban actions and render its state |
 | SokobanGame  | Pure game rules and live dynamic state                    |
 | TileMap      | Static terrain queries and bounds                         |
-| parseLevel   | Stateless conversion from text into level data            |
 | LevelManager | Level selection and progression, not live gameplay state  |
 | DebugOverlay | Small, useful development readouts                        |
 
@@ -80,15 +79,17 @@ Scenes may expose enter(), exit(), update(dt), and render(renderer); no base cla
 is required. Player/crate data can remain plain objects until behavior justifies
 classes.
 
-Text levels are an input format only. Vite raw-text imports are acceptable. Choose
-and document the symbol legend when building the parser, including entities on
-goals, whitespace, and invalid input handling.
+MVP levels are hardcoded JavaScript data, not text to parse. Keep level definitions
+separate from mutable gameplay state so restart can reuse the initial positions.
+A post-MVP parser can produce the same data shape without changing game rules.
 
 Keep logical game coordinates distinct from CSS display size and canvas bitmap
 size. For now they can match. Let Renderer own future resolution and DPI handling.
 
 ## After MVP
 
+- Text level parsing via a plain parseLevel(text) function. Choose the symbol legend
+  and handle entities on goals, whitespace, and invalid input then.
 - Sprite sheets and a small asset loader.
 - Web Audio wrapper, potentially brought forward if desired.
 - Small Canvas buttons when needed; no generic UI framework.
