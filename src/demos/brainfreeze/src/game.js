@@ -35,6 +35,8 @@ export class Game {
     this.update(deltaTime);
     this.render();
 
+    // Post frame clean up.
+    this.input.endFrame();
     requestAnimationFrame((timestamp) => this.frame(timestamp));
   }
 
@@ -45,6 +47,10 @@ export class Game {
   update(deltaTime) {
     const speed = 200.0;
     this.x += speed * deltaTime;
+
+    if (this.input.isKeyPressed("a")) {
+      this.x -= 100;
+    }
 
     if (this.x > 640) {
       this.x = 0;

@@ -1,6 +1,7 @@
 export class Input {
   constructor() {
-    this.keysDown = new Set();
+    this.keysDown = new Set(); // Keys that are pushed (current frame and continous).
+    this.keysPressed = new Set(); // Keys that were pushed for the current frame.
 
     // XXX: do we need to clean up the event handlers?
     window.addEventListener("keydown", (event) => {
@@ -15,11 +16,31 @@ export class Input {
       // Prevent any keys that are currently pressed from continuing to be pressed when focus
       // switches away from the game window.
       this.keysDown.clear();
+      this.keysPressed.clear();
     });
   }
 
+  /** Resets per-frame input state for the upcoming frame. */
+  endFrame() {
+    this.keysPressed.clear();
+  }
+
   /**
-   * Checks if a keyboard button `key` is down. The name is from `KeyboardEvent.key`.
+   * Checks if a keyboard button `key` was pushed _this frame_.
+   *
+   * key: The name of the keyboard button, taken from `event.key`.
+   *
+   * @param {string} key
+   */
+  isKeyPressed(key) {
+    return this.keysPressed.has(key);
+  }
+
+  /**
+   * Checks if a keyboard button `key` is pushed.
+   *
+   * key: The name of the keyboard button, taken from `event.key`.
+   *
    * @param {string} key
    */
   isKeyDown(key) {
@@ -31,8 +52,13 @@ export class Input {
    * @param {KeyboardEvent} event
    */
   #onKeyDown(event) {
-    // TODO: log when a key is pressed - ONCE. do the same when it's released.
-    this.keysDown.add(event.key);
+    const key = event.key;
+
+    if (!this.keysDown.has(key)) {
+      this.keysPressed.add(key);
+    }
+
+    this.keysDown.add(key);
   }
 
   /**
