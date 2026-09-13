@@ -4,11 +4,7 @@ Read this reference when changing games, canvas rendering, WASM loading, or demo
 
 ## Existing TypeScript engine
 
-The engine in `src/lib/gamebox/` is planned for removal and a much simpler future rewrite.
-Do not expand its abstractions, documentation, or test infrastructure unless a specific task
-requires it. Remove or rewrite it only when explicitly requested.
-
-For maintenance, games extend `BaseGame`; the engine uses a fixed timestep, rendering
+Games extend `BaseGame`; the engine uses a fixed timestep, rendering
 interpolation, and logical canvas dimensions. The current demo is in `src/demos/blockbreaker/`.
 These are existing implementation details, not requirements for the future rewrite.
 

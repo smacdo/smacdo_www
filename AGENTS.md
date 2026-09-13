@@ -119,11 +119,8 @@ unavailable, request only relevant content or provide proposed updates for manua
 
 ## Games scope
 
-The existing TypeScript engine
-is planned for removal and a simpler future rewrite; do not expand it or its test infrastructure
-unless required by a specific task. Removal requires an explicit request. Preserve the separate
-WASM integration. Read [games and graphics](docs/games-and-graphics.md) before working on games,
-canvas rendering, WASM loading, or demo hosting.
+Read [games and graphics](docs/games-and-graphics.md) before working on games, canvas rendering,
+WASM loading, or demo hosting.
 
 ## Architecture Overview
 
