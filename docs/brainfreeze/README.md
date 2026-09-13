@@ -29,14 +29,14 @@ From the repository root:
 ```sh
 npm ci                      # once
 npm run build:brainfreeze   # compile the demo bundle
-make serve                  # Zola dev server at http://127.0.0.1:1111
+npm run serve               # Zola dev server at http://127.0.0.1:1111
 ```
 
 Then open http://127.0.0.1:1111/games/brainfreeze/.
 
-`make serve` runs only Zola and does **not** compile JavaScript, so rerun `npm run
+`npm run serve` runs only Zola and does **not** compile JavaScript, so rerun `npm run
 build:brainfreeze` after editing any file under `src/demos/brainfreeze/`. If Zola regenerates
-`public/`, the bundle is removed and must be rebuilt. `make build` does the whole site at once.
+`public/`, the bundle is removed and must be rebuilt. `npm run build` does the whole site at once.
 
 Checks, all from the repository root: `npm run typecheck`, `npm run lint`, and
 `npm run format:check` (or `npm run format` to apply).

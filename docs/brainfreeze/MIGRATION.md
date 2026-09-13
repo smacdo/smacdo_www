@@ -21,6 +21,16 @@ alone without re-deriving the research below. **Update the status table as phase
 
 Nothing is pushed by any phase. See [Guardrails](#guardrails).
 
+### Changed after the migration
+
+The phase instructions below are kept as written, as a record of what was done. Two things have
+changed since, so read them as history rather than as current commands:
+
+- The `Makefile` was removed in favour of npm scripts. `make build` is now `npm run build` and
+  `make serve` is `npm run serve`; `npm run clean` removes `public/` only.
+- Finding F8's line-ending problem is fixed — a `.gitattributes` now pins LF, so the repo-wide
+  `npm run format:check` works and the scoped-prettier workaround is unnecessary.
+
 ### Deviations from the plan as written
 
 - **Phase 1** needed `git clone --no-local` (not plain `git clone`): filter-repo refuses to rewrite

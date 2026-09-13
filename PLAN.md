@@ -43,7 +43,14 @@
 - No React, no Vite, no bundler config files
 - The gamebox physics/math library (`src/lib/gamebox/`) is shared across demos
 
-### Build Orchestration: Makefile
+### Build Orchestration: Makefile — superseded 2026-09-13
+
+The Makefile was removed in favor of npm scripts: it used none of Make's dependency
+tracking (every target was phony), `make clean`'s `rm -rf` did not work on Windows, and
+three of its four build lines already just called npm. The commands below now live in
+`package.json` as `npm run build`, `npm run serve`, and `npm run clean`, the last of which
+removes `public/` only. The completed checklist items further down are left as written,
+since they record what was done at the time.
 
 - `make build` — runs Zola then esbuild
 - `make serve` — runs `zola serve` for local development
@@ -88,7 +95,6 @@ smacdo.com/
 ```
 smacdo.com repo/
 ├── config.toml              Zola configuration
-├── Makefile                 Build orchestration
 ├── package.json             esbuild only (single dev dependency)
 ├── PLAN.md                  This file
 │
@@ -300,7 +306,7 @@ steps:
           cache: "npm"
 
     - name: Build project
-      run: make build
+      run: npm run build
 
     - name: Check internal links
       run: zola check

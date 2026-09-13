@@ -138,8 +138,8 @@ and phased roadmap.
 | Site framework | Zola 0.22.1 (Tera templates, Markdown content)            |
 | CSS            | Plain CSS with custom properties (no Sass, no frameworks) |
 | JavaScript     | TypeScript → esbuild for site interactions and demos      |
-| Build          | `make build` (runs Zola then esbuild)                     |
-| Local dev      | `make serve` → http://127.0.0.1:1111                      |
+| Build          | `npm run build` (runs Zola then esbuild)                  |
+| Local dev      | `npm run serve` → http://127.0.0.1:1111                   |
 
 ## Directory Structure
 
@@ -160,14 +160,16 @@ public/         Generated output — gitignored, do not edit
 - Run `npm run typecheck` for TypeScript changes. CI runs it before building; existing
   `*.test.ts` files are excluded pending separate test setup.
 - Install dependencies with `npm ci`, matching CI and the committed lockfile.
-- Run `make build` for site code, template, style, or content changes.
+- Run `npm run build` for site code, template, style, or content changes. It runs `zola build`
+  first and the esbuild bundles after, because `zola build` regenerates `public/` and would
+  otherwise wipe them. Keep that order if you add a build step.
 - Run `zola check` for content or link changes; CI also runs this check.
 - For documentation-only changes, check links and run `git diff --check`.
 - For visual or interactive changes, check narrow and wide layouts, both themes, keyboard
   navigation, and browser console errors. Report any browser checks you could not perform.
 - Existing TypeScript tests are not wired to a test runner or an `npm test` command. Do not
   report a build as passing tests or add test infrastructure without a task that requires it.
-- `make serve` starts only Zola; it does not compile TypeScript. After TypeScript changes, run
+- `npm run serve` starts only Zola; it does not compile TypeScript. After TypeScript changes, run
   `npm run build:site`, `npm run build:demos`, or `npm run build:brainfreeze` as appropriate. If Zola regenerates `public/`,
   rebuild the bundles before checking browser behavior.
 

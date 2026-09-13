@@ -29,7 +29,7 @@ npm install
 Start a local dev server with live reload at `http://127.0.0.1:1111`:
 
 ```bash
-make serve
+npm run serve
 ```
 
 ## Build
@@ -37,7 +37,7 @@ make serve
 Produces a static site in `public/`:
 
 ```bash
-make build
+npm run build
 ```
 
 ## References
