@@ -1,4 +1,6 @@
 import "./style.css";
+import { Game } from "./game.js";
+import { Input } from "./input.js";
 
 const canvas = document.querySelector("#game");
 
@@ -8,11 +10,11 @@ if (canvas == null) {
   throw new Error("expected game canvas HTML element to be HTMLCanvasElement");
 }
 
-const context = canvas.getContext("2d");
+const canvasContext = canvas.getContext("2d");
 
-if (context == null) {
+if (canvasContext == null) {
   throw new Error("could not get game canvas 2d context");
 }
 
-context.fillStyle = "pink";
-context.fillRect(0, 0, canvas.width, canvas.height);
+const game = new Game(canvasContext, new Input());
+game.start();

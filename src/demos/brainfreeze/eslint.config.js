@@ -9,6 +9,9 @@ export default defineConfig([
   {
     files: ["**/*.js"],
     extends: [js.configs.recommended],
+    rules: {
+      "no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
+    },
   },
   {
     files: ["src/**/*.js"],
