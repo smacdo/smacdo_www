@@ -10,6 +10,21 @@ and development progress, without asking separately for documentation edits.
 Build a small complete Sokoban game, then try a different prototype to test which
 fundamentals deserve to become reusable core code.
 
+## Pause and handoff — 2026-09-13
+
+Game development is paused while the user waits for usage to reset. Next intended
+work is grafting Toybox into the user's other Git project, `smacdo_www`. No target
+repository inspection, migration, or Git operation has started. Resume by agreeing
+on the target location, integration approach, and whether/how to preserve history;
+inspect its stack and instructions when authorized. Carry over the learning-first
+workflow, game progress, and backlog. Do not assume deployment or history rewriting
+is authorized. Unit tests were the suggested next game task, now deferred behind
+this pivot.
+
+Latest review: lint, formatting, and build passed; browser checks exercised undo.
+Restart now clears undo history in source, and the user reports the fix works;
+that final fix has not been independently rerun. No persistent unit tests exist yet.
+
 ## Milestones
 
 ### 0. Browser rendering — complete
@@ -20,7 +35,12 @@ fundamentals deserve to become reusable core code.
 - The rendered output has been checked in a browser without console warnings or
   errors. The latest reviewed rectangle was pink.
 
-### 1. One visible level with player movement — next
+### 1. One visible level with player movement — complete
+
+Implemented and reviewed: frame loop, delta time, held/pressed keyboard input,
+hardcoded level, tile/entity rendering, and grid movement with wall/bounds checks.
+Rendering remains in Game; a separate Renderer is deferred. The board's bottom
+row is still partly clipped by the canvas (TASKS.md).
 
 Suggested learning sequence:
 
@@ -36,7 +56,11 @@ Suggested learning sequence:
 Done when one level appears and the player can move legally on its grid.
 Introduce modules as each step needs them, not all at once.
 
-### 2. Complete the single-level rules
+### 2. Complete the single-level rules — gameplay implemented; tests pending
+
+Crate pushing, goal highlighting, completion banner, R to restart, and Z to undo
+are implemented. Snapshot history covers successful moves only. Core behavior has
+been manually and programmatically checked; permanent Vitest coverage is pending.
 
 - Crate pushing, including blocked pushes and no pushing multiple crates at once.
 - Completion detection when all crates occupy goals.
@@ -82,12 +106,18 @@ classes.
 MVP levels are hardcoded JavaScript data, not text to parse. Keep level definitions
 separate from mutable gameplay state so restart can reuse the initial positions.
 A post-MVP parser can produce the same data shape without changing game rules.
+Use equal, nonzero box and goal counts for MVP. Checking that every goal has a box
+is equivalent to checking every box is on a goal under those level invariants.
+Level validation is still pending; unequal counts are future explicit variants.
 
 Keep logical game coordinates distinct from CSS display size and canvas bitmap
 size. For now they can match. Let Renderer own future resolution and DPI handling.
 
 ## After MVP
 
+- Consider movement animation and optional restart confirmation (existing code
+  TODOs, not required for the current prototype). A fixed timestep accumulator
+  remains deferred despite its code TODO; reachability analysis is also a stretch.
 - Text level parsing via a plain parseLevel(text) function. Choose the symbol legend
   and handle entities on goals, whitespace, and invalid input then.
 - Sprite sheets and a small asset loader.
