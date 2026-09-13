@@ -8,7 +8,7 @@ const level = {
     1, 1, 1, 1, 1,
   ],
   colsPerRow: 5,
-  playerSpawn: [1, 2],
+  player: [1, 2],
   boxes: [[2, 2]],
   goals: [[3, 2]],
 };

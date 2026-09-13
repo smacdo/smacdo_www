@@ -1,4 +1,5 @@
-import level from "./levels/level1.js";
+import DEAULT_LEVEL from "./levels/level1.js";
+
 export class Game {
   /**
    * @param {CanvasRenderingContext2D} canvasContext
@@ -8,8 +9,9 @@ export class Game {
     this.canvasContext = canvasContext;
     this.input = input;
     this.previousTimestamp = null;
-    this.x = 0;
-    this.y = 100;
+
+    // Gameplay state.
+    this.level = structuredClone(DEAULT_LEVEL);
   }
 
   /** Starts the game. */
@@ -43,32 +45,31 @@ export class Game {
 
   /**
    * Advance game state.
-   * @param {number} deltaTime
+   * @param {number} _deltaTime
    */
-  update(deltaTime) {
-    const speed = 200.0;
-    this.x += speed * deltaTime;
+  update(_deltaTime) {
+    // TODO: use deltaTime and perform movement animation.
+    // TODO: implement movement collision.
+    // TODO: implement crate pushing.
+    // TODO: implement winning.
 
-    if (this.input.isKeyPressed("a")) {
-      this.x -= 100;
+    if (this.input.isKeyPressed("w") && this.level.player[1] > 0) {
+      this.level.player[1] -= 1;
     }
-
-    if (this.x > 640) {
-      this.x = 0;
+    if (
+      this.input.isKeyPressed("s") &&
+      this.level.player[1] < this.level.tiles.length
+    ) {
+      this.level.player[1] += 1;
     }
-
-    const horizontalSpeed = 80.0;
-
-    if (this.input.isKeyDown("s")) {
-      this.y += horizontalSpeed * deltaTime;
-    } else if (this.input.isKeyDown("w")) {
-      this.y -= horizontalSpeed * deltaTime;
+    if (this.input.isKeyPressed("a") && this.level.player[0] > 0) {
+      this.level.player[0] -= 1;
     }
-
-    if (this.y < 0) {
-      this.y = 480 - 10;
-    } else if (this.y > 480) {
-      this.y = 0 + 10;
+    if (
+      this.input.isKeyPressed("d") &&
+      this.level.player[0] < this.level.colsPerRow
+    ) {
+      this.level.player[0] += 1;
     }
   }
 
@@ -100,12 +101,12 @@ export class Game {
     }
 
     // Draw the tile map.
-    const colCount = level.colsPerRow;
-    const rowCount = level.tiles.length / colCount;
+    const colCount = this.level.colsPerRow;
+    const rowCount = this.level.tiles.length / colCount;
 
     for (let y = 0; y < rowCount; y++) {
       for (let x = 0; x < colCount; x++) {
-        const tile = level.tiles.at(colCount * y + x);
+        const tile = this.level.tiles.at(colCount * y + x);
         this.canvasContext.fillStyle =
           tile === TILE_WALL ? WALL_COLOR : FLOOR_COLOR;
 
@@ -137,11 +138,11 @@ export class Game {
     const spriteOffsetX = (tileWidth - spriteWidth) / 2;
     const spriteOffsetY = (tileHeight - spriteHeight) / 2;
 
-    const goal_count = level.goals.length;
+    const goal_count = this.level.goals.length;
 
     for (let i = 0; i < goal_count; i++) {
-      const goalX = level.goals[i][0];
-      const goalY = level.goals[i][1];
+      const goalX = this.level.goals[i][0];
+      const goalY = this.level.goals[i][1];
 
       this.canvasContext.fillStyle = GOAL_EMPTY_COLOR;
       this.canvasContext.fillRect(
@@ -152,11 +153,11 @@ export class Game {
       );
     }
 
-    const box_count = level.boxes.length;
+    const box_count = this.level.boxes.length;
 
     for (let i = 0; i < box_count; i++) {
-      const boxX = level.boxes[i][0];
-      const boxY = level.boxes[i][1];
+      const boxX = this.level.boxes[i][0];
+      const boxY = this.level.boxes[i][1];
 
       this.canvasContext.fillStyle = BOX_COLOR;
       this.canvasContext.fillRect(
@@ -167,8 +168,8 @@ export class Game {
       );
     }
 
-    const playerX = level.playerSpawn[0];
-    const playerY = level.playerSpawn[1];
+    const playerX = this.level.player[0];
+    const playerY = this.level.player[1];
 
     this.canvasContext.fillStyle = PLAYER_COLOR;
     this.canvasContext.fillRect(
