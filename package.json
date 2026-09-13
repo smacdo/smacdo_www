@@ -4,10 +4,13 @@
   "scripts": {
     "build:demos": "npx esbuild src/demos/blockbreaker/demo.ts --bundle --outfile=public/js/demos/blockbreaker.js",
     "build:site": "npx esbuild src/site/header.ts --bundle --outfile=public/js/site.js",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "format:check": "prettier --check **/*.{ts,js,css,md}",
+    "format": "prettier --write **/*.{ts,js,css,md}"
   },
   "devDependencies": {
     "esbuild": "^0.25.0",
+    "prettier": "^3.9.6",
     "typescript": "^7.0.2"
   }
 }
