@@ -51,16 +51,16 @@ export class Game {
   update(_deltaTime) {
     // TODO: use deltaTime and perform movement animation.
 
-    if (this.input.isKeyPressed("w")) {
+    if (this.input.isKeyPressed("r")) {
+      // TODO: Ask confirmation.
+      this.gameState.restart();
+    } else if (this.input.isKeyPressed("w")) {
       this.gameState.move(0, -1);
-    }
-    if (this.input.isKeyPressed("s")) {
+    } else if (this.input.isKeyPressed("s")) {
       this.gameState.move(0, 1);
-    }
-    if (this.input.isKeyPressed("a")) {
+    } else if (this.input.isKeyPressed("a")) {
       this.gameState.move(-1, 0);
-    }
-    if (this.input.isKeyPressed("d")) {
+    } else if (this.input.isKeyPressed("d")) {
       this.gameState.move(1, 0);
     }
   }

@@ -5,6 +5,7 @@ export class SokobanGame {
    * @param {import("./level.js").Level} level
    */
   constructor(level) {
+    this.initialLevel = structuredClone(level);
     this.level = structuredClone(level);
   }
 
@@ -84,6 +85,11 @@ export class SokobanGame {
     this.level.player[1] = newY;
 
     return true;
+  }
+
+  /** Reset the level to its starting state. */
+  restart() {
+    this.level = structuredClone(this.initialLevel);
   }
 
   /** Get the tilemap for the level. */
