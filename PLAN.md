@@ -143,7 +143,8 @@ smacdo.com repo/
 
 Status reconciled against source on 2026-09-12. Checked items indicate implementation present,
 not fresh browser or deployment verification. The current guided improvement sequence is in
-[TODO.md](TODO.md#improvement-walkthrough-2026-09-12), beginning with TypeScript checking.
+[TODO.md](TODO.md#improvement-walkthrough-2026-09-12). TypeScript checking is configured and
+passes locally; linting and formatting are next.
 
 ### Phase 1: Zola Foundation ✅
 - [x] Initialize Zola project (`config.toml`)

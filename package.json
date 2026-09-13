@@ -3,9 +3,11 @@
   "private": true,
   "scripts": {
     "build:demos": "npx esbuild src/demos/blockbreaker/demo.ts --bundle --outfile=public/js/demos/blockbreaker.js",
-    "build:site": "npx esbuild src/site/header.ts --bundle --outfile=public/js/site.js"
+    "build:site": "npx esbuild src/site/header.ts --bundle --outfile=public/js/site.js",
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "esbuild": "^0.25.0"
+    "esbuild": "^0.25.0",
+    "typescript": "^7.0.2"
   }
 }

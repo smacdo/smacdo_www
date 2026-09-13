@@ -2,11 +2,13 @@
 
 ## Improvement walkthrough (2026-09-12)
 
-User implements; assistant guides and reviews. Start at item 1; each item is a separate checkpoint.
+User implements; assistant guides and reviews. Next: item 2; each item is a separate checkpoint.
 
-1. [ ] Add TypeScript as a dev dependency, a browser-oriented `tsconfig.json`, and a
+1. [x] Add TypeScript as a dev dependency, a browser-oriented `tsconfig.json`, and a
    `typecheck` script (`tsc --noEmit`). Resolve production-source diagnostics and add CI checking.
    Existing test files need separate runner/type setup; do not silently treat them as checked.
+   Verified locally: `npm run typecheck` passes with TypeScript 7.0.2. CI step reviewed,
+   positioned after dependency installation and before build; remote CI not yet run.
 2. [ ] Add typescript-eslint recommended linting and Prettier for TS, JS, CSS, and Markdown.
    Use a 100-character wrapping target; keep bulk formatting separate from behavior changes.
 3. [ ] Coordinate Zola serving and TypeScript rebuilds in one dev command. Account for Zola

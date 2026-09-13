@@ -152,6 +152,8 @@ public/         Generated output — gitignored, do not edit
 
 ## Development and Validation
 
+- Run `npm run typecheck` for TypeScript changes. CI runs it before building; existing
+  `*.test.ts` files are excluded pending separate test setup.
 - Install dependencies with `npm ci`, matching CI and the committed lockfile.
 - Run `make build` for site code, template, style, or content changes.
 - Run `zola check` for content or link changes; CI also runs this check.
