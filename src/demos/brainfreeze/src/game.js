@@ -51,6 +51,7 @@ export class Game {
   update(_deltaTime) {
     // TODO: use deltaTime and perform movement animation.
 
+    // Perform player's requested action.
     if (this.input.isKeyPressed("r")) {
       // TODO: Ask confirmation.
       this.gameState.restart();
@@ -181,12 +182,13 @@ export class Game {
       goalHeight,
     );
 
-    /*
-    this.canvasContext.fillStyle = "pink";
-    this.canvasContext.fillRect(0, 0, canvas.width, canvas.height);
+    // Show a message to the player if they've completed the level.
+    if (this.gameState.isComplete()) {
+      this.canvasContext.fillRect(40, 30, 450, 100);
 
-    this.canvasContext.fillStyle = "blue";
-    this.canvasContext.fillRect(this.x, this.y, 10, 10);
-    */
+      this.canvasContext.font = "bold 48px Arial";
+      this.canvasContext.fillStyle = "black";
+      this.canvasContext.fillText("YOU ARE WINNER", 50, 100);
+    }
   }
 }

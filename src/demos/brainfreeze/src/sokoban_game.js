@@ -1,5 +1,14 @@
 export const TILE_WALL = 1;
 
+// TODO: Add validation when loading the level that the following invariants hold:
+//  - Goals > 0
+//  - Goals == boxes (in the future we can support unequal counts for varations, but level requires flag).
+//  - Player, goals and boxes are in bounds.
+//  - Player, goals and boxes are on the floor (not in a wall).
+//  - No overlapping goals or boxes. (eg no boxes have duplicate positions, same for goals).
+//  - Player is not inside of a box.
+//  - Tilemap colsPerRow is divisble by the length (eg col count holds).
+//  - Player can reach all boxes and goals without being blocked by walls (STRETCH).
 export class SokobanGame {
   /**
    * @param {import("./level.js").Level} level
@@ -7,6 +16,8 @@ export class SokobanGame {
   constructor(level) {
     this.initialLevel = structuredClone(level);
     this.level = structuredClone(level);
+
+    // TODO: Validate the level.
   }
 
   /**
@@ -90,6 +101,37 @@ export class SokobanGame {
   /** Reset the level to its starting state. */
   restart() {
     this.level = structuredClone(this.initialLevel);
+  }
+
+  /** Check if the player has completed the level succesfully. */
+  isComplete() {
+    const goalCount = this.level.goals.length;
+    const boxCount = this.level.boxes.length;
+
+    // Make sure each goal has a box on top of it otherwise the level is not complete.
+    for (let goalIndex = 0; goalIndex < goalCount; goalIndex++) {
+      const goal = this.level.goals[goalIndex];
+
+      // Are there any boxes on top of this goal?
+      let hasBox = false;
+
+      for (let boxIndex = 0; boxIndex < boxCount; boxIndex++) {
+        const box = this.level.boxes[boxIndex];
+
+        if (goal[0] === box[0] && goal[1] === box[1]) {
+          hasBox = true;
+          break;
+        }
+      }
+
+      // Reject if no boxes are on the goal.
+      if (!hasBox) {
+        return false;
+      }
+    }
+
+    // Looks like all goals have a box on top.
+    return true;
   }
 
   /** Get the tilemap for the level. */
