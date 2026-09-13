@@ -91,14 +91,13 @@ Established 2026-09-13 by direct inspection and trial runs. Trust these; do not 
   `npx tsc`/`eslint`/`prettier` work fine. `npm ci` warns that esbuild's postinstall was blocked,
   but `npx esbuild --version` works (0.25.12) and `node_modules/@esbuild/win32-x64` is present. Python 3.13 and `pip` are on PATH
   (`C:\Python313\Scripts\pip.exe`), so `git filter-repo` is installable.
-- **F8 — `npm run format:check` cannot pass locally on Windows.** `core.autocrlf=true` with no
-  `.gitattributes`, so Git checks files out CRLF while Prettier defaults to `endOfLine: "lf"`.
-  Measured: all 36 flagged files differ by **line endings only, zero real formatting diffs**; CI
-  passes because the Linux checkout is LF. Consequence for this migration: use scoped checks
-  (`npx prettier --check <paths>`) on touched files rather than the repo-wide script. Files written
-  by `prettier --write` become LF on disk and then pass, and produce **no** Git diff, since
-  `autocrlf` normalizes CRLF to LF on add either way. Pre-existing issue, not caused by this work;
-  see the note added to `TODO.md`.
+- **F8 — `npm run format:check` could not pass locally on Windows. Fixed.** `core.autocrlf=true`
+  with no `.gitattributes` gave a CRLF working tree while Prettier defaults to `endOfLine: "lf"`,
+  so all 36 text files were reported as misformatted even though the committed content was correct
+  LF and CI was green. Resolved after the migration by committing a `.gitattributes` with
+  `* text=auto eol=lf` and re-checking out the working tree (`git rm --cached -r . && git reset
+--hard`). All 75 text files now report `i/lf w/lf`, and the repo-wide `format:check` passes.
+  Scoped prettier checks are no longer needed as a workaround.
 - **F7 — slug/filename coupling.** `templates/games/page.html` resolves the demo script as
   `/js/demos/{{ page.slug }}.js`. The content filename and the esbuild output basename must
   match exactly: `brainfreeze.md` ⇒ `brainfreeze.js`.
@@ -238,7 +237,7 @@ npx prettier --write "src/demos/brainfreeze/**/*.js" "docs/brainfreeze/**/*.md"
 ```
 
 **Verify:** `npx prettier --check "src/demos/brainfreeze/**/*.js" "docs/brainfreeze/**/*.md"`
-passes (scoped, per F8 — the repo-wide script cannot pass locally); `npm run typecheck` and
+passes; `npm run typecheck` and
 `npm run lint` still pass; `git diff` for this commit contains no behavior changes.
 
 ## Phase 5 — Page and code adaptation (commit 5)

@@ -26,11 +26,10 @@ User implements; assistant guides and reviews. Next: item 3; each item is a sepa
        regenerating `public/` and removing bundles, not just TypeScript file changes.
 4. [ ] Align local/CI Node versions, document `npm ci`, and provide one shared local/PR check
        command. Assess restoring existing tests as a separate task.
-       Note: `npm run format:check` cannot pass locally on Windows — `core.autocrlf=true` with no
-       `.gitattributes` yields a CRLF checkout while Prettier defaults to `endOfLine: "lf"`.
-       Verified 2026-09-13: all 36 flagged files differ by line endings only, zero real formatting
-       diffs, and CI is unaffected. Fix with a `.gitattributes` containing `* text=auto eol=lf`,
-       or set `"endOfLine": "auto"` in `.prettierrc.json`.
+       Done in part: `npm run format:check` could not pass on Windows, because
+       `core.autocrlf=true` with no `.gitattributes` gave a CRLF working tree while Prettier
+       defaults to `endOfLine: "lf"`. Fixed 2026-09-13 by committing `.gitattributes` with
+       `* text=auto eol=lf` and re-checking out the tree; all three checks now pass locally.
 5. [ ] Fix illegal top-level `return` statements in `templates/games/section.html`.
        Consider moving gallery discovery into checked TypeScript; handle missing metadata gracefully.
 6. [ ] Include `public/.htaccess` in the deployment artifact; upload-artifact v4 excludes

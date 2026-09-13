@@ -38,14 +38,8 @@ Then open http://127.0.0.1:1111/games/brainfreeze/.
 build:brainfreeze` after editing any file under `src/demos/brainfreeze/`. If Zola regenerates
 `public/`, the bundle is removed and must be rebuilt. `make build` does the whole site at once.
 
-Checks, all from the repository root: `npm run typecheck`, `npm run lint`, and `npm run format`.
-Note that `npm run format:check` cannot pass on a Windows checkout for line-ending reasons
-unrelated to this game — see finding F8 in [MIGRATION.md](MIGRATION.md) — so check only the paths
-you touched:
-
-```sh
-npx prettier --check "src/demos/brainfreeze/**/*.js"
-```
+Checks, all from the repository root: `npm run typecheck`, `npm run lint`, and
+`npm run format:check` (or `npm run format` to apply).
 
 ## Files to know
 
