@@ -130,13 +130,13 @@ and phased roadmap.
 
 ## Stack
 
-| Layer | Technology |
-|---|---|
-| Site framework | Zola 0.22.1 (Tera templates, Markdown content) |
-| CSS | Plain CSS with custom properties (no Sass, no frameworks) |
-| JavaScript | TypeScript → esbuild for site interactions and demos |
-| Build | `make build` (runs Zola then esbuild) |
-| Local dev | `make serve` → http://127.0.0.1:1111 |
+| Layer          | Technology                                                |
+| -------------- | --------------------------------------------------------- |
+| Site framework | Zola 0.22.1 (Tera templates, Markdown content)            |
+| CSS            | Plain CSS with custom properties (no Sass, no frameworks) |
+| JavaScript     | TypeScript → esbuild for site interactions and demos      |
+| Build          | `make build` (runs Zola then esbuild)                     |
+| Local dev      | `make serve` → http://127.0.0.1:1111                      |
 
 ## Directory Structure
 
@@ -152,6 +152,7 @@ public/         Generated output — gitignored, do not edit
 
 ## Development and Validation
 
+- Allow unused function parameters prefixed with `_` in ESLint; keep checks for other unused names.
 - Run `npm run typecheck` for TypeScript changes. CI runs it before building; existing
   `*.test.ts` files are excluded pending separate test setup.
 - Install dependencies with `npm ci`, matching CI and the committed lockfile.
@@ -204,11 +205,13 @@ Without these keys, Zola falls back to its built-in "Welcome to Zola!" placehold
 **Staging** deploys automatically on every push to `master`.
 
 **Production** requires a `releases-vN` tag:
+
 ```bash
 ## Replace N with the intended release number.
 git tag releases-vN
 git push origin releases-vN
 ```
+
 Then approve the pending deployment in GitHub Actions (Settings → Environments → production).
 
 For demo server scripts and the required Apache symlink setting, see

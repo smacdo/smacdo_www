@@ -7,7 +7,7 @@ A paragraph of body text. Reading comfort is the goal — warm ink on paper, gen
 
 ## Heading Two
 
-Another paragraph with **bold** and *italic* and `inline code`. The measure keeps lines short enough to read without losing your place.
+Another paragraph with **bold** and _italic_ and `inline code`. The measure keeps lines short enough to read without losing your place.
 
 ### Heading Three
 
