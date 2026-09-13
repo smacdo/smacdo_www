@@ -15,7 +15,7 @@ alone without re-deriving the research below. **Update the status table as phase
 | 1     | Graft toybox history (commit 1)             | DONE  |
 | 2     | Reorganize + strip scaffolding (commit 2)   | DONE  |
 | 3     | Wire into build/lint/typecheck (commit 3)   | DONE  |
-| 4     | Reformat to project style (commit 4)        | TODO  |
+| 4     | Reformat to project style (commit 4)        | DONE  |
 | 5     | Page + code adaptation (commit 5)           | TODO  |
 | 6     | Bookkeeping (commit 6)                      | TODO  |
 
