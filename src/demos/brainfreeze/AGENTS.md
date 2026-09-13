@@ -12,9 +12,12 @@
 - Exception: maintain AGENTS.md, PLAN.md, TASKS.md, README.md, and related project
   documentation automatically as discussion and progress warrant. Record tasks,
   features, status, and agreed rules; recording work does not authorize execution.
-- A review request authorizes relevant read-only inspection and validation.
-  Include the rendered page and console when browser tools are available
-  (currently Playwright MCP); inspect screenshots for Canvas visuals.
+- A review request authorizes inspection and validation commands as needed:
+  `npm run lint`, `npm run format:check`, `npm run build`, and browser checks
+  (currently Playwright MCP). Build output and browser artifacts are allowed;
+  source changes, including `npm run format` or lint autofixes, still need permission.
+  Check the rendered page, console, and relevant interactions; use screenshots
+  for Canvas visuals.
 
 ## Project constraints
 
