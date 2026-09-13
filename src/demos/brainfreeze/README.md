@@ -39,9 +39,10 @@ available in package.json; their presence is not a claim that a build was verifi
 - `jsconfig.json`: editor checking for JavaScript, including Vite asset imports.
 - `package.json`: dependencies and npm commands.
 
-The stack is vanilla JavaScript with ES modules, Vite, and Canvas 2D. ESLint,
-Prettier, and Vitest are listed as development dependencies; their project setup
-is still pending. Browser inspection through Playwright MCP is an optional local
+The stack is vanilla JavaScript with ES modules, Vite, and Canvas 2D. Run
+`npm run lint` for ESLint, `npm run format:check` to check formatting, or
+`npm run format` to apply Prettier formatting. Vitest setup is still pending.
+Browser inspection through Playwright MCP is an optional local
 assistant tool, not a game dependency. Its configuration lives outside this repo.
 
 ## Development notes

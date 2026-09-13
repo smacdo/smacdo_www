@@ -63,18 +63,18 @@ an understandable completion state.
 
 These are candidate responsibilities, not required classes to create immediately.
 
-| Area | Responsibility |
-| --- | --- |
-| Game | Browser loop and overall lifecycle |
-| Input | Browser events and input state; mouse support when needed |
-| Renderer | Canvas drawing; later scaling and coordinate conversion |
-| SceneManager | Active scene lifecycle and replacement |
-| GameScene | Translate input into Sokoban actions and render its state |
-| SokobanGame | Pure game rules and live dynamic state |
-| TileMap | Static terrain queries and bounds |
-| parseLevel | Stateless conversion from text into level data |
-| LevelManager | Level selection and progression, not live gameplay state |
-| DebugOverlay | Small, useful development readouts |
+| Area         | Responsibility                                            |
+| ------------ | --------------------------------------------------------- |
+| Game         | Browser loop and overall lifecycle                        |
+| Input        | Browser events and input state; mouse support when needed |
+| Renderer     | Canvas drawing; later scaling and coordinate conversion   |
+| SceneManager | Active scene lifecycle and replacement                    |
+| GameScene    | Translate input into Sokoban actions and render its state |
+| SokobanGame  | Pure game rules and live dynamic state                    |
+| TileMap      | Static terrain queries and bounds                         |
+| parseLevel   | Stateless conversion from text into level data            |
+| LevelManager | Level selection and progression, not live gameplay state  |
+| DebugOverlay | Small, useful development readouts                        |
 
 Scenes may expose enter(), exit(), update(dt), and render(renderer); no base class
 is required. Player/crate data can remain plain objects until behavior justifies

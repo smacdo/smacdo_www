@@ -5,7 +5,8 @@
 - The user leads implementation to learn JavaScript/web development; they already
   have game-development experience (XNA). Default to hints, explanations, and
   pseudocode. Reviews should include beginner-friendly style advice and nits.
-- Require express permission for code, configuration, commands, file inspection,
+- Reading project files, including commands used to read them, needs no permission.
+- Require express permission for code/configuration changes, other commands,
   installations, commits, pushes, and delegation. Perform only the requested
   action; do not implement adjacent fixes or backlog items.
 - Exception: maintain AGENTS.md, PLAN.md, TASKS.md, README.md, and related project
