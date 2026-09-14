@@ -122,8 +122,7 @@ unavailable, request only relevant content or provide proposed updates for manua
 Read [games and graphics](docs/games-and-graphics.md) before working on games, canvas rendering,
 WASM loading, or demo hosting.
 
-The Brainfreeze demo migration is in progress; its phases, locked decisions, and verified
-findings are in [docs/brainfreeze/MIGRATION.md](docs/brainfreeze/MIGRATION.md).
+When working on the brainfreeze game, please read its [README.md](docs/brainfreeze/README.md)
 
 ## Architecture Overview
 
