@@ -41,7 +41,9 @@ you want Zola on its own without the JavaScript watchers.
 Tests use [Vitest](https://vitest.dev/) and live alongside code as `*.test.ts`.
 
 ```bash
-npm test             # Run all unit tests.
+npm run check        # Run all checks including tests.
+
+npm test             # Only run tests.
 npm run test:watch   # Re-run tests each time the project is changed.
 ```
 

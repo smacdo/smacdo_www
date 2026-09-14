@@ -159,6 +159,7 @@ public/         Generated output — gitignored, do not edit
 ## Development and Validation
 
 - Allow unused function parameters prefixed with `_` in ESLint; keep checks for other unused names.
+- Use `npm run check` to run all checks (typecheck, lint, format and unit tests).
 - Run `npm run typecheck` for TypeScript changes. CI runs it before building.
 - Install dependencies with `npm ci`, matching CI and the committed lockfile.
 - Run `npm run build` for site code, template, style, or content changes. It runs the esbuild
