@@ -2,11 +2,6 @@
 
 Links collected while working on smacdo.com.
 
-## React / Vite (historical)
-
-- [React: Navigation Without React-Router](https://ncoughlin.com/posts/react-navigation-without-react-router)
-- [Vite + React + Ts + vitest + React Testing Library boilerplate](https://www.reddit.com/r/reactjs/comments/1hkf4vf/vite_react_ts_vitest_react_testing_library/)
-
 ## Canvas
 
 - [Canvas with React JS](https://medium.com/@pdx.lucasm/canvas-with-react-js-32e133c05258)

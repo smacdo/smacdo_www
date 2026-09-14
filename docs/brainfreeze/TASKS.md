@@ -12,8 +12,9 @@ a feature.
       works with the existing JavaScript type checking.
 - [x] Configure Prettier and add format/check commands, keeping the current
       double-quote and semicolon style unless the user chooses otherwise.
-- [ ] Add Vitest run/watch commands when preparing for game-rule tests; avoid
-      creating placeholder tests just to exercise the runner.
+- [x] Add Vitest run/watch commands when preparing for game-rule tests; avoid
+      creating placeholder tests just to exercise the runner. Done repo-wide: `npm test` and
+      `npm run test:watch`, with `vitest.config.ts` at the root.
 - [ ] Add Vitest unit tests for SokobanGame movement: valid cardinal steps,
       invalid arguments throwing without state changes, coordinate bounds and row
       wrapping, walls, successful pushes, blocked pushes (walls, boxes, board edges),

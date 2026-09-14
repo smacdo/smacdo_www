@@ -9,7 +9,7 @@ interpolation, the logical render surface, collision resolution, and sprite-atla
 
 Originally part of the React SPA, deleted with it in Phase 1 of the redesign, recovered from git
 history and rebuilt as a standalone esbuild demo in Phase 3 — see
-[PLAN.md](../../PLAN.md#phase-3-js-demo-infrastructure-).
+[PLAN.md](../../PLAN.md#completed-phases).
 
 ## Current state
 

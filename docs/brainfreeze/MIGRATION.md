@@ -328,16 +328,18 @@ and a scoped prettier check all pass. Then **hand to the user** for `make build`
 
 ## Deferred and open items
 
-- **Gamebox merge is blocked pending a decision.** The user's stated endgame is folding this into
-  `src/lib/gamebox/`, but `AGENTS.md` (Continuity section) refers to "the planned removal below"
-  with no such section present in that file, and `docs/games-and-graphics.md` calls the engine's
-  details "not requirements for the future rewrite" and says to preserve the WASM integration
-  "during engine removal". `PLAN.md` does not mention the engine at all. **Resolve whether gamebox
-  is being removed/rewritten before refactoring Brainfreeze toward it.**
+- **Gamebox merge — partly unblocked 2026-09-13.** This was recorded as blocked because the
+  instruction files pointed at a "planned removal" and a "future rewrite" of the engine that no
+  file described. That premise is gone: 2D games stay in TypeScript and turboprop takes 3D, so
+  the engine is not being removed. The user's stated endgame, folding Brainfreeze into
+  `src/lib/gamebox/`, is therefore viable. What is still undecided is gamebox's _shape_ — kept
+  as-is, reworked, or rebuilt around Brainfreeze's approach — so settle that before refactoring
+  toward it.
 - **Input listener disposal** — `input.js` attaches `keydown`/`keyup`/`blur` to `window` at
   construction and never removes them. Carried over from toybox's TASKS.md, and now genuinely
   relevant on a multi-page site.
-- **No test runner** comes across; Vitest and the SokobanGame unit tests stay in
-  `docs/brainfreeze/TASKS.md`.
+- **SokobanGame unit tests** stay in `docs/brainfreeze/TASKS.md`. No test runner came across in
+  the graft, but the repository has since gained one — Vitest, run by `npm test` — so only the
+  tests themselves are outstanding.
 - **Level data validation** at construction — still unimplemented, still in TASKS.md.
 - **`/games/` → `/demos/` rename** — blocked by finding F1.

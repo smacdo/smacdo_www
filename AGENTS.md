@@ -87,12 +87,13 @@ commit or create a PR, explain the problem and rationale, scaling detail to the 
 
 ### Continuity and documentation
 
-Read relevant existing project instructions and progress notes at session start. After more than a
-day away, give a short orientation when resuming project work. Use [PLAN.md](PLAN.md) for the
-redesign roadmap and architecture decisions, [TODO.md](TODO.md) for the backlog. Inspect their 
-contents before treating an item as current. In particular, older engine expansion tasks do not
-override the planned removal below. Reuse existing completion conventions; create additional
-continuity files only when a useful gap warrants them.
+At session start read [PLAN.md](PLAN.md#current-status) — the status block only — and
+[TODO.md](TODO.md) for the backlog. Read further into PLAN.md for goals and architecture decisions,
+and into the module documents it links, when the task calls for them. After more than a day away,
+give a short orientation when resuming project work. Inspect contents before treating an item as
+current. The TypeScript engine is staying (decided 2026-09-13), so the older engine expansion
+tasks in TODO.md are live again rather than superseded. Reuse existing completion conventions;
+create additional continuity files only when a useful gap warrants them.
 
 Maintain bookkeeping autonomously at meaningful checkpoints: mark completed tasks, document verified
 features, update progress and agreed next steps, and record decisions and explicit standing
@@ -119,7 +120,9 @@ unavailable, request only relevant content or provide proposed updates for manua
 ## Games scope
 
 Read [games and graphics](docs/games-and-graphics.md) before working on games, canvas rendering,
-WASM loading, or demo hosting.
+WASM loading, or demo hosting. For why the delivery pipelines are split as they are, see
+[demo delivery](docs/demo-delivery.md). The animated site header is
+[docs/sky-header.md](docs/sky-header.md).
 
 When working on the brainfreeze game, please read its [README.md](docs/brainfreeze/README.md).
 When working on the block breaker game or `src/lib/gamebox/`, read its
@@ -128,8 +131,8 @@ When working on the block breaker game or `src/lib/gamebox/`, read its
 ## Architecture Overview
 
 Personal website built with **Zola** (static site generator). TypeScript site interactions and
-canvas demos are compiled separately with **esbuild**. See `PLAN.md` for the full redesign plan
-and phased roadmap.
+canvas demos are compiled separately with **esbuild**. See [PLAN.md](PLAN.md) for goals,
+architecture decisions, and the map of module documents in `docs/`.
 
 ## Stack
 
@@ -151,6 +154,7 @@ static/js/      Generated esbuild bundles land here — gitignored, do not edit
 scripts/        Repository tooling (dev.mjs: watch + serve)
 src/lib/gamebox/  Physics/math library (TypeScript, no framework deps)
 src/demos/      Canvas demos compiled by esbuild (TypeScript; brainfreeze is still JavaScript)
+docs/           Module documents — PLAN.md maps them
 docs/brainfreeze/ Brainfreeze demo docs: constraints, plan, tasks, migration record
 docs/blockbreaker/ Block Breaker demo docs: overview, engine usage, tasks
 src/site/       Site interactions → static/js/site.js
@@ -163,6 +167,8 @@ public/         Generated output — gitignored, do not edit
 - Use `npm run check` to run all checks (typecheck, lint, format and unit tests).
 - Run `npm run typecheck` for TypeScript changes. CI runs it before building.
 - Install dependencies with `npm ci`, matching CI and the committed lockfile.
+- `typescript` is pinned to an exact version (no caret) for typescript-eslint
+  compatibility. Bump it and `typescript-eslint` together, and run `npm run lint` after.
 - Run `npm run build` for site code, template, style, or content changes. It runs the esbuild
   bundles **first** and `zola build` after, because the bundles are written into `static/` and
   Zola copies that directory into `public/`. Keep that order if you add a build step.
@@ -172,8 +178,8 @@ public/         Generated output — gitignored, do not edit
   navigation, and browser console errors. Report any browser checks you could not perform.
 - Run `npm test` to run unit tests for changes under `src/`.
     - CI runs this before building.
-    - Tests use vitest
-    - The default environment is node and files needing a DOM opt in via `// @vitest-environment jsdom`
+    - The default environment is node; files needing a DOM opt in with
+      `// @vitest-environment jsdom`
     - Keep this pattern because a global jsdom environment makes the suite about 13x slower!
 - Use `npm run dev` for development. It watches and rebuilds every bundle and runs `zola serve`,
   so editing a demo reloads the browser automatically, the same as editing a template or style.
@@ -186,11 +192,8 @@ public/         Generated output — gitignored, do not edit
 
 ### Zola Templates
 
-- Templates use Tera syntax — similar to Jinja2/Django templates
-- `templates/base.html` is the base layout all pages extend
-- Section pages use `templates/[section-name]/section.html`
-- Individual pages use `templates/[section-name]/page.html`
-- Front matter is TOML between `+++` delimiters
+Section pages use `templates/[section]/section.html`, individual pages
+`templates/[section]/page.html`, both extending `templates/base.html`.
 
 **Critical: Zola does NOT auto-discover subdirectory templates.** Every section's
 `_index.md` must explicitly declare which templates to use:
@@ -211,23 +214,13 @@ Without these keys, Zola falls back to its built-in "Welcome to Zola!" placehold
 ### CSS
 
 - All styles in `static/css/style.css`
-- Light/dark theming via CSS custom properties (`--bg`, `--fg`, `--muted`, `--border`, `--link`)
+- Light/dark theming via CSS custom properties: `--bg`, `--fg`, `--muted`, `--border`, `--link`,
+  `--accent`
 - Theme is toggled by setting `data-theme="dark"` on `<html>` and persisted in localStorage
-- No Sass, no utility frameworks — plain CSS only
 
 ### Deployment
 
-**Staging** deploys automatically on every push to `master`.
-
-**Production** requires a `releases-vN` tag:
-
-```bash
-## Replace N with the intended release number.
-git tag releases-vN
-git push origin releases-vN
-```
-
-Then approve the pending deployment in GitHub Actions (Settings → Environments → production).
-
-For demo server scripts and the required Apache symlink setting, see
-[demo hosting](docs/games-and-graphics.md#demo-hosting).
+Staging deploys on every push to `master`; production needs a `releases-vN` tag and then a manual
+approval. Steps are in [README.md](README.md#deployment); the workflow is
+`.github/workflows/deploy_template.yml`. For demo server scripts and the Apache symlink setting,
+see [demo hosting](docs/games-and-graphics.md#demo-hosting).

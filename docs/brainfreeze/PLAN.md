@@ -24,9 +24,9 @@ Build, typecheck, lint, and formatting are wired up and passing. Full record, in
 findings worth not re-deriving: [MIGRATION.md](MIGRATION.md).
 
 Next: the progressive TypeScript refactor, file by file. Unit tests remain the suggested next
-_game_ task and are still deferred. Folding this into the site's own `src/lib/gamebox/` engine is
-blocked pending a decision on whether that engine is being removed or rewritten — see
-[MIGRATION.md](MIGRATION.md).
+_game_ task and are still deferred. Folding this into the site's own `src/lib/gamebox/`
+engine is no longer blocked by a possible engine removal — that plan is dropped — but still waits
+on a decision about what shape gamebox should take. See [MIGRATION.md](MIGRATION.md).
 
 ## Milestones
 

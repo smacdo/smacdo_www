@@ -20,10 +20,10 @@ brew install node
 
 ## Development
 
-Install JS dependencies (esbuild only):
+Install dependencies, matching the committed lockfile the way CI does:
 
 ```bash
-npm install
+npm ci
 ```
 
 Start the dev server at `http://127.0.0.1:1111`:
@@ -55,6 +55,8 @@ Produces a static site in `public/`:
 npm run build
 ```
 
+`npm run clean` removes `public/` and the generated bundles.
+
 ## References
 
 Collected links and resources are in [docs/references.md](docs/references.md).
@@ -71,3 +73,5 @@ matching `releases-v*` on the master branch:
 git tag releases-v1
 git push origin releases-v1
 ```
+
+Production then waits for manual approval: GitHub → Settings → Environments → production.
