@@ -198,8 +198,8 @@ command is next. All three checks are wired into deployment CI, not yet verified
 - [x] Document the implemented contract in [games and graphics](docs/games-and-graphics.md#wasm-games)
 
 Current implementation uses `/demos/<slug>/loader.js` and `load(canvas)`, with content under
-`/demos/<slug>/content/`. Final cross-repository agreement remains unverified. Gallery discovery
-exists but has a syntax error tracked in TODO.md.
+`/demos/<slug>/content/`. Final cross-repository agreement remains unverified. Runtime gallery
+discovery was removed in Phase 6a; the section page now lists demos from the content tree alone.
 
 ### Phase 5: Visual Polish
 
@@ -294,38 +294,43 @@ stayed hidden for months because prod kept promoting a stale copy from its stagi
 only visible symptom was the symlinked `/demos/` failing on staging. See
 docs/brainfreeze/MIGRATION.md finding F1.
 
-#### 6a: Delete runtime gallery discovery (do this first)
+#### 6a: Delete runtime gallery discovery ✅
 
-`templates/games/section.html` renders `section.pages` at build time, then a module script
-fetches `/demos/metadata.json` and appends a second list describing the same demos. That script
-has never run: the bare `return` on its fourth line is illegal at the top level of a module, so
-the block is a parse error and the browser discards it whole.
+`templates/games/section.html` rendered `section.pages` at build time, then a module script
+fetched `/demos/metadata.json` and appended a second list describing the same demos. That script
+never ran: the bare `return` on its fourth line is illegal at the top level of a module, so the
+block was a parse error and the browser discarded it whole.
 
-- [ ] Remove the `<script type="module">` discovery block from `templates/games/section.html`
-- [ ] Decide where the version badge comes from (front matter, or drop it)
+- [x] Remove the `<script type="module">` discovery block from `templates/games/section.html`
+- [x] Decide where the version badge comes from — dropped. `.version-badge` had no CSS rule
+      anywhere and, since the script never executed, had never rendered. Version and publish date
+      on the demo page itself remain an open TODO, unaffected by this.
 - [ ] Verify `/games/` lists each demo exactly once on staging, then prod
 
-Why this is pure subtraction, not a trade:
+Why this was subtraction, not a trade:
 
-- **The code is dead, not merely redundant.** Verified 2026-09-13 by rendering
-  smacdo.com/games/ in headless Chrome: `#wasm-demos` is empty and each demo appears exactly
-  once. The illegal top-level `return` is TODO.md item 5.
-- **Repairing it would create a duplicate listing rather than fix anything.** `metadata.json`
-  holds one entry, `turboprop-demo`, which already has a content page and is already rendered by
-  `section.pages`. So item 5 should be closed by deleting the block, not by making it parse.
-- **Runtime discovery cannot do the job it was added for.** The script links entries to
+- **The code was dead, not merely redundant.** Verified 2026-09-13 by rendering
+  smacdo.com/games/ in headless Chrome: `#wasm-demos` was empty and each demo appeared exactly
+  once. The illegal top-level `return` was TODO.md item 5.
+- **Repairing it would have created a duplicate listing rather than fixed anything.**
+  `metadata.json` holds one entry, `turboprop-demo`, which already has a content page and was
+  already rendered by `section.pages`. Item 5 was therefore closed by deleting the block, not by
+  making it parse. Record this clearly: the reason not to restore gallery discovery is not that
+  it was broken, but that a working version would duplicate the content tree.
+- **Runtime discovery could not do the job it was added for.** The script linked entries to
   `/games/<slug>/`, and Zola generates that page only from `content/games/<slug>.md`. A demo
-  present in `metadata.json` but absent from the content tree links to a 404. Discovery can
-  never surface a demo the site does not already know about.
-- **It costs no workflow.** Publishing a WASM demo already requires adding a content page;
-  `content/games/turboprop-demo.md` exists for exactly that reason. Removing the fetch removes
+  present in `metadata.json` but absent from the content tree linked to a 404. Discovery could
+  never surface a demo the site did not already know about.
+- **It cost no workflow.** Publishing a WASM demo already requires adding a content page;
+  `content/games/turboprop-demo.md` exists for exactly that reason. Removing the fetch removed
   the pretense that the content page is optional, not the step itself.
-- **`version` is the only field `metadata.json` renders that the content file lacks.** `slug`,
-  `title` and `description` duplicate front matter; `loader_url` is derivable; `published` is
+- **`version` was the only field `metadata.json` rendered that the content file lacks.** `slug`,
+  `title` and `description` duplicate front matter; `loader_url` is derivable; `published` was
   unused.
 
 It also makes the gallery crawlable, brings demo links under `zola check`, and makes staging's
-`/demos/` 403 irrelevant, since nothing would fetch `metadata.json` any more.
+`/demos/` 403 irrelevant, since nothing fetches `metadata.json` any more. `metadata.json` is
+still generated on the server; Phase 6b decides its fate.
 
 #### 6b: Move WASM artifacts out of the document root (deferred)
 

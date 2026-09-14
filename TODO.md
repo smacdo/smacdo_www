@@ -36,11 +36,11 @@ User implements; assistant guides and reviews. Next: item 3; each item is a sepa
        `core.autocrlf=true` with no `.gitattributes` gave a CRLF working tree while Prettier
        defaults to `endOfLine: "lf"`. Fixed 2026-09-13 by committing `.gitattributes` with
        `* text=auto eol=lf` and re-checking out the tree; all three checks now pass locally.
-5. [ ] Fix illegal top-level `return` statements in `templates/games/section.html`.
-       Resolve by deleting the block, not by repairing it — see PLAN.md Phase 6a. Confirmed
-       2026-09-13 in headless Chrome that the script never executes, so the gallery it builds
-       has never appeared; making it parse would duplicate an entry the content tree already
-       renders.
+5. [x] Fix illegal top-level `return` statements in `templates/games/section.html`.
+       Resolved 2026-09-13 by deleting the gallery discovery block rather than repairing it —
+       see PLAN.md Phase 6a. Confirmed in headless Chrome that the script never executed, so
+       the gallery it built had never appeared; making it parse would have duplicated an entry
+       the content tree already renders.
 6. [x] Include `public/.htaccess` in the deployment artifact; upload-artifact v4 excludes
        hidden files by default. Fixed 2026-09-13 with `include-hidden-files: true` in
        `deploy_template.yml`. Verified on both hosts: the custom 404 page is served, which
@@ -49,8 +49,10 @@ User implements; assistant guides and reviews. Next: item 3; each item is a sepa
        release its object URL after image load/error.
 8. [ ] Bound fixed-step catch-up in `BaseGame` and reset runner timing when resuming.
 
-Baseline: `make build` passes; the gallery module fails Node's syntax check with
-`Illegal return statement`. No browser or live-server validation performed in this review.
+Baseline as of this review (2026-09-12): `make build` passes; the gallery module fails Node's
+syntax check with `Illegal return statement`. No browser or live-server validation performed in
+this review. Both halves have since changed — `make build` became `npm run build` on 2026-09-13,
+and the gallery module was deleted outright rather than repaired (item 5).
 
 ## Earlier engine backlog
 
@@ -67,12 +69,6 @@ Baseline: `make build` passes; the gallery module fails Node's syntax check with
 
 ## Demos
 
-- Delete runtime gallery discovery — see PLAN.md Phase 6a, and closes item 5 above.
-  `templates/games/section.html` fetches `/demos/metadata.json` and appends a second list on top
-  of the one Zola already rendered. The block has never run — its top-level `return` is a parse
-  error — so repairing the syntax would introduce a duplicate listing rather than fix anything.
-  The fetch also cannot surface a demo the content tree lacks, because `/games/<slug>/` only
-  exists from `content/games/<slug>.md`. Pure subtraction.
 - Rename /games/ to /demos/ — **blocked by hosting.** `deploy-www.sh` rsyncs with
   `--exclude '/demos'` so the `~/smacdo.com/demos` → `~/turboprop-demos` symlink survives, so a
   Zola-built `/demos/` page would work locally and never reach the doc root. Moving the section
@@ -80,8 +76,9 @@ Baseline: `make build` passes; the gallery module fails Node's syntax check with
   together. PLAN.md Phase 6b is what unblocks this: once the artifacts have their own host there
   is no symlink in the doc root to protect, and the exclude goes away entirely. Verified
   2026-09-13; see docs/brainfreeze/MIGRATION.md finding F1.
-- Show version and publish date on the demo page (demos/name-of-demo) — note this is the one
-  field `metadata.json` carries that front matter does not, so settle it as part of Phase 6a.
+- Show version and publish date on the demo page (demos/name-of-demo). Still open: Phase 6a
+  dropped the gallery version badge, which is a different surface. If this is built, take the
+  values from front matter rather than re-introducing a runtime fetch of `metadata.json`.
 
 ## Viewport
 

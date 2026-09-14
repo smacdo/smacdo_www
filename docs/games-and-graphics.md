@@ -21,7 +21,10 @@ candidates, not proof of a memory leak. Verify suspected leaks with runtime prof
 ## WASM Games
 
 - Built in the `turboprop` repo; CI publishes artifacts to `~/turboprop-demos/<slug>/` on the server
-- Discovery: the games section page fetches `/demos/metadata.json` at runtime to list available demos
+- Discovery:
+    - demos are listed from `content/games/*.md`
+    - a WASM demo needs a content page with `loader = "wasm"` and a slug matching the
+      published artifact directory
 - Each game page sets `loader = "wasm"` in front matter; `templates/games/page.html` imports
   `/demos/<slug>/loader.js` and calls `load(canvas)`
 - Canvas element must have `id="game-canvas"` — turboprop-graphics finds it by ID at startup
