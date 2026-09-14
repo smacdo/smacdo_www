@@ -61,6 +61,9 @@ jobs:
         with:
           name: deployment-files
           path: ./public
+          # .htaccess is a dotfile; upload-artifact drops hidden files unless told
+          # otherwise, so without this the site deploys with no Apache config at all.
+          include-hidden-files: true
 
   deploy:
     name: Deploy to ${{ inputs.deployment_name }}
