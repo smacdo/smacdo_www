@@ -159,8 +159,7 @@ public/         Generated output — gitignored, do not edit
 ## Development and Validation
 
 - Allow unused function parameters prefixed with `_` in ESLint; keep checks for other unused names.
-- Run `npm run typecheck` for TypeScript changes. CI runs it before building; existing
-  `*.test.ts` files are excluded pending separate test setup.
+- Run `npm run typecheck` for TypeScript changes. CI runs it before building.
 - Install dependencies with `npm ci`, matching CI and the committed lockfile.
 - Run `npm run build` for site code, template, style, or content changes. It runs the esbuild
   bundles **first** and `zola build` after, because the bundles are written into `static/` and
@@ -169,8 +168,11 @@ public/         Generated output — gitignored, do not edit
 - For documentation-only changes, check links and run `git diff --check`.
 - For visual or interactive changes, check narrow and wide layouts, both themes, keyboard
   navigation, and browser console errors. Report any browser checks you could not perform.
-- Existing TypeScript tests are not wired to a test runner or an `npm test` command. Do not
-  report a build as passing tests or add test infrastructure without a task that requires it.
+- Run `npm test` to run unit tests for changes under `src/`.
+    - CI runs this before building.
+    - Tests use vitest
+    - The default environment is node and files needing a DOM opt in via `// @vitest-environment jsdom`
+    - Keep this pattern because a global jsdom environment makes the suite about 13x slower!
 - Use `npm run dev` for development. It watches and rebuilds every bundle and runs `zola serve`,
   so editing a demo reloads the browser automatically, the same as editing a template or style.
   `npm run serve` runs Zola alone and does not rebuild JavaScript; prefer `npm run dev`.

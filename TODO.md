@@ -30,7 +30,7 @@ User implements; assistant guides and reviews. Next: item 3; each item is a sepa
        Note the premise here was wrong: `zola serve` does _not_ regenerate `public/` or remove
        bundles; it rebuilds incrementally. `zola build` does clean the output directory, which
        is why the build order is now esbuild first, Zola second.
-4. [ ] Align local/CI Node versions, document `npm ci`, and provide one shared local/PR check
+4. [x] Align local/CI Node versions, document `npm ci`, and provide one shared local/PR check
        command. Assess restoring existing tests as a separate task.
        Done in part: `npm run format:check` could not pass on Windows, because
        `core.autocrlf=true` with no `.gitattributes` gave a CRLF working tree while Prettier

@@ -4,7 +4,7 @@ import tseslint from "typescript-eslint";
 import globals from "globals";
 
 export default defineConfig([
-    globalIgnores(["public/**", "src/**/*.test.ts", "static/js/site.js", "static/js/demos/**"]),
+    globalIgnores(["public/**", "static/js/site.js", "static/js/demos/**"]),
     {
         files: ["src/**/*.ts"],
         extends: [js.configs.recommended, tseslint.configs.recommended],

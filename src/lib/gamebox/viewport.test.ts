@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { Viewport } from "./viewport.ts";
 
 describe("viewport", () => {

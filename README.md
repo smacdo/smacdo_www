@@ -36,6 +36,15 @@ This watches the TypeScript and JavaScript bundles and runs Zola together, so ed
 a template, a stylesheet or a page reloads the browser automatically. Use `npm run serve` if
 you want Zola on its own without the JavaScript watchers.
 
+## Test
+
+Tests use [Vitest](https://vitest.dev/) and live alongside code as `*.test.ts`.
+
+```bash
+npm test             # Run all unit tests.
+npm run test:watch   # Re-run tests each time the project is changed.
+```
+
 ## Build
 
 Produces a static site in `public/`:
