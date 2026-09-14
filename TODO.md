@@ -62,12 +62,20 @@ Baseline: `make build` passes; the gallery module fails Node's syntax check with
 
 ## Demos
 
+- Delete runtime gallery discovery — see PLAN.md Phase 6a. `templates/games/section.html`
+  fetches `/demos/metadata.json` and appends a second list on top of the one Zola already
+  rendered, so smacdo.com/games/ lists Turboprop Demo twice. The fetch cannot surface a demo
+  the content tree lacks, because `/games/<slug>/` only exists from `content/games/<slug>.md`.
+  Pure subtraction.
 - Rename /games/ to /demos/ — **blocked by hosting.** `deploy-www.sh` rsyncs with
-  `--exclude demos/` so the `~/smacdo.com/demos` → `~/turboprop-demos` symlink survives, so a
+  `--exclude '/demos'` so the `~/smacdo.com/demos` → `~/turboprop-demos` symlink survives, so a
   Zola-built `/demos/` page would work locally and never reach the doc root. Moving the section
   means changing that deploy script (it lives in the turboprop repo) and the WASM URL contract
-  together. Verified 2026-09-13; see docs/brainfreeze/MIGRATION.md finding F1.
-- Show version and publish date on the demo page (demos/name-of-demo)
+  together. PLAN.md Phase 6b is what unblocks this: once the artifacts have their own host there
+  is no symlink in the doc root to protect, and the exclude goes away entirely. Verified
+  2026-09-13; see docs/brainfreeze/MIGRATION.md finding F1.
+- Show version and publish date on the demo page (demos/name-of-demo) — note this is the one
+  field `metadata.json` carries that front matter does not, so settle it as part of Phase 6a.
 
 ## Viewport
 

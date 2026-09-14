@@ -61,7 +61,10 @@ since they record what was done at the time.
 
 - WASM builds live in a separate Rust repository
 - That repo's CI builds and rsyncs artifacts directly to the web server
-- URL contract: `/games/[slug]/loader.js`, `/games/[slug]/game.wasm`, `/games/[slug]/assets/`
+- URL contract, corrected 2026-09-13: `/demos/<slug>/loader.js`, with content under
+  `/demos/<slug>/content/`. The `/games/[slug]/` paths recorded here were never what
+  shipped; Phase 4 and docs/games-and-graphics.md describe the implemented contract,
+  and Phase 6b may move it to a separate host.
 - `loader.js` exports `init(canvas: HTMLCanvasElement): Promise<void>`
 - Site's game page template provides the canvas container within normal site chrome
 
@@ -272,6 +275,96 @@ Implemented in `src/site/header.ts`, compiled to `public/js/site.js`.
 - [ ] Article line-height, font-size, and measure tuning
 - [x] Heading hierarchy with Oxanium weights
 - [ ] Code block styling with JetBrains Mono + Catppuccin syntax highlight theme
+
+### Phase 6: Demo Delivery Simplification
+
+Demos reach the browser through two unrelated pipelines. TypeScript demos are bundled by
+esbuild into `static/js/demos/<slug>.js` and deployed with the site. WASM demos are built in
+the turboprop repo, published by its own CI to `~/turboprop-demos/<slug>/` on the server, and
+exposed at `/demos/` through a symlink inside the Apache document root.
+
+Splitting on _how a demo is built_ is correct — different toolchains, different repos, different
+release cadence. The split that is not correct is _how a demo is listed and delivered_. Two of
+the September 2026 deploy failures surfaced at that seam. The unanchored `--exclude 'demos'` in
+`deploy-www.sh`, which exists only to protect the symlink, also matched `js/demos/` and froze the
+site's own demo bundles at an April copy — and because `--exclude` shields receiver files from
+`--delete`, they could be neither updated nor removed. Separately, `.htaccess` never reached any
+document root, which is an `upload-artifact` dotfile problem rather than a demos problem, but it
+stayed hidden for months because prod kept promoting a stale copy from its staging area and the
+only visible symptom was the symlinked `/demos/` failing on staging. See
+docs/brainfreeze/MIGRATION.md finding F1.
+
+#### 6a: Delete runtime gallery discovery (do this first)
+
+`templates/games/section.html` renders `section.pages` at build time, then a module script
+fetches `/demos/metadata.json` and appends a second list. Both lists describe the same demos.
+
+- [ ] Remove the `<script type="module">` discovery block from `templates/games/section.html`
+- [ ] Decide where the version badge comes from (front matter, or drop it)
+- [ ] Verify `/games/` lists each demo exactly once on staging, then prod
+
+Why this is pure subtraction, not a trade:
+
+- **It fixes a live bug.** Verified 2026-09-13: smacdo.com/games/ lists "Turboprop Demo" twice,
+  once from the content tree and once from the fetch, same slug and same href.
+- **Runtime discovery cannot do the job it was added for.** The script links entries to
+  `/games/<slug>/`, and Zola generates that page only from `content/games/<slug>.md`. A demo
+  present in `metadata.json` but absent from the content tree links to a 404. Discovery can
+  never surface a demo the site does not already know about.
+- **It costs no workflow.** Publishing a WASM demo already requires adding a content page;
+  `content/games/turboprop-demo.md` exists for exactly that reason. Removing the fetch removes
+  the pretense that the content page is optional, not the step itself.
+- **`version` is the only field `metadata.json` renders that the content file lacks.** `slug`,
+  `title` and `description` duplicate front matter; `loader_url` is derivable; `published` is
+  unused.
+
+It also makes the gallery crawlable, brings demo links under `zola check`, and makes staging's
+`/demos/` 403 irrelevant, since nothing would fetch `metadata.json` any more.
+
+#### 6b: Move WASM artifacts out of the document root (deferred)
+
+Not a build change — the artifacts never enter `public/` and are never rsynced by
+`deploy-www.sh`. They exist only on the server. Three distinct directories are easy to conflate:
+
+| Directory               | What it is           | Where                   |
+| ----------------------- | -------------------- | ----------------------- |
+| `public/`               | Zola build output    | CI runner / dev machine |
+| `~/deploy/staging/www/` | deploy staging area  | server                  |
+| `~/smacdo.com/`         | Apache document root | server                  |
+
+`~/turboprop-demos/` is symlinked as `demos` inside the third. So two deploy pipelines write
+into one served directory, and a cluster of guard rails exists purely to keep them apart: the
+anchored `--exclude '/demos'` in `deploy-www.sh`, `Options +FollowSymLinks` in `static/.htaccess`,
+and the standing rule that `--delete` must not be added to the staging rsync.
+
+Giving the artifacts their own origin removes the collision by construction rather than guarding
+against it.
+
+- [ ] Dreamhost subdomain `demos.smacdo.com` with its own document root, plus Cloudflare DNS
+- [ ] CORS headers on that host so the cross-origin module import and content fetches succeed
+- [ ] turboprop: `window.__turboprop_content_base` becomes an absolute URL
+- [ ] `templates/games/page.html`: import the loader from the demos host
+- [ ] `deploy-www.sh`: drop `--exclude`, and `--delete` becomes safe to add
+- [ ] Update the URL contract in "WASM Games: Separate Repository" above
+
+**Deferred deliberately.** After the September 2026 deploy fixes the current arrangement works on
+both hosts. This removes a category of future bug, not a present one, and there is exactly one
+WASM demo to justify it. Cross-origin module loading is the part most likely to consume
+unplanned time.
+
+Do it when any of these becomes true:
+
+- A second or third WASM demo exists — the coupling cost scales with them, this work does not
+- Staging needs to mirror prod's demos, which today means cloning the whole publish pipeline
+- The `/games/` to `/demos/` rename in TODO.md is wanted; 6b is what unblocks it
+
+#### Not in scope
+
+- **Moving WASM artifacts into this repository.** Different toolchain and cadence, and binaries
+  would bloat a Zola repo. The separation is right; the placement and the runtime discovery are
+  the problems.
+- **Collapsing the `page.extra.loader` branch in `templates/games/page.html`.** Six lines
+  expressing a genuine difference in where an entrypoint comes from.
 
 ### Follow-up / Future
 
