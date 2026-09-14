@@ -89,11 +89,10 @@ commit or create a PR, explain the problem and rationale, scaling detail to the 
 
 Read relevant existing project instructions and progress notes at session start. After more than a
 day away, give a short orientation when resuming project work. Use [PLAN.md](PLAN.md) for the
-redesign roadmap and architecture decisions, [TODO.md](TODO.md) for the backlog, and
-[NOTES.md](NOTES.md) for existing notes. Inspect their contents before treating an item as current.
-In particular, older engine expansion tasks do not override the planned removal below. Reuse
-existing completion conventions; create additional continuity files only when a useful gap warrants
-them.
+redesign roadmap and architecture decisions, [TODO.md](TODO.md) for the backlog. Inspect their 
+contents before treating an item as current. In particular, older engine expansion tasks do not
+override the planned removal below. Reuse existing completion conventions; create additional
+continuity files only when a useful gap warrants them.
 
 Maintain bookkeeping autonomously at meaningful checkpoints: mark completed tasks, document verified
 features, update progress and agreed next steps, and record decisions and explicit standing
