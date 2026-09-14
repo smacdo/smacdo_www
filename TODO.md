@@ -37,9 +37,14 @@ User implements; assistant guides and reviews. Next: item 3; each item is a sepa
        defaults to `endOfLine: "lf"`. Fixed 2026-09-13 by committing `.gitattributes` with
        `* text=auto eol=lf` and re-checking out the tree; all three checks now pass locally.
 5. [ ] Fix illegal top-level `return` statements in `templates/games/section.html`.
-       Consider moving gallery discovery into checked TypeScript; handle missing metadata gracefully.
-6. [ ] Include `public/.htaccess` in the deployment artifact; upload-artifact v4 excludes
-       hidden files by default. Verify the downloaded artifact contains it.
+       Resolve by deleting the block, not by repairing it — see PLAN.md Phase 6a. Confirmed
+       2026-09-13 in headless Chrome that the script never executes, so the gallery it builds
+       has never appeared; making it parse would duplicate an entry the content tree already
+       renders.
+6. [x] Include `public/.htaccess` in the deployment artifact; upload-artifact v4 excludes
+       hidden files by default. Fixed 2026-09-13 with `include-hidden-files: true` in
+       `deploy_template.yml`. Verified on both hosts: the custom 404 page is served, which
+       only happens once `.htaccess` reaches the document root.
 7. [ ] Fix premature resolution in `httpGetImage` (`src/lib/gamebox/resources.ts`) and
        release its object URL after image load/error.
 8. [ ] Bound fixed-step catch-up in `BaseGame` and reset runner timing when resuming.
@@ -62,11 +67,12 @@ Baseline: `make build` passes; the gallery module fails Node's syntax check with
 
 ## Demos
 
-- Delete runtime gallery discovery — see PLAN.md Phase 6a. `templates/games/section.html`
-  fetches `/demos/metadata.json` and appends a second list on top of the one Zola already
-  rendered, so smacdo.com/games/ lists Turboprop Demo twice. The fetch cannot surface a demo
-  the content tree lacks, because `/games/<slug>/` only exists from `content/games/<slug>.md`.
-  Pure subtraction.
+- Delete runtime gallery discovery — see PLAN.md Phase 6a, and closes item 5 above.
+  `templates/games/section.html` fetches `/demos/metadata.json` and appends a second list on top
+  of the one Zola already rendered. The block has never run — its top-level `return` is a parse
+  error — so repairing the syntax would introduce a duplicate listing rather than fix anything.
+  The fetch also cannot surface a demo the content tree lacks, because `/games/<slug>/` only
+  exists from `content/games/<slug>.md`. Pure subtraction.
 - Rename /games/ to /demos/ — **blocked by hosting.** `deploy-www.sh` rsyncs with
   `--exclude '/demos'` so the `~/smacdo.com/demos` → `~/turboprop-demos` symlink survives, so a
   Zola-built `/demos/` page would work locally and never reach the doc root. Moving the section

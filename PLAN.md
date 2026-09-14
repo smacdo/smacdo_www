@@ -297,7 +297,9 @@ docs/brainfreeze/MIGRATION.md finding F1.
 #### 6a: Delete runtime gallery discovery (do this first)
 
 `templates/games/section.html` renders `section.pages` at build time, then a module script
-fetches `/demos/metadata.json` and appends a second list. Both lists describe the same demos.
+fetches `/demos/metadata.json` and appends a second list describing the same demos. That script
+has never run: the bare `return` on its fourth line is illegal at the top level of a module, so
+the block is a parse error and the browser discards it whole.
 
 - [ ] Remove the `<script type="module">` discovery block from `templates/games/section.html`
 - [ ] Decide where the version badge comes from (front matter, or drop it)
@@ -305,8 +307,12 @@ fetches `/demos/metadata.json` and appends a second list. Both lists describe th
 
 Why this is pure subtraction, not a trade:
 
-- **It fixes a live bug.** Verified 2026-09-13: smacdo.com/games/ lists "Turboprop Demo" twice,
-  once from the content tree and once from the fetch, same slug and same href.
+- **The code is dead, not merely redundant.** Verified 2026-09-13 by rendering
+  smacdo.com/games/ in headless Chrome: `#wasm-demos` is empty and each demo appears exactly
+  once. The illegal top-level `return` is TODO.md item 5.
+- **Repairing it would create a duplicate listing rather than fix anything.** `metadata.json`
+  holds one entry, `turboprop-demo`, which already has a content page and is already rendered by
+  `section.pages`. So item 5 should be closed by deleting the block, not by making it parse.
 - **Runtime discovery cannot do the job it was added for.** The script links entries to
   `/games/<slug>/`, and Zola generates that page only from `content/games/<slug>.md`. A demo
   present in `metadata.json` but absent from the content tree links to a 404. Discovery can
