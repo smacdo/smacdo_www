@@ -122,7 +122,9 @@ unavailable, request only relevant content or provide proposed updates for manua
 Read [games and graphics](docs/games-and-graphics.md) before working on games, canvas rendering,
 WASM loading, or demo hosting.
 
-When working on the brainfreeze game, please read its [README.md](docs/brainfreeze/README.md)
+When working on the brainfreeze game, please read its [README.md](docs/brainfreeze/README.md).
+When working on the block breaker game or `src/lib/gamebox/`, read its
+[README.md](docs/blockbreaker/README.md).
 
 ## Architecture Overview
 
@@ -151,6 +153,7 @@ scripts/        Repository tooling (dev.mjs: watch + serve)
 src/lib/gamebox/  Physics/math library (TypeScript, no framework deps)
 src/demos/      Canvas demos compiled by esbuild (TypeScript; brainfreeze is still JavaScript)
 docs/brainfreeze/ Brainfreeze demo docs: constraints, plan, tasks, migration record
+docs/blockbreaker/ Block Breaker demo docs: overview, engine usage, tasks
 src/site/       Site interactions → static/js/site.js
 public/         Generated output — gitignored, do not edit
 ```

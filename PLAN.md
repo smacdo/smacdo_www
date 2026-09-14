@@ -38,10 +38,13 @@
 ### JS/TypeScript Demos: esbuild
 
 - Each demo is a standalone TypeScript file compiled by esbuild
-- Source lives in `src/demos/[name]/demo.ts`
-- esbuild outputs to `public/js/demos/[name].js` after `zola build` runs
+- Source lives in `src/demos/[name]/demo.ts` (Brainfreeze is still `demo.js`)
+- Corrected 2026-09-13: esbuild outputs to `static/js/demos/[name].js` and runs **before**
+  `zola build`, which then copies `static/` into `public/`. The `public/js/demos/` path recorded
+  here was never what shipped.
 - No React, no Vite, no bundler config files
-- The gamebox physics/math library (`src/lib/gamebox/`) is shared across demos
+- The gamebox library (`src/lib/gamebox/`) is available to every demo; Block Breaker is currently
+  its only consumer — see [docs/blockbreaker/README.md](docs/blockbreaker/README.md)
 
 ### Build Orchestration: Makefile — superseded 2026-09-13
 
@@ -109,7 +112,9 @@ smacdo.com repo/
 │   │   └── _index.md        Writing section index
 │   └── games/
 │       ├── _index.md        Games gallery index
-│       └── blockbreaker.md  BlockBreaker game page
+│       ├── blockbreaker.md  BlockBreaker game page
+│       ├── brainfreeze.md   Brainfreeze game page
+│       └── turboprop-demo.md  WASM demo page
 │
 ├── templates/               Tera HTML templates
 │   ├── base.html            Base layout (header, nav, footer, theme toggle)
@@ -130,20 +135,26 @@ smacdo.com repo/
 │   └── img/
 │
 ├── src/                     TypeScript source (compiled by esbuild, not Zola)
-│   ├── lib/
-│   │   └── gamebox/         Physics/math library (React stripped out)
+│   ├── lib/                 Reconciled with the tree 2026-09-13
+│   │   ├── utils.ts         not_null, clamp
+│   │   ├── debounce.ts
+│   │   └── gamebox/         Game engine + physics/math (React stripped out)
+│   │       ├── base-game.ts Fixed timestep, interpolation, offscreen blit
+│   │       ├── game-runner.ts  rAF loop, resize observer, key listeners
+│   │       ├── object.ts    GameObject (position, velocity, bounds)
 │   │       ├── bounds.ts    AABB, Circle, collision resolution
 │   │       ├── math.ts      lerp, vector ops
 │   │       ├── direction.ts Direction enum
 │   │       ├── viewport.ts  Canvas scaling logic
 │   │       ├── resources.ts ImageLoader
-│   │       ├── sprites.ts   SpriteDefinition
-│   │       └── debounce.ts
+│   │       └── sprites.ts   SpriteDefinition
+│   ├── site/
+│   │   └── header.ts        Sky canvas → static/js/site.js
 │   └── demos/
-│       ├── canvas-demo/
-│       │   └── demo.ts      Minimal canvas animation template
-│       └── blockbreaker/
-│           └── demo.ts      BlockBreaker (TS, until Rust port replaces it)
+│       ├── blockbreaker/    Docs: docs/blockbreaker/
+│       │   ├── demo.ts      Entry point (TS, until Rust port replaces it)
+│       │   └── blockbreaker.ts  Game rules, level, rendering
+│       └── brainfreeze/     Sokoban demo (still JS). Docs: docs/brainfreeze/
 │
 └── .github/
     └── workflows/
@@ -190,6 +201,10 @@ command is next. All three checks are wired into deployment CI, not yet verified
 - [x] Add esbuild compilation step to Makefile
 - [x] Migrate BlockBreaker to standalone TS demo (BaseGame + game-runner.ts, no React)
 - [x] Recover BlockBreaker source from git history after Phase 1 deletion
+
+Demo-specific documentation moved to [docs/blockbreaker/](docs/blockbreaker/README.md) on
+2026-09-13: current behavior, how it drives the engine, and its
+[open items](docs/blockbreaker/TASKS.md).
 
 ### Phase 4: WASM Integration
 
@@ -382,7 +397,7 @@ Do it when any of these becomes true:
 - [ ] **Scroll parallax clouds** — experiment with clouds shifting on page scroll (keep ambient drift as fallback)
 - [ ] Games gallery card design (thumbnail, hover effect, download links)
 - [ ] First real Writing article
-- [ ] Rust port of BlockBreaker (separate repo, replaces TS demo)
+- [ ] Rust port of BlockBreaker (separate repo, replaces TS demo) — [demo docs](docs/blockbreaker/README.md#planned-direction)
 - [ ] Trees, castle/buildings added to foreground silhouette over time
 - [ ] Tools page (scope TBD)
 
@@ -455,7 +470,8 @@ The Zola game page template embeds the game:
 
 ## Future / Deferred Items
 
-- Rust port of BlockBreaker (separate repo, replaces TS demo)
+- Rust port of BlockBreaker (separate repo, replaces TS demo) — also listed under Follow-up above;
+  [demo docs](docs/blockbreaker/README.md#planned-direction)
 - Interactive parallax header (mouse movement, shooting stars, day/night toggle)
 - Game download links (desktop Windows/Mac builds)
 - Game storefront links (itch.io, Steam)

@@ -56,6 +56,10 @@ and the gallery module was deleted outright rather than repaired (item 5).
 
 ## Earlier engine backlog
 
+These concern `src/lib/gamebox/`. Block Breaker is its only consumer and would be the first game
+to exercise any of them; demo-specific items live in
+[docs/blockbreaker/TASKS.md](docs/blockbreaker/TASKS.md).
+
 - Resize the canvas and game when the window changes dimensions.
 - A game should declare its target dimensions (width, height), aspect ratio requirements (lock to
   vertical, horizontal, or none), and then the engine will handle implementation.

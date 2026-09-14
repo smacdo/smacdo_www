@@ -5,7 +5,9 @@ Read this reference when changing games, canvas rendering, WASM loading, or demo
 ## Existing TypeScript engine
 
 Games extend `BaseGame`; the engine uses a fixed timestep, rendering
-interpolation, and logical canvas dimensions. The current demo is in `src/demos/blockbreaker/`.
+interpolation, and logical canvas dimensions. Its only consumer is Block Breaker — see
+[docs/blockbreaker/README.md](blockbreaker/README.md) for how that demo drives each piece.
+Brainfreeze is also a TypeScript-bundled demo but does not use this engine. It may in the future.
 These are existing implementation details, not requirements for the future rewrite.
 
 ## Canvas resource reuse
@@ -31,8 +33,7 @@ candidates, not proof of a memory leak. Verify suspected leaks with runtime prof
 - Assets are fetched from `/demos/<slug>/content/`; `loader.js` sets
   `window.__turboprop_content_base` before calling `init()` so turboprop knows where to look
 
-The WASM integration is separate from the TypeScript engine. Preserve it during engine
-removal unless the task explicitly includes changing it.
+The WASM integration is separate from the TypeScript engine.
 
 ## Demo hosting
 
