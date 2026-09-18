@@ -23,10 +23,10 @@ reformatting commit to this repo's Prettier style, and docs living here in `docs
 Build, typecheck, lint, and formatting are wired up and passing. Full record, including verified
 findings worth not re-deriving: [MIGRATION.md](MIGRATION.md).
 
-Next: the progressive TypeScript refactor, file by file. Unit tests remain the suggested next
-_game_ task and are still deferred. Folding this into the site's own `src/lib/gamebox/`
-engine is no longer blocked by a possible engine removal — that plan is dropped — but still waits
-on a decision about what shape gamebox should take. See [MIGRATION.md](MIGRATION.md).
+Next: the progressive TypeScript refactor, file by file. The browser-independent game rules now
+have permanent Vitest coverage. Folding this into the site's own `src/lib/gamebox/` engine is no
+longer blocked by a possible engine removal — that plan is dropped — but still waits on a decision
+about what shape gamebox should take. See [MIGRATION.md](MIGRATION.md).
 
 ## Milestones
 
@@ -59,17 +59,17 @@ Suggested learning sequence:
 Done when one level appears and the player can move legally on its grid.
 Introduce modules as each step needs them, not all at once.
 
-### 2. Complete the single-level rules — gameplay implemented; tests pending
+### 2. Complete the single-level rules — complete
 
 Crate pushing, goal highlighting, completion banner, R to restart, and Z to undo
 are implemented. Snapshot history covers successful moves only. Core behavior has
-been manually and programmatically checked; permanent Vitest coverage is pending.
+permanent Vitest coverage for movement, pushing, completion, undo, and restart.
 
 - Crate pushing, including blocked pushes and no pushing multiple crates at once.
 - Completion detection when all crates occupy goals.
 - Restart and snapshot-based undo. Record player/crate positions before successful
   moves only; static terrain is not part of history.
-- Vitest coverage for valid/invalid moves, pushes, undo, restart, and completion.
+- Vitest coverage for valid/invalid moves, pushes, undo, restart, and completion — complete.
 
 Done when the level can be solved, restarted, and undone without browser-dependent
 game rules.

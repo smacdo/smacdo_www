@@ -19,8 +19,9 @@ Still vanilla JavaScript with JSDoc types, not TypeScript. The annotations alrea
 repository's strict `tsconfig.json`, so the planned conversion can proceed file by file rather than
 as one blocking cleanup.
 
-Typecheck, lint, formatting, and the esbuild bundle all pass. Permanent unit tests and level-data
-validation remain pending; see [TASKS.md](TASKS.md).
+Typecheck, lint, formatting, and the esbuild bundle all pass. Automated tests cover the
+browser-independent rules, keyboard state, game-loop coordination, completion overlay, and demo
+bootstrap; level-data validation remains pending. See [TASKS.md](TASKS.md).
 
 ## Working on it
 
