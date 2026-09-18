@@ -35,6 +35,14 @@ Decided 2026-09-13: 2D games stay in TypeScript and this engine stays with them.
 of Block Breaker is no longer planned; turboprop is for 3D. Whether gamebox is kept as-is,
 reworked, or merged with Brainfreeze's approach is still open.
 
+## Spatial data layout
+
+Store frequently accessed coordinates directly on their owning game state or entity as `x` and
+`y`. Do not allocate nested `Position` or `Vector` objects solely to group scalar fields when an
+owner already exists. Coordinate-only collections should use records with direct `x` and `y`
+fields. Use standalone coordinate values only when they must be passed or stored independently;
+pursue denser layouts only when profiling justifies them.
+
 ## Canvas resource reuse
 
 Reuse gradients, offscreen canvases, image bitmaps, and WebGL resources across frames.

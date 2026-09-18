@@ -103,8 +103,10 @@ These are candidate responsibilities, not required classes to create immediately
 | DebugOverlay | Small, useful development readouts                        |
 
 Scenes may expose enter(), exit(), update(dt), and render(renderer); no base class
-is required. Player/crate data can remain plain objects until behavior justifies
-classes.
+is required. Player and crate data remain plain state until behavior justifies classes. During the
+TypeScript conversion, store player coordinates directly on the live game state and crate/goal
+coordinates directly on their records. Do not introduce nested `Position` or `Vector` wrappers
+solely to group `x` and `y`.
 
 MVP levels are hardcoded JavaScript data, not text to parse. Keep level definitions
 separate from mutable gameplay state so restart can reuse the initial positions.
