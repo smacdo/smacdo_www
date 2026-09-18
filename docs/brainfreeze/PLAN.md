@@ -23,10 +23,12 @@ reformatting commit to this repo's Prettier style, and docs living here in `docs
 Build, typecheck, lint, and formatting are wired up and passing. Full record, including verified
 findings worth not re-deriving: [MIGRATION.md](MIGRATION.md).
 
-Next: the progressive TypeScript refactor, file by file. The browser-independent game rules now
-have permanent Vitest coverage. Folding this into the site's own `src/lib/gamebox/` engine is no
-longer blocked by a possible engine removal — that plan is dropped — but still waits on a decision
-about what shape gamebox should take. See [MIGRATION.md](MIGRATION.md).
+The progressive TypeScript refactor is underway: the level types, first level, and
+browser-independent rules are converted, while the browser-facing modules remain checked
+JavaScript. The rules have permanent Vitest coverage. Folding this into the site's own
+`src/lib/gamebox/` engine is no longer blocked by a possible engine removal — that plan is dropped
+— but still waits on a decision about what shape gamebox should take. See
+[MIGRATION.md](MIGRATION.md).
 
 ## Milestones
 
@@ -76,7 +78,7 @@ game rules.
 
 ### 3. Complete the Brainfreeze MVP
 
-- Multiple hardcoded JavaScript levels and progression through a small LevelManager.
+- Multiple hardcoded TypeScript levels and progression through a small LevelManager.
 - Simple title, gameplay, and level-complete flow.
 - Lightweight SceneManager with replace(); add push()/pop() only if needed.
 - Small debug overlay: start with useful values such as frame time, player tile
@@ -108,7 +110,7 @@ TypeScript conversion, store player coordinates directly on the live game state 
 coordinates directly on their records. Do not introduce nested `Position` or `Vector` wrappers
 solely to group `x` and `y`.
 
-MVP levels are hardcoded JavaScript data, not text to parse. Keep level definitions
+MVP levels are hardcoded TypeScript data, not text to parse. Keep level definitions
 separate from mutable gameplay state so restart can reuse the initial positions.
 A post-MVP parser can produce the same data shape without changing game rules.
 Use equal, nonzero box and goal counts for MVP. Checking that every goal has a box

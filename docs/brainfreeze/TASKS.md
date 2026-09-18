@@ -23,8 +23,8 @@ a feature.
       snapshot independence, rejected moves, undoing a win, and restart clearing history. Completed
       with 45 browser-independent rule tests in `sokoban-game.test.ts`.
 - [x] Add focused tests around the remaining runtime boundaries: keyboard held/pressed/blur state,
-      action mapping and frame timing, the completion overlay, and demo bootstrap. Keep `level.js`
-      type-only and avoid tests that merely repeat the static `level1.js` fixture.
+      action mapping and frame timing, the completion overlay, and demo bootstrap. Keep `level.ts`
+      type-only and avoid tests that merely repeat the static `level1.ts` fixture.
 - [x] Simplify .gitignore. Remove unrelated Vite-repository patterns and duplicates;
       reconcile `.vscode/*` plus the extensions.json exception with the later rule
       that ignores the whole `.vscode` directory. Preserve intended generated-file

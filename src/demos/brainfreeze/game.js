@@ -127,8 +127,8 @@ export class Game {
         const goal_count = goals.length;
 
         for (let i = 0; i < goal_count; i++) {
-            const goalX = goals[i][0];
-            const goalY = goals[i][1];
+            const goalX = goals[i].x;
+            const goalY = goals[i].y;
 
             this.canvasContext.fillStyle = this.gameState.isBoxAt(goalX, goalY)
                 ? GOAL_FULL_COLOR
@@ -151,8 +151,8 @@ export class Game {
         const box_count = boxes.length;
 
         for (let i = 0; i < box_count; i++) {
-            const boxX = boxes[i][0];
-            const boxY = boxes[i][1];
+            const boxX = boxes[i].x;
+            const boxY = boxes[i].y;
 
             this.canvasContext.fillStyle = BOX_COLOR;
             this.canvasContext.fillRect(
@@ -165,8 +165,8 @@ export class Game {
 
         // Draw the player.
         const player = this.gameState.player();
-        const playerX = player[0];
-        const playerY = player[1];
+        const playerX = player.x;
+        const playerY = player.y;
 
         this.canvasContext.fillStyle = PLAYER_COLOR;
         this.canvasContext.fillRect(

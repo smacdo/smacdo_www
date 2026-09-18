@@ -1,12 +1,13 @@
+import { Box, Level, Player } from "./level.ts";
+
 export const TILE_WALL = 1;
 
 /** Captures mutable level state to perform undo. */
 class LevelState {
-    /**
-     * @param {[number, number]} player
-     * @param {Array<[number, number]>} boxes
-     */
-    constructor(player, boxes) {
+    player: Player;
+    boxes: Box[];
+
+    constructor(player: Player, boxes: Box[]) {
         this.player = player;
         this.boxes = boxes;
     }
@@ -22,10 +23,11 @@ class LevelState {
 //  - Tilemap colsPerRow is divisble by the length (eg col count holds).
 //  - Player can reach all boxes and goals without being blocked by walls (STRETCH).
 export class SokobanGame {
-    /**
-     * @param {import("./level.js").Level} level
-     */
-    constructor(level) {
+    initialLevel: Level;
+    level: Level;
+    stateSnapshots: LevelState[];
+
+    constructor(level: Level) {
         this.initialLevel = structuredClone(level);
         this.level = structuredClone(level);
 
@@ -44,11 +46,8 @@ export class SokobanGame {
      *   - It must be a non-floating point integer. (eg, 0 or 1, not 0.7).
      *   - It must be in the range [-1, 1].
      *   - Cardinal directions only, eg diagonal moves are not allowed.
-     *
-     * @param {number} dx
-     * @param {number} dy
      */
-    move(dx, dy) {
+    move(dx: number, dy: number) {
         // Validate movement argument values are valid.
         if (!Number.isInteger(dx)) {
             throw new TypeError("dx must be an integer value");
@@ -71,8 +70,8 @@ export class SokobanGame {
         }
 
         // Reject out of bounds moves.
-        const newX = this.level.player[0] + dx;
-        const newY = this.level.player[1] + dy;
+        const newX = this.level.player.x + dx;
+        const newY = this.level.player.y + dy;
 
         if (!this.isValidPos(newX, newY)) {
             console.log("out of bounds rejected: dx = " + dx + ", dy = " + dy);
@@ -104,13 +103,13 @@ export class SokobanGame {
 
         // Complete the box move - if the player pushed a box.
         if (boxIndex !== -1) {
-            this.level.boxes[boxIndex][0] += dx;
-            this.level.boxes[boxIndex][1] += dy;
+            this.level.boxes[boxIndex].x += dx;
+            this.level.boxes[boxIndex].y += dy;
         }
 
         // OK.
-        this.level.player[0] = newX;
-        this.level.player[1] = newY;
+        this.level.player.x = newX;
+        this.level.player.y = newY;
 
         return true;
     }
@@ -118,7 +117,10 @@ export class SokobanGame {
     /** Snapshot the game state for undoing moves. */
     #snapshot() {
         this.stateSnapshots.push(
-            new LevelState(structuredClone(this.level.player), structuredClone(this.level.boxes)),
+            new LevelState(
+                { ...this.level.player },
+                this.level.boxes.map((box) => ({ ...box })),
+            ),
         );
     }
 
@@ -159,7 +161,7 @@ export class SokobanGame {
             for (let boxIndex = 0; boxIndex < boxCount; boxIndex++) {
                 const box = this.level.boxes[boxIndex];
 
-                if (goal[0] === box[0] && goal[1] === box[1]) {
+                if (goal.x === box.x && goal.y === box.y) {
                     hasBox = true;
                     break;
                 }
@@ -200,61 +202,42 @@ export class SokobanGame {
         return this.level.boxes;
     }
 
-    /**
-     * Check if the position is within the tilemap bounds.
-     *
-     * @param {number} x
-     * @param {number} y
-     */
-    isValidPos(x, y) {
+    /** Check if the position is within the tilemap bounds. */
+    isValidPos(x: number, y: number) {
         return y >= 0 && y < this.rowCount() && x >= 0 && x < this.colCount();
     }
 
     /**
      * Check if a position is a valid movement target for a player or box. This method does not  push
      * logic, so if a box is in the way it will return false.
-     *
-     * @param {number} x
-     * @param {number} y
      */
-    canMoveTo(x, y) {
+    canMoveTo(x: number, y: number) {
         return this.isValidPos(x, y) && !this.isWallAt(x, y) && !this.isBoxAt(x, y);
     }
 
     /**
      * Check if a wall is at the given position.
-     *
-     * @param {number} x
-     * @param {number} y
      */
-    isWallAt(x, y) {
+    isWallAt(x: number, y: number) {
         return (
             this.isValidPos(x, y) && this.level.tiles[y * this.level.colsPerRow + x] === TILE_WALL
         );
     }
 
-    /**
-     * Check if a box is at the given position.
-     *
-     * @param {number} x
-     * @param {number} y
-     */
-    isBoxAt(x, y) {
+    /** Check if a box is at the given position. */
+    isBoxAt(x: number, y: number) {
         return this.#indexOfBoxAt(x, y) !== -1;
     }
 
     /**
      * Get the index of the box at the given position, or `-1` if no such box exists.
-     *
-     * @param {number} x
-     * @param {number} y
      */
-    #indexOfBoxAt(x, y) {
+    #indexOfBoxAt(x: number, y: number) {
         if (this.isValidPos(x, y)) {
-            let boxCount = this.level.boxes.length;
+            const boxCount = this.level.boxes.length;
 
             for (let i = 0; i < boxCount; i++) {
-                if (this.level.boxes[i][0] === x && this.level.boxes[i][1] === y) {
+                if (this.level.boxes[i].x === x && this.level.boxes[i].y === y) {
                     return i;
                 }
             }
@@ -268,28 +251,18 @@ export class SokobanGame {
         return this.level.goals;
     }
 
-    /**
-     * Check if a goal is at the given position.
-     *
-     * @param {number} x
-     * @param {number} y
-     */
-    isGoalAt(x, y) {
+    /** Check if a goal is at the given position. */
+    isGoalAt(x: number, y: number) {
         return this.#indexOfGoalAt(x, y) !== -1;
     }
 
-    /**
-     * Get the index of the goal at the given position, or `-1` if no such goal exists.
-     *
-     * @param {number} x
-     * @param {number} y
-     */
-    #indexOfGoalAt(x, y) {
+    /** Get the index of the goal at the given position, or `-1` if no such goal exists. */
+    #indexOfGoalAt(x: number, y: number) {
         if (this.isValidPos(x, y)) {
-            let goalCount = this.level.goals.length;
+            const goalCount = this.level.goals.length;
 
             for (let i = 0; i < goalCount; i++) {
-                if (this.level.goals[i][0] === x && this.level.goals[i][1] === y) {
+                if (this.level.goals[i].x === x && this.level.goals[i].y === y) {
                     return i;
                 }
             }

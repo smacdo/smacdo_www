@@ -1,25 +1,19 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import type { Level } from "./level.js";
+import type { Level } from "./level.ts";
 import { SokobanGame, TILE_WALL } from "./sokoban-game.js";
-
-type Position = [number, number];
 
 const LEVEL_WIDTH = 5;
 const LEVEL_HEIGHT = 5;
 const FLOOR = 0;
 
-function copyPosition([x, y]: Position): Position {
-    return [x, y];
-}
-
 function createLevel(overrides: Partial<Level> = {}): Level {
     const defaults: Level = {
         tiles: Array<number>(LEVEL_WIDTH * LEVEL_HEIGHT).fill(FLOOR),
         colsPerRow: LEVEL_WIDTH,
-        player: [2, 2],
-        boxes: [[4, 4]],
-        goals: [[0, 4]],
+        player: { x: 2, y: 2 },
+        boxes: [{ x: 4, y: 4 }],
+        goals: [{ x: 0, y: 4 }],
     };
 
     const level = { ...defaults, ...overrides };
@@ -27,18 +21,15 @@ function createLevel(overrides: Partial<Level> = {}): Level {
     return {
         tiles: [...level.tiles],
         colsPerRow: level.colsPerRow,
-        player: copyPosition(level.player),
-        boxes: level.boxes.map(copyPosition),
-        goals: level.goals.map(copyPosition),
+        player: { ...level.player },
+        boxes: level.boxes.map((box) => ({ ...box })),
+        goals: level.goals.map((goal) => ({ ...goal })),
     };
 }
 
-function createTilesWithWalls(...walls: Position[]): number[] {
+function createTilesWithWall(wallX: number, wallY: number): number[] {
     const tiles = Array<number>(LEVEL_WIDTH * LEVEL_HEIGHT).fill(FLOOR);
-
-    for (const [x, y] of walls) {
-        tiles[y * LEVEL_WIDTH + x] = TILE_WALL;
-    }
+    tiles[wallY * LEVEL_WIDTH + wallX] = TILE_WALL;
 
     return tiles;
 }
@@ -57,10 +48,10 @@ afterEach(() => {
 describe("SokobanGame.move", () => {
     describe("without a box", () => {
         it.each([
-            { direction: "left", dx: -1, dy: 0, expected: [1, 2] as Position },
-            { direction: "right", dx: 1, dy: 0, expected: [3, 2] as Position },
-            { direction: "up", dx: 0, dy: -1, expected: [2, 1] as Position },
-            { direction: "down", dx: 0, dy: 1, expected: [2, 3] as Position },
+            { direction: "left", dx: -1, dy: 0, expected: { x: 1, y: 2 } },
+            { direction: "right", dx: 1, dy: 0, expected: { x: 3, y: 2 } },
+            { direction: "up", dx: 0, dy: -1, expected: { x: 2, y: 1 } },
+            { direction: "down", dx: 0, dy: 1, expected: { x: 2, y: 3 } },
         ])("moves one square $direction", ({ dx, dy, expected }) => {
             const game = new SokobanGame(createLevel());
 
@@ -71,7 +62,7 @@ describe("SokobanGame.move", () => {
         it("rejects movement into a wall without changing state", () => {
             const game = new SokobanGame(
                 createLevel({
-                    tiles: createTilesWithWalls([3, 2]),
+                    tiles: createTilesWithWall(3, 2),
                 }),
             );
             const before = dynamicState(game);
@@ -102,10 +93,10 @@ describe("SokobanGame.move", () => {
 
     describe("board boundaries", () => {
         it.each([
-            { edge: "left", player: [0, 2] as Position, dx: -1, dy: 0 },
-            { edge: "right", player: [4, 2] as Position, dx: 1, dy: 0 },
-            { edge: "top", player: [2, 0] as Position, dx: 0, dy: -1 },
-            { edge: "bottom", player: [2, 4] as Position, dx: 0, dy: 1 },
+            { edge: "left", player: { x: 0, y: 2 }, dx: -1, dy: 0 },
+            { edge: "right", player: { x: 4, y: 2 }, dx: 1, dy: 0 },
+            { edge: "top", player: { x: 2, y: 0 }, dx: 0, dy: -1 },
+            { edge: "bottom", player: { x: 2, y: 4 }, dx: 0, dy: 1 },
         ])("rejects movement past the $edge edge", ({ player, dx, dy }) => {
             vi.spyOn(console, "log").mockImplementation(() => {});
             const game = new SokobanGame(createLevel({ player }));
@@ -116,25 +107,25 @@ describe("SokobanGame.move", () => {
 
         it("does not wrap horizontal movement into an adjacent row", () => {
             vi.spyOn(console, "log").mockImplementation(() => {});
-            const game = new SokobanGame(createLevel({ player: [4, 1] }));
+            const game = new SokobanGame(createLevel({ player: { x: 4, y: 1 } }));
 
             expect(game.move(1, 0)).toBe(false);
-            expect(game.player()).toEqual([4, 1]);
+            expect(game.player()).toEqual({ x: 4, y: 1 });
         });
     });
 
     describe("pushing boxes", () => {
         it.each([
-            { direction: "left", dx: -1, dy: 0, box: [1, 2] as Position, goal: [0, 2] as Position },
+            { direction: "left", dx: -1, dy: 0, box: { x: 1, y: 2 }, goal: { x: 0, y: 2 } },
             {
                 direction: "right",
                 dx: 1,
                 dy: 0,
-                box: [3, 2] as Position,
-                goal: [4, 2] as Position,
+                box: { x: 3, y: 2 },
+                goal: { x: 4, y: 2 },
             },
-            { direction: "up", dx: 0, dy: -1, box: [2, 1] as Position, goal: [2, 0] as Position },
-            { direction: "down", dx: 0, dy: 1, box: [2, 3] as Position, goal: [2, 4] as Position },
+            { direction: "up", dx: 0, dy: -1, box: { x: 2, y: 1 }, goal: { x: 2, y: 0 } },
+            { direction: "down", dx: 0, dy: 1, box: { x: 2, y: 3 }, goal: { x: 2, y: 4 } },
         ])("pushes a box one square $direction", ({ dx, dy, box, goal }) => {
             const game = new SokobanGame(createLevel({ boxes: [box], goals: [goal] }));
 
@@ -146,9 +137,9 @@ describe("SokobanGame.move", () => {
         it("rejects a push when a wall is behind the box", () => {
             const game = new SokobanGame(
                 createLevel({
-                    tiles: createTilesWithWalls([4, 2]),
-                    boxes: [[3, 2]],
-                    goals: [[0, 0]],
+                    tiles: createTilesWithWall(4, 2),
+                    boxes: [{ x: 3, y: 2 }],
+                    goals: [{ x: 0, y: 0 }],
                 }),
             );
             const before = dynamicState(game);
@@ -162,12 +153,12 @@ describe("SokobanGame.move", () => {
             const game = new SokobanGame(
                 createLevel({
                     boxes: [
-                        [3, 2],
-                        [4, 2],
+                        { x: 3, y: 2 },
+                        { x: 4, y: 2 },
                     ],
                     goals: [
-                        [0, 0],
-                        [0, 1],
+                        { x: 0, y: 0 },
+                        { x: 0, y: 1 },
                     ],
                 }),
             );
@@ -180,9 +171,9 @@ describe("SokobanGame.move", () => {
         it("rejects a push past the edge of the board", () => {
             const game = new SokobanGame(
                 createLevel({
-                    player: [3, 2],
-                    boxes: [[4, 2]],
-                    goals: [[0, 0]],
+                    player: { x: 3, y: 2 },
+                    boxes: [{ x: 4, y: 2 }],
+                    goals: [{ x: 0, y: 0 }],
                 }),
             );
             const before = dynamicState(game);
@@ -195,13 +186,13 @@ describe("SokobanGame.move", () => {
 
 describe("SokobanGame board queries", () => {
     it.each([
-        { position: [0, 0] as Position, expected: true },
-        { position: [4, 4] as Position, expected: true },
-        { position: [-1, 0] as Position, expected: false },
-        { position: [5, 0] as Position, expected: false },
-        { position: [0, -1] as Position, expected: false },
-        { position: [0, 5] as Position, expected: false },
-    ])("reports whether $position is in bounds", ({ position: [x, y], expected }) => {
+        { x: 0, y: 0, expected: true },
+        { x: 4, y: 4, expected: true },
+        { x: -1, y: 0, expected: false },
+        { x: 5, y: 0, expected: false },
+        { x: 0, y: -1, expected: false },
+        { x: 0, y: 5, expected: false },
+    ])("reports whether ($x, $y) is in bounds", ({ x, y, expected }) => {
         const game = new SokobanGame(createLevel());
 
         expect(game.isValidPos(x, y)).toBe(expected);
@@ -210,9 +201,9 @@ describe("SokobanGame board queries", () => {
     it("distinguishes open, wall, box, and out-of-bounds destinations", () => {
         const game = new SokobanGame(
             createLevel({
-                tiles: createTilesWithWalls([1, 1]),
-                boxes: [[3, 3]],
-                goals: [[4, 4]],
+                tiles: createTilesWithWall(1, 1),
+                boxes: [{ x: 3, y: 3 }],
+                goals: [{ x: 4, y: 4 }],
             }),
         );
 
@@ -223,7 +214,7 @@ describe("SokobanGame board queries", () => {
     });
 
     it("reports goals by coordinate", () => {
-        const game = new SokobanGame(createLevel({ goals: [[1, 3]] }));
+        const game = new SokobanGame(createLevel({ goals: [{ x: 1, y: 3 }] }));
 
         expect(game.isGoalAt(1, 3)).toBe(true);
         expect(game.isGoalAt(1, 2)).toBe(false);
@@ -234,28 +225,28 @@ describe("SokobanGame board queries", () => {
 describe("SokobanGame state ownership", () => {
     it("clones the original level instead of retaining its mutable data", () => {
         const original = createLevel({
-            player: [1, 1],
-            boxes: [[2, 1]],
-            goals: [[3, 1]],
+            player: { x: 1, y: 1 },
+            boxes: [{ x: 2, y: 1 }],
+            goals: [{ x: 3, y: 1 }],
         });
         const game = new SokobanGame(original);
 
         original.tiles[0] = TILE_WALL;
-        original.player[0] = 4;
-        original.boxes[0][0] = 4;
-        original.goals[0][0] = 4;
+        original.player.x = 4;
+        original.boxes[0].x = 4;
+        original.goals[0].x = 4;
 
         expect(game.tilemap()[0]).toBe(FLOOR);
-        expect(game.player()).toEqual([1, 1]);
-        expect(game.boxes()).toEqual([[2, 1]]);
-        expect(game.goals()).toEqual([[3, 1]]);
+        expect(game.player()).toEqual({ x: 1, y: 1 });
+        expect(game.boxes()).toEqual([{ x: 2, y: 1 }]);
+        expect(game.goals()).toEqual([{ x: 3, y: 1 }]);
     });
 
     it("does not mutate the original level while playing or restarting", () => {
         const original = createLevel({
-            player: [1, 1],
-            boxes: [[2, 1]],
-            goals: [[3, 1]],
+            player: { x: 1, y: 1 },
+            boxes: [{ x: 2, y: 1 }],
+            goals: [{ x: 3, y: 1 }],
         });
         const originalSnapshot = structuredClone(original);
         const game = new SokobanGame(original);
@@ -277,9 +268,9 @@ describe("SokobanGame.undo", () => {
     it("restores player and box positions after a push", () => {
         const game = new SokobanGame(
             createLevel({
-                player: [1, 1],
-                boxes: [[2, 1]],
-                goals: [[3, 1]],
+                player: { x: 1, y: 1 },
+                boxes: [{ x: 2, y: 1 }],
+                goals: [{ x: 3, y: 1 }],
             }),
         );
         const before = dynamicState(game);
@@ -296,33 +287,33 @@ describe("SokobanGame.undo", () => {
         expect(game.move(0, -1)).toBe(true);
 
         expect(game.undo()).toBe(true);
-        expect(game.player()).toEqual([1, 2]);
+        expect(game.player()).toEqual({ x: 1, y: 2 });
         expect(game.undo()).toBe(true);
-        expect(game.player()).toEqual([2, 2]);
+        expect(game.player()).toEqual({ x: 2, y: 2 });
         expect(game.undo()).toBe(false);
     });
 
     it("keeps snapshots independent from later state mutations", () => {
         const game = new SokobanGame(
             createLevel({
-                player: [1, 1],
-                boxes: [[2, 1]],
-                goals: [[3, 1]],
+                player: { x: 1, y: 1 },
+                boxes: [{ x: 2, y: 1 }],
+                goals: [{ x: 3, y: 1 }],
             }),
         );
 
         expect(game.move(1, 0)).toBe(true);
-        game.boxes()[0][0] = 4;
+        game.boxes()[0].x = 4;
 
         expect(game.undo()).toBe(true);
-        expect(game.player()).toEqual([1, 1]);
-        expect(game.boxes()).toEqual([[2, 1]]);
+        expect(game.player()).toEqual({ x: 1, y: 1 });
+        expect(game.boxes()).toEqual([{ x: 2, y: 1 }]);
     });
 
     it("does not record rejected moves", () => {
         const game = new SokobanGame(
             createLevel({
-                tiles: createTilesWithWalls([3, 2]),
+                tiles: createTilesWithWall(3, 2),
             }),
         );
 
@@ -333,9 +324,9 @@ describe("SokobanGame.undo", () => {
     it("can undo a move that completed the level", () => {
         const game = new SokobanGame(
             createLevel({
-                player: [1, 1],
-                boxes: [[2, 1]],
-                goals: [[3, 1]],
+                player: { x: 1, y: 1 },
+                boxes: [{ x: 2, y: 1 }],
+                goals: [{ x: 3, y: 1 }],
             }),
         );
 
@@ -352,9 +343,9 @@ describe("SokobanGame.restart", () => {
     it("restores the initial player and box positions", () => {
         const game = new SokobanGame(
             createLevel({
-                player: [1, 1],
-                boxes: [[2, 1]],
-                goals: [[3, 1]],
+                player: { x: 1, y: 1 },
+                boxes: [{ x: 2, y: 1 }],
+                goals: [{ x: 3, y: 1 }],
             }),
         );
         const initialState = dynamicState(game);
@@ -373,7 +364,7 @@ describe("SokobanGame.restart", () => {
         game.restart();
 
         expect(game.undo()).toBe(false);
-        expect(game.player()).toEqual([2, 2]);
+        expect(game.player()).toEqual({ x: 2, y: 2 });
     });
 });
 
@@ -381,14 +372,14 @@ describe("SokobanGame.isComplete", () => {
     it("returns false while any goal is unoccupied", () => {
         const game = new SokobanGame(
             createLevel({
-                player: [4, 0],
+                player: { x: 4, y: 0 },
                 boxes: [
-                    [1, 1],
-                    [2, 2],
+                    { x: 1, y: 1 },
+                    { x: 2, y: 2 },
                 ],
                 goals: [
-                    [1, 1],
-                    [3, 3],
+                    { x: 1, y: 1 },
+                    { x: 3, y: 3 },
                 ],
             }),
         );
@@ -400,12 +391,12 @@ describe("SokobanGame.isComplete", () => {
         const game = new SokobanGame(
             createLevel({
                 boxes: [
-                    [3, 3],
-                    [1, 1],
+                    { x: 3, y: 3 },
+                    { x: 1, y: 1 },
                 ],
                 goals: [
-                    [1, 1],
-                    [3, 3],
+                    { x: 1, y: 1 },
+                    { x: 3, y: 3 },
                 ],
             }),
         );

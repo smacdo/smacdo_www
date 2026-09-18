@@ -1,6 +1,6 @@
 # Brainfreeze
 
-A small 2D browser game for learning modern JavaScript and Canvas, playable at
+A small 2D browser game for learning modern TypeScript, JavaScript, and Canvas, playable at
 `/games/brainfreeze/`. It is a Sokoban-style puzzle: push every crate onto a goal square. A later,
 different prototype will help evaluate which parts of the code are actually reusable.
 
@@ -12,12 +12,13 @@ and which decisions are locked.
 
 One hardcoded level supports grid movement, crate pushing, goal highlighting, completion
 detection, restart, and snapshot undo. Controls: WASD to move, R to restart, Z to undo. The game
-uses a continuous frame loop with discrete input actions; `sokoban-game.js` owns browser-independent
+uses a continuous frame loop with discrete input actions; `sokoban-game.ts` owns browser-independent
 rules and state.
 
-Still vanilla JavaScript with JSDoc types, not TypeScript. The annotations already pass this
-repository's strict `tsconfig.json`, so the planned conversion can proceed file by file rather than
-as one blocking cleanup.
+The progressive TypeScript conversion is underway. The level types, first level, and
+browser-independent rules are now TypeScript; the browser-facing entry point, loop/rendering, and
+input modules remain JavaScript with checked JSDoc types. This mixed state is intentional so the
+conversion can proceed file by file rather than as one blocking cleanup.
 
 Typecheck, lint, formatting, and the esbuild bundle all pass. Automated tests cover the
 browser-independent rules, keyboard state, game-loop coordination, completion overlay, and demo
@@ -47,10 +48,10 @@ All paths relative to `src/demos/brainfreeze/`:
 
 - `demo.js`: entry point — finds the canvas the page template provides, sizes it, starts the game.
 - `game.js`: frame loop, input-to-action mapping, and Canvas rendering.
-- `sokoban-game.js`: movement rules, completion, restart, and undo. No browser APIs.
+- `sokoban-game.ts`: movement rules, completion, restart, and undo. No browser APIs.
 - `input.js`: held/pressed keyboard state and focus-loss handling.
-- `level.js`: shared JSDoc level type.
-- `levels/level1.js`: the hardcoded level definition.
+- `level.ts`: shared level types.
+- `levels/level1.ts`: the hardcoded level definition.
 
 Outside that directory:
 
