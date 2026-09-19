@@ -15,7 +15,7 @@ import { spawn } from "node:child_process";
 const BUNDLES = [
     { in: "src/site/header.ts", out: "static/js/site.js" },
     { in: "src/demos/blockbreaker/demo.ts", out: "static/js/demos/blockbreaker.js" },
-    { in: "src/demos/brainfreeze/demo.js", out: "static/js/demos/brainfreeze.js" },
+    { in: "src/demos/brainfreeze/demo.ts", out: "static/js/demos/brainfreeze.js" },
 ];
 
 const contexts = [];

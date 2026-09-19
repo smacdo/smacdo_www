@@ -20,7 +20,7 @@ What is actually open:
 | Sky header    | Castle silhouette, full-bleed footer — [docs/sky-header.md](docs/sky-header.md)                    |
 | Demo delivery | WASM artifacts still share the document root — [docs/demo-delivery.md](docs/demo-delivery.md)      |
 | Block Breaker | Staying TypeScript; gamebox's shape still open — [docs/blockbreaker/](docs/blockbreaker/README.md) |
-| Brainfreeze   | TypeScript conversion, unit tests — [docs/brainfreeze/](docs/brainfreeze/README.md)                |
+| Brainfreeze   | MVP progression, level validation — [docs/brainfreeze/](docs/brainfreeze/README.md)                |
 | Backlog       | [TODO.md](TODO.md#improvement-walkthrough-2026-09-12) — engine bugs, `/demos/` rename              |
 
 ## Goals
@@ -59,7 +59,7 @@ What is actually open:
 ### JS/TypeScript Demos: esbuild
 
 - Each demo is a standalone TypeScript file compiled by esbuild
-- Source lives in `src/demos/[name]/demo.ts` (Brainfreeze is still `demo.js`)
+- Source lives in `src/demos/[name]/demo.ts`
 - esbuild outputs to `static/js/demos/[name].js` and runs **before** `zola build`, which then
   copies `static/` into `public/`
 - No React, no Vite, no bundler config files

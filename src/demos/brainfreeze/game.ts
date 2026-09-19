@@ -1,12 +1,14 @@
-import DEFAULT_LEVEL from "./levels/level1.js";
-import { TILE_WALL, SokobanGame } from "./sokoban-game.js";
+import { Input } from "./input.ts";
+import DEFAULT_LEVEL from "./levels/level1.ts";
+import { TILE_WALL, SokobanGame } from "./sokoban-game.ts";
 
 export class Game {
-    /**
-     * @param {CanvasRenderingContext2D} canvasContext
-     * @param {import("./input.js").Input} input
-     */
-    constructor(canvasContext, input) {
+    canvasContext: CanvasRenderingContext2D;
+    input: Input;
+    gameState: SokobanGame;
+    previousTimestamp: number | null;
+
+    constructor(canvasContext: CanvasRenderingContext2D, input: Input) {
         this.canvasContext = canvasContext;
         this.input = input;
         this.previousTimestamp = null;
@@ -22,9 +24,10 @@ export class Game {
     }
 
     /**
-     * @param {number} timestamp
+     * Triggers game state updates and rendering as needed, depending on the
+     * amount of time that has elapsed since the last call to `frame()`.
      */
-    frame(timestamp) {
+    frame(timestamp: number) {
         // Calculate the amount of time that has elapsed since the last time `frame()` was called.
         const rawDeltaTime =
             this.previousTimestamp === null ? 0 : (timestamp - this.previousTimestamp) / 1000;
@@ -42,11 +45,8 @@ export class Game {
         requestAnimationFrame((timestamp) => this.frame(timestamp));
     }
 
-    /**
-     * Advance game state.
-     * @param {number} _deltaTime
-     */
-    update(_deltaTime) {
+    /** Advance game state. */
+    update(_deltaTime: number) {
         // TODO: use deltaTime and perform movement animation.
 
         // Perform player's requested action.
@@ -66,9 +66,7 @@ export class Game {
         }
     }
 
-    /**
-     * Draw game state.
-     */
+    /** Draw game state. */
     render() {
         //const canvas = this.canvasContext.canvas;
 

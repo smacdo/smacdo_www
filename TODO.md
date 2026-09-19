@@ -1,10 +1,11 @@
 # TODO
 
-## Brainfreeze migration (active)
+## Brainfreeze development
 
-Grafting the `toybox` Sokoban project in as a demo at `/games/brainfreeze/`, with its Git
-history. Phases, locked decisions, and verified findings:
-[docs/brainfreeze/MIGRATION.md](docs/brainfreeze/MIGRATION.md).
+The `toybox` Sokoban project is grafted in as a demo at `/games/brainfreeze/`, with its Git history,
+and its source conversion to TypeScript is complete. Current work lives in
+[docs/brainfreeze/TASKS.md](docs/brainfreeze/TASKS.md); migration phases, locked decisions, and
+verified findings remain in [docs/brainfreeze/MIGRATION.md](docs/brainfreeze/MIGRATION.md).
 
 ## Improvement walkthrough (2026-09-12)
 

@@ -1,7 +1,12 @@
 export class Input {
+    /// Keys that are down, both this frame and previous frames.
+    keysDown: Set<string>;
+    /// Keys that were pushed down on this frame (not previous frames).
+    keysPressed: Set<string>;
+
     constructor() {
-        this.keysDown = new Set(); // Keys that are pushed (current frame and continous).
-        this.keysPressed = new Set(); // Keys that were pushed for the current frame.
+        this.keysDown = new Set();
+        this.keysPressed = new Set();
 
         // XXX: do we need to clean up the event handlers?
         window.addEventListener("keydown", (event) => {
@@ -29,10 +34,8 @@ export class Input {
      * Checks if a keyboard button `key` was pushed _this frame_.
      *
      * key: The name of the keyboard button, taken from `event.key`.
-     *
-     * @param {string} key
      */
-    isKeyPressed(key) {
+    isKeyPressed(key: string) {
         return this.keysPressed.has(key);
     }
 
@@ -40,18 +43,13 @@ export class Input {
      * Checks if a keyboard button `key` is pushed.
      *
      * key: The name of the keyboard button, taken from `event.key`.
-     *
-     * @param {string} key
      */
-    isKeyDown(key) {
+    isKeyDown(key: string) {
         return this.keysDown.has(key);
     }
 
-    /**
-     * Called when a keyboard button is pushed.
-     * @param {KeyboardEvent} event
-     */
-    #onKeyDown(event) {
+    /** Called when a keyboard button is pushed. */
+    #onKeyDown(event: KeyboardEvent) {
         const key = event.key;
 
         if (!this.keysDown.has(key)) {
@@ -61,11 +59,8 @@ export class Input {
         this.keysDown.add(key);
     }
 
-    /**
-     * Called when a keyboard button is no longer pushed.
-     * @param {KeyboardEvent} event
-     */
-    #onKeyUp(event) {
+    /** * Called when a keyboard button is no longer pushed. */
+    #onKeyUp(event: KeyboardEvent) {
         this.keysDown.delete(event.key);
     }
 }

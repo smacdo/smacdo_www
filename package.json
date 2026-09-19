@@ -9,7 +9,7 @@
     "build:zola": "zola build",
     "build:site": "npx esbuild src/site/header.ts --bundle --outfile=static/js/site.js",
     "build:demos": "npx esbuild src/demos/blockbreaker/demo.ts --bundle --outfile=static/js/demos/blockbreaker.js",
-    "build:brainfreeze": "npx esbuild src/demos/brainfreeze/demo.js --bundle --outfile=static/js/demos/brainfreeze.js",
+    "build:brainfreeze": "npx esbuild src/demos/brainfreeze/demo.ts --bundle --outfile=static/js/demos/brainfreeze.js",
     "serve": "zola serve",
     "clean": "node -e \"for (const p of ['public','static/js/demos','static/js/site.js']) require('fs').rmSync(p,{recursive:true,force:true})\"",
     "typecheck": "tsc --noEmit",

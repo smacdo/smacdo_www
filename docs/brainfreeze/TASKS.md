@@ -38,11 +38,11 @@ a feature.
 
 ## Gameplay and integration follow-ups
 
-- [ ] Convert the demo to TypeScript progressively, one file at a time. The existing JSDoc
-      already passes the repository's strict `tsconfig.json`, so this needs no up-front cleanup.
+- [x] Convert the demo to TypeScript progressively, one file at a time. Completed 2026-09-19;
+      all Brainfreeze source modules are now TypeScript.
 
 - [x] Fix canvas clipping: 8 rows at 64 pixels need 512 pixels of height; canvas
-      height was 480. Fixed during the migration — `demo.js` now sizes the canvas bitmap to
+      height was 480. Fixed during the migration — `demo.ts` now sizes the canvas bitmap to
       512x512 rather than relying on markup attributes.
 - [ ] Validate level data at construction: positive integer column count dividing
       tile count, recognized tiles, equal nonzero box/goal counts, integer in-bounds

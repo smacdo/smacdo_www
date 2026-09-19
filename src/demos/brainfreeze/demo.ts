@@ -1,5 +1,5 @@
-import { Game } from "./game.js";
-import { Input } from "./input.js";
+import { Game } from "./game.ts";
+import { Input } from "./input.ts";
 
 const canvas = document.querySelector("#game-canvas");
 
@@ -9,7 +9,7 @@ if (canvas == null) {
     throw new Error("expected game canvas HTML element to be HTMLCanvasElement");
 }
 
-// The board is 8x8 tiles at the 64px tile size used by game.js, so the canvas bitmap needs to
+// The board is 8x8 tiles at the 64px tile size used by game.ts, so the canvas bitmap needs to
 // be 512x512. Keep these in step with the tile size and level dimensions until the renderer
 // derives them itself.
 canvas.width = 512;

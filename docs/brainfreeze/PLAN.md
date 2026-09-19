@@ -23,9 +23,8 @@ reformatting commit to this repo's Prettier style, and docs living here in `docs
 Build, typecheck, lint, and formatting are wired up and passing. Full record, including verified
 findings worth not re-deriving: [MIGRATION.md](MIGRATION.md).
 
-The progressive TypeScript refactor is underway: the level types, first level, and
-browser-independent rules are converted, while the browser-facing modules remain checked
-JavaScript. The rules have permanent Vitest coverage. Folding this into the site's own
+The TypeScript refactor is complete: all Brainfreeze source modules are TypeScript, and the rules
+and browser-facing boundaries have permanent Vitest coverage. Folding this into the site's own
 `src/lib/gamebox/` engine is no longer blocked by a possible engine removal — that plan is dropped
 — but still waits on a decision about what shape gamebox should take. See
 [MIGRATION.md](MIGRATION.md).
@@ -105,10 +104,9 @@ These are candidate responsibilities, not required classes to create immediately
 | DebugOverlay | Small, useful development readouts                        |
 
 Scenes may expose enter(), exit(), update(dt), and render(renderer); no base class
-is required. Player and crate data remain plain state until behavior justifies classes. During the
-TypeScript conversion, store player coordinates directly on the live game state and crate/goal
-coordinates directly on their records. Do not introduce nested `Position` or `Vector` wrappers
-solely to group `x` and `y`.
+is required. Player and crate data remain plain state until behavior justifies classes. Store
+player coordinates directly on the live game state and crate/goal coordinates directly on their
+records. Do not introduce nested `Position` or `Vector` wrappers solely to group `x` and `y`.
 
 MVP levels are hardcoded TypeScript data, not text to parse. Keep level definitions
 separate from mutable gameplay state so restart can reuse the initial positions.

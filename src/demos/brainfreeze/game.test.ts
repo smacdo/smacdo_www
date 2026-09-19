@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { Game } from "./game.js";
-import type { Input } from "./input.js";
+import { Game } from "./game.ts";
+import type { Input } from "./input.ts";
 
 function createInput(...pressedKeys: string[]): Input {
     const pressed = new Set(pressedKeys);

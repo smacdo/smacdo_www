@@ -15,10 +15,8 @@ detection, restart, and snapshot undo. Controls: WASD to move, R to restart, Z t
 uses a continuous frame loop with discrete input actions; `sokoban-game.ts` owns browser-independent
 rules and state.
 
-The progressive TypeScript conversion is underway. The level types, first level, and
-browser-independent rules are now TypeScript; the browser-facing entry point, loop/rendering, and
-input modules remain JavaScript with checked JSDoc types. This mixed state is intentional so the
-conversion can proceed file by file rather than as one blocking cleanup.
+The TypeScript conversion is complete. The level types and data, browser-independent rules,
+browser-facing entry point, loop/rendering, and input modules are all TypeScript.
 
 Typecheck, lint, formatting, and the esbuild bundle all pass. Automated tests cover the
 browser-independent rules, keyboard state, game-loop coordination, completion overlay, and demo
@@ -46,10 +44,10 @@ Checks, all from the repository root: `npm run typecheck`, `npm run lint`, and
 
 All paths relative to `src/demos/brainfreeze/`:
 
-- `demo.js`: entry point — finds the canvas the page template provides, sizes it, starts the game.
-- `game.js`: frame loop, input-to-action mapping, and Canvas rendering.
+- `demo.ts`: entry point — finds the canvas the page template provides, sizes it, starts the game.
+- `game.ts`: frame loop, input-to-action mapping, and Canvas rendering.
 - `sokoban-game.ts`: movement rules, completion, restart, and undo. No browser APIs.
-- `input.js`: held/pressed keyboard state and focus-loss handling.
+- `input.ts`: held/pressed keyboard state and focus-loss handling.
 - `level.ts`: shared level types.
 - `levels/level1.ts`: the hardcoded level definition.
 
