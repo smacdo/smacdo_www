@@ -44,10 +44,12 @@ a feature.
 - [x] Fix canvas clipping: 8 rows at 64 pixels need 512 pixels of height; canvas
       height was 480. Fixed during the migration — `demo.ts` now sizes the canvas bitmap to
       512x512 rather than relying on markup attributes.
-- [ ] Validate level data at construction: positive integer column count dividing
+- [x] Validate level data at construction: positive integer column count dividing
       tile count, recognized tiles, equal nonzero box/goal counts, integer in-bounds
       floor positions, unique boxes/goals, and no player/box overlap. Reachability
-      analysis is deferred (PLAN.md).
+      analysis is deferred (PLAN.md). Completed 2026-09-19 with focused unit tests.
+- [ ] Change `Box`, `Goal`, and `Player` back to interfaces extending `Position`. They have no
+      runtime behavior, and `structuredClone()` does not preserve custom class prototypes.
 - [ ] Decide how Input listeners are disposed when a game is unmounted/recreated. Now
       live rather than hypothetical: the demo runs inside a multi-page site. Current
       listeners are attached to `window` at construction and live for the page lifetime.

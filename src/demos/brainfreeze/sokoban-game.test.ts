@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { Level } from "./level.ts";
-import { SokobanGame, TILE_WALL } from "./sokoban-game.js";
+import { SokobanGame, TILE_WALL, validateLevel } from "./sokoban-game.js";
 
 const LEVEL_WIDTH = 5;
 const LEVEL_HEIGHT = 5;
@@ -43,6 +43,174 @@ function dynamicState(game: SokobanGame) {
 
 afterEach(() => {
     vi.restoreAllMocks();
+});
+
+describe("validateLevel", () => {
+    it("accepts a valid level", () => {
+        expect(validateLevel(createLevel())).toEqual([]);
+    });
+
+    it.each([
+        {
+            condition: "an empty tilemap",
+            overrides: { tiles: [] },
+            expected: "tilemaps cannot be zero length",
+        },
+        {
+            condition: "no columns",
+            overrides: { colsPerRow: 0 },
+            expected: "tilemaps must have at least one column per row",
+        },
+        {
+            condition: "a fractional column count",
+            overrides: { colsPerRow: 2.5 },
+            expected: "tilemap column count must be an integer",
+        },
+        {
+            condition: "an incomplete final row",
+            overrides: { tiles: Array<number>(LEVEL_WIDTH * LEVEL_HEIGHT - 1).fill(FLOOR) },
+            expected: "tilemaps must have a consistent column count",
+        },
+    ])("rejects $condition", ({ overrides, expected }) => {
+        expect(validateLevel(createLevel(overrides))).toContain(expected);
+    });
+
+    it("rejects an unrecognized tile and reports its coordinates", () => {
+        const tiles = Array<number>(LEVEL_WIDTH * LEVEL_HEIGHT).fill(FLOOR);
+        tiles[7] = 2;
+
+        expect(validateLevel(createLevel({ tiles }))).toContain(
+            "tile 2, 1 at index 7 is not a recognized tile type",
+        );
+    });
+
+    it("requires at least one goal", () => {
+        expect(validateLevel(createLevel({ boxes: [], goals: [] }))).toContain(
+            "level must have at least one goal",
+        );
+    });
+
+    it("requires equal box and goal counts", () => {
+        expect(validateLevel(createLevel({ boxes: [] }))).toContain(
+            "the number of goals (1) and boxes (0) should be the same",
+        );
+    });
+
+    it.each([
+        {
+            entity: "player",
+            level: () => createLevel({ player: { x: 0.5, y: 2 } }),
+            expected: "player position 0.5, 2 must be an integer",
+        },
+        {
+            entity: "goal",
+            level: () => createLevel({ goals: [{ x: 0.5, y: 4 }] }),
+            expected: "goal position 0.5, 4 must be an integer",
+        },
+        {
+            entity: "box",
+            level: () => createLevel({ boxes: [{ x: 3.5, y: 4 }] }),
+            expected: "box position 3.5, 4 must be an integer",
+        },
+    ])("rejects fractional $entity coordinates", ({ level, expected }) => {
+        expect(validateLevel(level())).toContain(expected);
+    });
+
+    it.each([
+        {
+            entity: "player",
+            level: () => createLevel({ player: { x: LEVEL_WIDTH, y: 2 } }),
+            expected: "player position 5, 2 must be in tilemap bounds 5 x 5",
+        },
+        {
+            entity: "goal",
+            level: () => createLevel({ goals: [{ x: 0, y: LEVEL_HEIGHT }] }),
+            expected: "goal position 0, 5 must be in tilemap bounds 5 x 5",
+        },
+        {
+            entity: "box",
+            level: () => createLevel({ boxes: [{ x: -1, y: 4 }] }),
+            expected: "box position -1, 4 must be in tilemap bounds 5 x 5",
+        },
+    ])("rejects an out-of-bounds $entity", ({ level, expected }) => {
+        expect(validateLevel(level())).toContain(expected);
+    });
+
+    it.each([
+        {
+            entity: "player",
+            level: () => createLevel({ tiles: createTilesWithWall(2, 2) }),
+            expected: "player position 2, 2 must be on a floor tile",
+        },
+        {
+            entity: "goal",
+            level: () => createLevel({ tiles: createTilesWithWall(0, 4) }),
+            expected: "goal position 0, 4 must be on a floor tile",
+        },
+        {
+            entity: "box",
+            level: () => createLevel({ tiles: createTilesWithWall(4, 4) }),
+            expected: "box position 4, 4 must be on a floor tile",
+        },
+    ])("rejects a $entity on a wall", ({ level, expected }) => {
+        expect(validateLevel(level())).toContain(expected);
+    });
+
+    it("rejects duplicate goals", () => {
+        const errors = validateLevel(
+            createLevel({
+                boxes: [
+                    { x: 3, y: 4 },
+                    { x: 4, y: 4 },
+                ],
+                goals: [
+                    { x: 0, y: 4 },
+                    { x: 0, y: 4 },
+                ],
+            }),
+        );
+
+        expect(errors).toContain("duplicate goal positions found at index 0 and 1");
+    });
+
+    it("rejects duplicate boxes", () => {
+        const errors = validateLevel(
+            createLevel({
+                boxes: [
+                    { x: 4, y: 4 },
+                    { x: 4, y: 4 },
+                ],
+                goals: [
+                    { x: 0, y: 4 },
+                    { x: 1, y: 4 },
+                ],
+            }),
+        );
+
+        expect(errors).toContain("duplicate box positions found at index 0 and 1");
+    });
+
+    it("rejects a player overlapping a box", () => {
+        expect(validateLevel(createLevel({ player: { x: 4, y: 4 } }))).toContain(
+            "player cannot be at same position as box at index 0",
+        );
+    });
+
+    it("allows a player and box to share one coordinate", () => {
+        expect(validateLevel(createLevel({ player: { x: 4, y: 0 } }))).toEqual([]);
+    });
+
+    it("includes each validation error on its own line when construction fails", () => {
+        const constructInvalidLevel = () => new SokobanGame(createLevel({ goals: [] }));
+
+        expect(constructInvalidLevel).toThrowError(
+            new Error(
+                "Failed to load level due to the following errors:\n" +
+                    " - level must have at least one goal\n" +
+                    " - the number of goals (0) and boxes (1) should be the same\n",
+            ),
+        );
+    });
 });
 
 describe("SokobanGame.move", () => {

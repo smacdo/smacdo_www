@@ -1,16 +1,27 @@
-export interface Box {
+export interface Position {
     x: number;
     y: number;
 }
 
-export interface Goal {
-    x: number;
-    y: number;
+export class Box implements Position {
+    constructor(
+        public x: number,
+        public y: number,
+    ) {}
 }
 
-export interface Player {
-    x: number;
-    y: number;
+export class Goal implements Position {
+    constructor(
+        public x: number,
+        public y: number,
+    ) {}
+}
+
+export class Player implements Position {
+    constructor(
+        public x: number,
+        public y: number,
+    ) {}
 }
 
 export interface Level {

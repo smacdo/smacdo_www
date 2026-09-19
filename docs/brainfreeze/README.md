@@ -19,8 +19,8 @@ The TypeScript conversion is complete. The level types and data, browser-indepen
 browser-facing entry point, loop/rendering, and input modules are all TypeScript.
 
 Typecheck, lint, formatting, and the esbuild bundle all pass. Automated tests cover the
-browser-independent rules, keyboard state, game-loop coordination, completion overlay, and demo
-bootstrap; level-data validation remains pending. See [TASKS.md](TASKS.md).
+browser-independent rules and level validation, keyboard state, game-loop coordination, completion
+overlay, and demo bootstrap. See [TASKS.md](TASKS.md).
 
 ## Working on it
 

@@ -1,6 +1,7 @@
-import { Box, Level, Player } from "./level.ts";
+import { Box, Level, Player, Position } from "./level.ts";
 
 export const TILE_WALL = 1;
+export const TILE_FLOOR = 0;
 
 /** Captures mutable level state to perform undo. */
 class LevelState {
@@ -13,28 +14,24 @@ class LevelState {
     }
 }
 
-// TODO: Add validation when loading the level that the following invariants hold:
-//  - Goals > 0
-//  - Goals == boxes (in the future we can support unequal counts for varations, but level requires flag).
-//  - Player, goals and boxes are in bounds.
-//  - Player, goals and boxes are on the floor (not in a wall).
-//  - No overlapping goals or boxes. (eg no boxes have duplicate positions, same for goals).
-//  - Player is not inside of a box.
-//  - Tilemap colsPerRow is divisble by the length (eg col count holds).
-//  - Player can reach all boxes and goals without being blocked by walls (STRETCH).
 export class SokobanGame {
     initialLevel: Level;
     level: Level;
     stateSnapshots: LevelState[];
 
     constructor(level: Level) {
+        this.stateSnapshots = [];
+        const validateResults = validateLevel(level);
+
+        if (validateResults.length != 0) {
+            throw new Error(
+                "Failed to load level due to the following errors:\n" +
+                    validateResults.map((message) => ` - ${message}\n`).join(""),
+            );
+        }
+
         this.initialLevel = structuredClone(level);
         this.level = structuredClone(level);
-
-        /** @type{Array<LevelState>} */
-        this.stateSnapshots = [];
-
-        // TODO: Validate the level.
     }
 
     /**
@@ -270,4 +267,136 @@ export class SokobanGame {
 
         return -1;
     }
+}
+
+/**
+ * Performs sanity checks on the level to see if it is playable.
+ *
+ * This function returns an empty list if the level is valid, or the list of validation checks that
+ * failed.
+ */
+export function validateLevel(level: Level): string[] {
+    const errors: string[] = [];
+
+    // The level must be a rectangle with at least one column and row.
+    //
+    // Any failure in these checks makes tilemap lookups unsafe so return early
+    // rather than continue checking.
+    if (level.tiles.length == 0) {
+        errors.push("tilemaps cannot be zero length");
+    } else if (level.colsPerRow < 1) {
+        errors.push("tilemaps must have at least one column per row");
+    } else if (!Number.isInteger(level.colsPerRow)) {
+        errors.push("tilemap column count must be an integer");
+    } else if (!Number.isInteger(level.tiles.length / level.colsPerRow)) {
+        errors.push("tilemaps must have a consistent column count");
+    }
+
+    if (errors.length > 0) {
+        return errors;
+    }
+
+    // Ensure all tiles are valid types.
+    for (let i = 0; i < level.tiles.length; i++) {
+        if (level.tiles[i] != TILE_FLOOR && level.tiles[i] != TILE_WALL) {
+            errors.push(
+                `tile ${i % level.colsPerRow}, ${Math.floor(i / level.colsPerRow)} at index ${i} is not a recognized tile type`,
+            );
+        }
+    }
+
+    // There must be at least one goal.
+    const goalCount = level.goals.length;
+
+    if (goalCount < 1) {
+        errors.push("level must have at least one goal");
+    }
+
+    // Goal and box count should match.
+    // TODO: Support variants where this is not true but those levels have a marker.
+    const boxCount = level.boxes.length;
+
+    if (goalCount != boxCount) {
+        errors.push(
+            `the number of goals (${goalCount}) and boxes (${boxCount}) should be the same`,
+        );
+    }
+
+    // The player, goals and boxes should be within the level bounds and on the floor.
+    const rowCount = level.tiles.length / level.colsPerRow;
+
+    function isInBounds(x: number, y: number) {
+        return x >= 0 && x < level.colsPerRow && y >= 0 && y < rowCount;
+    }
+
+    function isOnFloor(x: number, y: number) {
+        return isInBounds(x, y) && level.tiles[y * level.colsPerRow + x] == TILE_FLOOR;
+    }
+
+    const entitiesToCheck = [
+        { name: "player", x: level.player.x, y: level.player.y },
+        ...level.goals.map((goal) => ({ name: "goal", x: goal.x, y: goal.y })),
+        ...level.boxes.map((box) => ({ name: "box", x: box.x, y: box.y })),
+    ];
+
+    for (let i = 0; i < entitiesToCheck.length; i++) {
+        const e = entitiesToCheck[i];
+
+        if (!Number.isInteger(e.x) || !Number.isInteger(e.y)) {
+            errors.push(`${e.name} position ${e.x}, ${e.y} must be an integer`);
+            return errors; // Return early avoid unsafe tilemap look ups.
+        }
+
+        if (!isInBounds(e.x, e.y)) {
+            errors.push(
+                `${e.name} position ${e.x}, ${e.y} must be in tilemap bounds ${level.colsPerRow} x ${rowCount}`,
+            );
+        }
+
+        if (!isOnFloor(e.x, e.y)) {
+            errors.push(`${e.name} position ${e.x}, ${e.y} must be on a floor tile`);
+        }
+    }
+
+    // There should be no overlapping goals or boxes (eg, two boxes in the same spot).
+    function hasDuplicates(positions: Position[]): [number, number] | null {
+        for (let i = 0; i < positions.length; i++) {
+            for (let j = i + 1; j < positions.length; j++) {
+                if (positions[i].x == positions[j].x && positions[i].y == positions[j].y) {
+                    return [i, j];
+                }
+            }
+        }
+
+        return null;
+    }
+
+    const goalDuplicateResults = hasDuplicates(level.goals);
+
+    if (goalDuplicateResults != null) {
+        errors.push(
+            `duplicate goal positions found at index ${goalDuplicateResults[0]} and ${goalDuplicateResults[1]}`,
+        );
+    }
+
+    const boxDuplicateResults = hasDuplicates(level.boxes);
+
+    if (boxDuplicateResults != null) {
+        errors.push(
+            `duplicate box positions found at index ${boxDuplicateResults[0]} and ${boxDuplicateResults[1]}`,
+        );
+    }
+
+    // Player should not be inside of a box.
+    for (let i = 0; i < level.boxes.length; i++) {
+        const box = level.boxes[i];
+
+        if (level.player.x == box.x && level.player.y == box.y) {
+            errors.push(`player cannot be at same position as box at index ${i}`);
+        }
+    }
+
+    //  TODO: Player can reach all boxes and goals without being blocked by walls
+
+    return errors;
 }
