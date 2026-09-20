@@ -21,7 +21,9 @@ migration in favor of it.
   Level definitions stay separate from mutable state so restart can reuse initial positions.
 - **Continuous `requestAnimationFrame` loop with discrete moves.** No fixed-timestep accumulator
   yet, despite the TODO in `game.ts`. Primitive rendering first.
-- **Canvas for game UI; DOM for debug controls** if and when debug controls appear.
+- **Canvas is the long-term home for game-facing UI.** Small plain-HTML controls are allowed as an
+  incremental bridge for early mobile and responsive work, and DOM remains appropriate for debug
+  controls. Do not add a UI framework.
 - Reconsider a rendering library such as PixiJS only if rendering plumbing starts outweighing the
   learning benefit.
 

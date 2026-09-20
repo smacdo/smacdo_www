@@ -95,13 +95,14 @@ These are candidate responsibilities, not required classes to create immediately
 | ------------ | --------------------------------------------------------- |
 | Game         | Browser loop and overall lifecycle                        |
 | Input        | Browser events and input state; mouse support when needed |
-| Renderer     | Canvas drawing; later scaling and coordinate conversion   |
+| Renderer     | Canvas drawing, viewport fitting, DPI, and coordinates    |
 | SceneManager | Active scene lifecycle and replacement                    |
 | GameScene    | Translate input into Sokoban actions and render its state |
 | SokobanGame  | Pure game rules and live dynamic state                    |
 | TileMap      | Static terrain queries and bounds                         |
 | LevelManager | Level selection and progression, not live gameplay state  |
 | DebugOverlay | Small, useful development readouts                        |
+| GameUI       | Minimal Canvas HUD, menus, and reusable buttons as needed |
 
 Scenes may expose enter(), exit(), update(dt), and render(renderer); no base class
 is required. Player and crate data remain plain state until behavior justifies classes. Store
@@ -113,16 +114,19 @@ separate from mutable gameplay state so restart can reuse the initial positions.
 A post-MVP parser can produce the same data shape without changing game rules.
 Use equal, nonzero box and goal counts for MVP. Checking that every goal has a box
 is equivalent to checking every box is on a goal under those level invariants.
-Level validation is still pending; unequal counts are future explicit variants.
+Level validation covers structure, entity placement, and wall-based reachability; unequal counts
+remain future explicit variants.
 
 Keep logical game coordinates distinct from CSS display size and canvas bitmap
-size. For now they can match. Let Renderer own future resolution and DPI handling.
+size. For now they can match. Let Renderer own future resolution and DPI handling. Future level
+packs may vary board dimensions substantially, so fitting must derive from each level rather than
+assuming the current 8 x 8 board.
 
 ## After MVP
 
 - Consider movement animation and optional restart confirmation (existing code
   TODOs, not required for the current prototype). A fixed timestep accumulator
-  remains deferred despite its code TODO; reachability analysis is also a stretch.
+  remains deferred despite its code TODO.
 - Text level parsing via a plain parseLevel(text) function. Choose the symbol legend
   and handle entities on goals, whitespace, and invalid input then.
 - Sprite sheets and a small asset loader.
@@ -136,3 +140,59 @@ size. For now they can match. Let Renderer own future resolution and DPI handlin
 Reconsider a rendering library such as PixiJS only if rendering plumbing starts
 outweighing the learning benefit. No engine or additional runtime library is
 planned now.
+
+## Longer-term direction
+
+These are agreed product directions, not a committed implementation sequence. Prefer small
+checkpoints that preserve a playable game.
+
+### Mobile, input, and display
+
+- Support portrait and landscape layouts, viewport changes without losing game state, and an
+  explicit fullscreen mode.
+- Put device-specific input behind game actions so keyboard, on-screen controls, swipes, and
+  controllers drive the same gameplay commands.
+- Start mobile input with simple on-screen directional and action controls; swipes can follow as
+  an optional second input method.
+- Fit variable-sized boards without scrolling when practical, and support zoom plus panning when
+  the player wants a closer view or the fitted board is too small to read comfortably. Prefer the
+  largest integer pixel-art scale that fits while it remains above a usable minimum tile size.
+- Determine the minimum readable displayed tile size experimentally with representative sprite
+  art and real phone and desktop viewports. Compare at least 16 x 16 and 32 x 32 CSS pixels per
+  tile; 8 x 8 is expected to be useful only as an overview, if at all.
+- Keep fractional nearest-neighbor scaling as an optional fallback or experiment. Do not assume
+  quarter-step factors such as 1.25 or 1.5 are visually superior without testing representative
+  sprite art on real displays.
+- Treat logical resolution, CSS display size, canvas bitmap size, and device-pixel ratio as
+  distinct values owned by the renderer.
+
+### Game UI
+
+- Move toward a small Canvas-rendered UI for the HUD, menus, level selection, and controls. Derive
+  only the reusable layout, focus, and button behavior that real screens require.
+- Plain HTML controls are an acceptable bridge while mobile input and responsive layout are being
+  established; replacing them with Canvas UI is not an MVP prerequisite.
+- Advanced Canvas text, screen-reader integration, and full accessibility work are deferred for
+  this small game. Preserve keyboard play, legible contrast, and adequately sized controls where
+  those come cheaply, and avoid designs that make later improvements impossible.
+- Planned HUD information includes pack name, level number or name, move count, push count, undo,
+  redo, and menu access. A timer remains optional until its pause and scoring semantics are chosen.
+- Fullscreen should be entered through an explicit control and include a visible exit control;
+  browser-driven exit such as Escape remains available. Whether mobile launches directly into
+  fullscreen or offers both embedded and fullscreen play remains open.
+
+### Levels, packs, and progress
+
+- Add local progress before considering cloud accounts. Progress data will need stable pack and
+  level identities plus a versioning policy.
+- Initial downloadable packs are trusted, vetted content hosted by the site. Define a versioned
+  data format and validate it into the existing level shape rather than executing downloaded code.
+- Arbitrary local pack loading is a stretch goal after the trusted format and error handling are
+  proven.
+- An in-game level/pack editor, user uploads, and cloud-synced accounts are later stretch goals.
+
+### Presentation stretch goals
+
+- Animated or otherwise richer backgrounds.
+- Alternate characters and sprite-sheet themes that do not affect puzzle rules.
+- Installable web-app support after the mobile and offline behavior is worth preserving.
