@@ -1,29 +1,21 @@
 import { Grid } from "./tilemap.ts";
 
+/// An object that can be located on a grid with integer coordinates.
 export interface Position {
     x: number;
     y: number;
 }
 
-export class Box implements Position {
-    constructor(
-        public x: number,
-        public y: number,
-    ) {}
+export interface Box extends Position {
+    readonly kind: "box";
 }
 
-export class Goal implements Position {
-    constructor(
-        public x: number,
-        public y: number,
-    ) {}
+export interface Goal extends Position {
+    readonly kind: "goal";
 }
 
-export class Player implements Position {
-    constructor(
-        public x: number,
-        public y: number,
-    ) {}
+export interface Player extends Position {
+    readonly kind: "player";
 }
 
 export interface Level {

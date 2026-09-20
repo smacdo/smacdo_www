@@ -8,21 +8,25 @@ const LEVEL_WIDTH = 5;
 const LEVEL_HEIGHT = 5;
 const FLOOR = 0;
 
-function createLevel(overrides: Partial<Level> = {}): Level {
-    const defaults: Level = {
-        tiles: new Grid(Array<number>(LEVEL_WIDTH * LEVEL_HEIGHT).fill(FLOOR), LEVEL_WIDTH),
-        player: { x: 2, y: 2 },
-        boxes: [{ x: 4, y: 4 }],
-        goals: [{ x: 0, y: 4 }],
-    };
+interface LevelOverrides {
+    tiles?: Grid<number>;
+    player?: Position;
+    boxes?: Position[];
+    goals?: Position[];
+}
 
-    const level = { ...defaults, ...overrides };
+function createLevel(overrides: LevelOverrides = {}): Level {
+    const player = overrides.player ?? { x: 2, y: 2 };
+    const boxes = overrides.boxes ?? [{ x: 4, y: 4 }];
+    const goals = overrides.goals ?? [{ x: 0, y: 4 }];
 
     return {
-        tiles: level.tiles,
-        player: { ...level.player },
-        boxes: level.boxes.map((box) => ({ ...box })),
-        goals: level.goals.map((goal) => ({ ...goal })),
+        tiles:
+            overrides.tiles ??
+            new Grid(Array<number>(LEVEL_WIDTH * LEVEL_HEIGHT).fill(FLOOR), LEVEL_WIDTH),
+        player: { kind: "player", ...player },
+        boxes: boxes.map((box) => ({ kind: "box", ...box })),
+        goals: goals.map((goal) => ({ kind: "goal", ...goal })),
     };
 }
 
@@ -269,7 +273,7 @@ describe("SokobanGame.move", () => {
             const game = new SokobanGame(createLevel());
 
             expect(game.move(dx, dy)).toBe(true);
-            expect(game.player).toEqual(expected);
+            expect(game.player).toEqual({ kind: "player", ...expected });
         });
 
         it("rejects movement into a wall without changing state", () => {
@@ -315,7 +319,7 @@ describe("SokobanGame.move", () => {
             const game = new SokobanGame(createLevel({ player }));
 
             expect(game.move(dx, dy)).toBe(false);
-            expect(game.player).toEqual(player);
+            expect(game.player).toEqual({ kind: "player", ...player });
         });
 
         it("does not wrap horizontal movement into an adjacent row", () => {
@@ -323,7 +327,7 @@ describe("SokobanGame.move", () => {
             const game = new SokobanGame(createLevel({ player: { x: 4, y: 1 } }));
 
             expect(game.move(1, 0)).toBe(false);
-            expect(game.player).toEqual({ x: 4, y: 1 });
+            expect(game.player).toEqual({ kind: "player", x: 4, y: 1 });
         });
     });
 
@@ -343,8 +347,8 @@ describe("SokobanGame.move", () => {
             const game = new SokobanGame(createLevel({ boxes: [box], goals: [goal] }));
 
             expect(game.move(dx, dy)).toBe(true);
-            expect(game.player).toEqual(box);
-            expect(game.boxes).toEqual([goal]);
+            expect(game.player).toEqual({ kind: "player", ...box });
+            expect(game.boxes).toEqual([{ kind: "box", ...goal }]);
         });
 
         it("rejects a push when a wall is behind the box", () => {
@@ -450,9 +454,9 @@ describe("SokobanGame state ownership", () => {
         original.goals[0].x = 4;
 
         expect(game.tilemap.get(0, 0)).toBe(FLOOR);
-        expect(game.player).toEqual({ x: 1, y: 1 });
-        expect(game.boxes).toEqual([{ x: 2, y: 1 }]);
-        expect(game.goals).toEqual([{ x: 3, y: 1 }]);
+        expect(game.player).toEqual({ kind: "player", x: 1, y: 1 });
+        expect(game.boxes).toEqual([{ kind: "box", x: 2, y: 1 }]);
+        expect(game.goals).toEqual([{ kind: "goal", x: 3, y: 1 }]);
     });
 
     it("does not mutate the original level while playing or restarting", () => {
@@ -500,9 +504,9 @@ describe("SokobanGame.undo", () => {
         expect(game.move(0, -1)).toBe(true);
 
         expect(game.undo()).toBe(true);
-        expect(game.player).toEqual({ x: 1, y: 2 });
+        expect(game.player).toEqual({ kind: "player", x: 1, y: 2 });
         expect(game.undo()).toBe(true);
-        expect(game.player).toEqual({ x: 2, y: 2 });
+        expect(game.player).toEqual({ kind: "player", x: 2, y: 2 });
         expect(game.undo()).toBe(false);
     });
 
@@ -519,8 +523,8 @@ describe("SokobanGame.undo", () => {
         game.boxes[0].x = 4;
 
         expect(game.undo()).toBe(true);
-        expect(game.player).toEqual({ x: 1, y: 1 });
-        expect(game.boxes).toEqual([{ x: 2, y: 1 }]);
+        expect(game.player).toEqual({ kind: "player", x: 1, y: 1 });
+        expect(game.boxes).toEqual([{ kind: "box", x: 2, y: 1 }]);
     });
 
     it("does not record rejected moves", () => {
@@ -577,7 +581,7 @@ describe("SokobanGame.restart", () => {
         game.restart();
 
         expect(game.undo()).toBe(false);
-        expect(game.player).toEqual({ x: 2, y: 2 });
+        expect(game.player).toEqual({ kind: "player", x: 2, y: 2 });
     });
 });
 

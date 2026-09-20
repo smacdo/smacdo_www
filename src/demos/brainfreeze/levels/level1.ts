@@ -16,14 +16,14 @@ const level: Level = {
         ],
         8,
     ),
-    player: { x: 1, y: 2 },
+    player: { kind: "player", x: 1, y: 2 },
     boxes: [
-        { x: 3, y: 2 },
-        { x: 4, y: 3 },
+        { kind: "box", x: 3, y: 2 },
+        { kind: "box", x: 4, y: 3 },
     ],
     goals: [
-        { x: 6, y: 2 },
-        { x: 3, y: 5 },
+        { kind: "goal", x: 6, y: 2 },
+        { kind: "goal", x: 3, y: 5 },
     ],
 };
 

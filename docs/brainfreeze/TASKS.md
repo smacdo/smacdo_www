@@ -50,8 +50,11 @@ a feature.
       the player to every box and goal. Completed 2026-09-19 with focused unit tests, including
       disconnected regions, paths around walls, and boxes being ignored as obstacles. The
       extracted `Grid` has 25 focused tests covering construction, cloning, cell access, and bounds.
-- [ ] Change `Box`, `Goal`, and `Player` back to interfaces extending `Position`. They have no
-      runtime behavior, and `structuredClone()` does not preserve custom class prototypes.
+- [x] Replace the `Box`, `Goal`, and `Player` classes with plain interfaces that extend `Position`
+      and carry distinct literal `kind` fields. The discriminants prevent those structurally
+      similar records from being mixed accidentally and survive `structuredClone()`, unlike custom
+      class prototypes. Update level definitions and test fixtures to provide the corresponding
+      `kind` values. Completed 2026-09-20.
 - [ ] Decide how Input listeners are disposed when a game is unmounted/recreated. Now
       live rather than hypothetical: the demo runs inside a multi-page site. Current
       listeners are attached to `window` at construction and live for the page lifetime.
