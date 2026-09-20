@@ -21,7 +21,7 @@ a feature.
       goal occupancy, and independence from the original level data. Extend coverage
       to the now-implemented undo, restart, and completion: repeated/empty undo,
       snapshot independence, rejected moves, undoing a win, and restart clearing history. Completed
-      with 45 browser-independent rule tests in `sokoban-game.test.ts`.
+      with 64 browser-independent rule tests in `sokoban-game.test.ts`.
 - [x] Add focused tests around the remaining runtime boundaries: keyboard held/pressed/blur state,
       action mapping and frame timing, the completion overlay, and demo bootstrap. Keep `level.ts`
       type-only and avoid tests that merely repeat the static `level1.ts` fixture.
@@ -47,7 +47,8 @@ a feature.
 - [x] Validate level data at construction: positive integer column count dividing
       tile count, recognized tiles, equal nonzero box/goal counts, integer in-bounds
       floor positions, unique boxes/goals, and no player/box overlap. Reachability
-      analysis is deferred (PLAN.md). Completed 2026-09-19 with focused unit tests.
+      analysis is deferred (PLAN.md). Completed 2026-09-19 with focused unit tests. The extracted
+      `Grid` has 25 focused tests covering construction, cloning, cell access, and bounds.
 - [ ] Change `Box`, `Goal`, and `Player` back to interfaces extending `Position`. They have no
       runtime behavior, and `structuredClone()` does not preserve custom class prototypes.
 - [ ] Decide how Input listeners are disposed when a game is unmounted/recreated. Now

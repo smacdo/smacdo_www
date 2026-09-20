@@ -90,12 +90,12 @@ export class Game {
         }
 
         // Draw the tile map.
-        const colCount = this.gameState.colCount();
-        const rowCount = this.gameState.tilemap().length / colCount;
+        const colCount = this.gameState.tilemap.cols;
+        const rowCount = this.gameState.tilemap.rows;
 
         for (let y = 0; y < rowCount; y++) {
             for (let x = 0; x < colCount; x++) {
-                const tile = this.gameState.tilemap().at(colCount * y + x);
+                const tile = this.gameState.tilemap.get(x, y);
                 this.canvasContext.fillStyle = tile === TILE_WALL ? WALL_COLOR : FLOOR_COLOR;
 
                 this.canvasContext.fillRect(x * tileWidth, y * tileHeight, tileWidth, tileHeight);
@@ -121,7 +121,7 @@ export class Game {
         const goalOffsetX = (tileWidth - goalWidth) / 2;
         const goalOffsetY = (tileHeight - goalHeight) / 2;
 
-        const goals = this.gameState.goals();
+        const goals = this.gameState.goals;
         const goal_count = goals.length;
 
         for (let i = 0; i < goal_count; i++) {
@@ -145,7 +145,7 @@ export class Game {
         const boxOffsetX = (tileWidth - boxWidth) / 2;
         const boxOffsetY = (tileHeight - boxHeight) / 2;
 
-        const boxes = this.gameState.boxes();
+        const boxes = this.gameState.boxes;
         const box_count = boxes.length;
 
         for (let i = 0; i < box_count; i++) {
@@ -162,7 +162,7 @@ export class Game {
         }
 
         // Draw the player.
-        const player = this.gameState.player();
+        const player = this.gameState.player;
         const playerX = player.x;
         const playerY = player.y;
 

@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { Level } from "./level.ts";
 import { SokobanGame, TILE_WALL, validateLevel } from "./sokoban-game.js";
+import { Grid } from "./tilemap.ts";
 
 const LEVEL_WIDTH = 5;
 const LEVEL_HEIGHT = 5;
@@ -9,8 +10,7 @@ const FLOOR = 0;
 
 function createLevel(overrides: Partial<Level> = {}): Level {
     const defaults: Level = {
-        tiles: Array<number>(LEVEL_WIDTH * LEVEL_HEIGHT).fill(FLOOR),
-        colsPerRow: LEVEL_WIDTH,
+        tiles: new Grid(Array<number>(LEVEL_WIDTH * LEVEL_HEIGHT).fill(FLOOR), LEVEL_WIDTH),
         player: { x: 2, y: 2 },
         boxes: [{ x: 4, y: 4 }],
         goals: [{ x: 0, y: 4 }],
@@ -19,25 +19,24 @@ function createLevel(overrides: Partial<Level> = {}): Level {
     const level = { ...defaults, ...overrides };
 
     return {
-        tiles: [...level.tiles],
-        colsPerRow: level.colsPerRow,
+        tiles: level.tiles,
         player: { ...level.player },
         boxes: level.boxes.map((box) => ({ ...box })),
         goals: level.goals.map((goal) => ({ ...goal })),
     };
 }
 
-function createTilesWithWall(wallX: number, wallY: number): number[] {
+function createTilesWithWall(wallX: number, wallY: number): Grid<number> {
     const tiles = Array<number>(LEVEL_WIDTH * LEVEL_HEIGHT).fill(FLOOR);
     tiles[wallY * LEVEL_WIDTH + wallX] = TILE_WALL;
 
-    return tiles;
+    return new Grid(tiles, LEVEL_WIDTH);
 }
 
 function dynamicState(game: SokobanGame) {
     return {
-        player: structuredClone(game.player()),
-        boxes: structuredClone(game.boxes()),
+        player: structuredClone(game.player),
+        boxes: structuredClone(game.boxes),
     };
 }
 
@@ -50,37 +49,18 @@ describe("validateLevel", () => {
         expect(validateLevel(createLevel())).toEqual([]);
     });
 
-    it.each([
-        {
-            condition: "an empty tilemap",
-            overrides: { tiles: [] },
-            expected: "tilemaps cannot be zero length",
-        },
-        {
-            condition: "no columns",
-            overrides: { colsPerRow: 0 },
-            expected: "tilemaps must have at least one column per row",
-        },
-        {
-            condition: "a fractional column count",
-            overrides: { colsPerRow: 2.5 },
-            expected: "tilemap column count must be an integer",
-        },
-        {
-            condition: "an incomplete final row",
-            overrides: { tiles: Array<number>(LEVEL_WIDTH * LEVEL_HEIGHT - 1).fill(FLOOR) },
-            expected: "tilemaps must have a consistent column count",
-        },
-    ])("rejects $condition", ({ overrides, expected }) => {
-        expect(validateLevel(createLevel(overrides))).toContain(expected);
+    it("rejects an empty tilemap", () => {
+        expect(validateLevel(createLevel({ tiles: new Grid([], 0) }))).toContain(
+            "tilemaps cannot be zero length",
+        );
     });
 
     it("rejects an unrecognized tile and reports its coordinates", () => {
         const tiles = Array<number>(LEVEL_WIDTH * LEVEL_HEIGHT).fill(FLOOR);
         tiles[7] = 2;
 
-        expect(validateLevel(createLevel({ tiles }))).toContain(
-            "tile 2, 1 at index 7 is not a recognized tile type",
+        expect(validateLevel(createLevel({ tiles: new Grid(tiles, LEVEL_WIDTH) }))).toContain(
+            "tile 2, 1 is not a recognized tile type",
         );
     });
 
@@ -224,7 +204,7 @@ describe("SokobanGame.move", () => {
             const game = new SokobanGame(createLevel());
 
             expect(game.move(dx, dy)).toBe(true);
-            expect(game.player()).toEqual(expected);
+            expect(game.player).toEqual(expected);
         });
 
         it("rejects movement into a wall without changing state", () => {
@@ -270,7 +250,7 @@ describe("SokobanGame.move", () => {
             const game = new SokobanGame(createLevel({ player }));
 
             expect(game.move(dx, dy)).toBe(false);
-            expect(game.player()).toEqual(player);
+            expect(game.player).toEqual(player);
         });
 
         it("does not wrap horizontal movement into an adjacent row", () => {
@@ -278,7 +258,7 @@ describe("SokobanGame.move", () => {
             const game = new SokobanGame(createLevel({ player: { x: 4, y: 1 } }));
 
             expect(game.move(1, 0)).toBe(false);
-            expect(game.player()).toEqual({ x: 4, y: 1 });
+            expect(game.player).toEqual({ x: 4, y: 1 });
         });
     });
 
@@ -298,8 +278,8 @@ describe("SokobanGame.move", () => {
             const game = new SokobanGame(createLevel({ boxes: [box], goals: [goal] }));
 
             expect(game.move(dx, dy)).toBe(true);
-            expect(game.player()).toEqual(box);
-            expect(game.boxes()).toEqual([goal]);
+            expect(game.player).toEqual(box);
+            expect(game.boxes).toEqual([goal]);
         });
 
         it("rejects a push when a wall is behind the box", () => {
@@ -363,7 +343,7 @@ describe("SokobanGame board queries", () => {
     ])("reports whether ($x, $y) is in bounds", ({ x, y, expected }) => {
         const game = new SokobanGame(createLevel());
 
-        expect(game.isValidPos(x, y)).toBe(expected);
+        expect(game.tilemap.isInBounds(x, y)).toBe(expected);
     });
 
     it("distinguishes open, wall, box, and out-of-bounds destinations", () => {
@@ -399,15 +379,15 @@ describe("SokobanGame state ownership", () => {
         });
         const game = new SokobanGame(original);
 
-        original.tiles[0] = TILE_WALL;
+        original.tiles.set(0, 0, TILE_WALL);
         original.player.x = 4;
         original.boxes[0].x = 4;
         original.goals[0].x = 4;
 
-        expect(game.tilemap()[0]).toBe(FLOOR);
-        expect(game.player()).toEqual({ x: 1, y: 1 });
-        expect(game.boxes()).toEqual([{ x: 2, y: 1 }]);
-        expect(game.goals()).toEqual([{ x: 3, y: 1 }]);
+        expect(game.tilemap.get(0, 0)).toBe(FLOOR);
+        expect(game.player).toEqual({ x: 1, y: 1 });
+        expect(game.boxes).toEqual([{ x: 2, y: 1 }]);
+        expect(game.goals).toEqual([{ x: 3, y: 1 }]);
     });
 
     it("does not mutate the original level while playing or restarting", () => {
@@ -455,9 +435,9 @@ describe("SokobanGame.undo", () => {
         expect(game.move(0, -1)).toBe(true);
 
         expect(game.undo()).toBe(true);
-        expect(game.player()).toEqual({ x: 1, y: 2 });
+        expect(game.player).toEqual({ x: 1, y: 2 });
         expect(game.undo()).toBe(true);
-        expect(game.player()).toEqual({ x: 2, y: 2 });
+        expect(game.player).toEqual({ x: 2, y: 2 });
         expect(game.undo()).toBe(false);
     });
 
@@ -471,11 +451,11 @@ describe("SokobanGame.undo", () => {
         );
 
         expect(game.move(1, 0)).toBe(true);
-        game.boxes()[0].x = 4;
+        game.boxes[0].x = 4;
 
         expect(game.undo()).toBe(true);
-        expect(game.player()).toEqual({ x: 1, y: 1 });
-        expect(game.boxes()).toEqual([{ x: 2, y: 1 }]);
+        expect(game.player).toEqual({ x: 1, y: 1 });
+        expect(game.boxes).toEqual([{ x: 2, y: 1 }]);
     });
 
     it("does not record rejected moves", () => {
@@ -532,7 +512,7 @@ describe("SokobanGame.restart", () => {
         game.restart();
 
         expect(game.undo()).toBe(false);
-        expect(game.player()).toEqual({ x: 2, y: 2 });
+        expect(game.player).toEqual({ x: 2, y: 2 });
     });
 });
 

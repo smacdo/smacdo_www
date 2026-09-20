@@ -1,3 +1,5 @@
+import { Grid } from "./tilemap.ts";
+
 export interface Position {
     x: number;
     y: number;
@@ -25,9 +27,17 @@ export class Player implements Position {
 }
 
 export interface Level {
-    tiles: number[]; // TODO: convert this to a Tilemap or Grid interface.
-    colsPerRow: number; // TODO: move this field to the upcoming Tilemap/Grid.
+    tiles: Grid<number>; // TODO: convert T to be a Tile enum type.
     player: Player;
     boxes: Box[];
     goals: Goal[];
+}
+
+export function cloneLevel(level: Level): Level {
+    return {
+        tiles: level.tiles.clone(),
+        player: structuredClone(level.player),
+        boxes: structuredClone(level.boxes),
+        goals: structuredClone(level.goals),
+    };
 }
