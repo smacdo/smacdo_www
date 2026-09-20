@@ -46,9 +46,10 @@ a feature.
       512x512 rather than relying on markup attributes.
 - [x] Validate level data at construction: positive integer column count dividing
       tile count, recognized tiles, equal nonzero box/goal counts, integer in-bounds
-      floor positions, unique boxes/goals, and no player/box overlap. Reachability
-      analysis is deferred (PLAN.md). Completed 2026-09-19 with focused unit tests. The extracted
-      `Grid` has 25 focused tests covering construction, cloning, cell access, and bounds.
+      floor positions, unique boxes/goals, no player/box overlap, and wall-based reachability from
+      the player to every box and goal. Completed 2026-09-19 with focused unit tests, including
+      disconnected regions, paths around walls, and boxes being ignored as obstacles. The
+      extracted `Grid` has 25 focused tests covering construction, cloning, cell access, and bounds.
 - [ ] Change `Box`, `Goal`, and `Player` back to interfaces extending `Position`. They have no
       runtime behavior, and `structuredClone()` does not preserve custom class prototypes.
 - [ ] Decide how Input listeners are disposed when a game is unmounted/recreated. Now

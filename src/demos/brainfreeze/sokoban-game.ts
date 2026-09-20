@@ -1,4 +1,6 @@
+import { not_null } from "../../lib/utils.ts";
 import { Box, cloneLevel, Level, Player, Position } from "./level.ts";
+import { Grid } from "./tilemap.ts";
 
 export const TILE_WALL = 1;
 export const TILE_FLOOR = 0;
@@ -349,6 +351,55 @@ export function validateLevel(level: Level): string[] {
         }
     }
 
-    //  TODO: Player can reach all boxes and goals without being blocked by walls.
+    // Return early before performing reachability analysis if there are any structural errors.
+    // These errors could cause the reachability check to blow up.
+    if (errors.length > 0) {
+        return errors;
+    }
+
+    // Player can reach all boxes and goals without being blocked by walls.
+    const neighbors: readonly [number, number][] = [
+        [1, 0],
+        [0, -1],
+        [-1, 0],
+        [0, 1],
+    ];
+
+    const visited = new Grid<boolean>(Array(level.tiles.length).fill(false), level.tiles.cols);
+    visited.set(level.player.x, level.player.y, true);
+
+    const stack: Position[] = [level.player];
+    let goalsFound = 0;
+    let boxesFound = 0;
+
+    while (stack.length > 0) {
+        const pos = not_null(stack.pop());
+
+        goalsFound += level.goals.filter((goal) => goal.x == pos.x && goal.y == pos.y).length;
+        boxesFound += level.boxes.filter((box) => box.x == pos.x && box.y == pos.y).length;
+
+        for (const n of neighbors) {
+            const nx = n[0] + pos.x;
+            const ny = n[1] + pos.y;
+
+            if (
+                level.tiles.isInBounds(nx, ny) &&
+                level.tiles.get(nx, ny) == TILE_FLOOR &&
+                !visited.get(nx, ny)
+            ) {
+                visited.set(nx, ny, true);
+                stack.push({ x: nx, y: ny });
+            }
+        }
+    }
+
+    if (goalsFound != goalCount) {
+        errors.push(`all goals must be reachable (visited ${goalsFound} of ${goalCount} total)`);
+    }
+
+    if (boxesFound != boxCount) {
+        errors.push(`all boxes must be reachable (visited ${boxesFound} of ${boxCount} total)`);
+    }
+
     return errors;
 }

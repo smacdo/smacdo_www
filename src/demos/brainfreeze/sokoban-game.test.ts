@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import type { Level } from "./level.ts";
+import type { Level, Position } from "./level.ts";
 import { SokobanGame, TILE_WALL, validateLevel } from "./sokoban-game.js";
 import { Grid } from "./tilemap.ts";
 
@@ -26,11 +26,18 @@ function createLevel(overrides: Partial<Level> = {}): Level {
     };
 }
 
-function createTilesWithWall(wallX: number, wallY: number): Grid<number> {
+function createTilesWithWalls(walls: readonly Position[]): Grid<number> {
     const tiles = Array<number>(LEVEL_WIDTH * LEVEL_HEIGHT).fill(FLOOR);
-    tiles[wallY * LEVEL_WIDTH + wallX] = TILE_WALL;
+
+    for (const wall of walls) {
+        tiles[wall.y * LEVEL_WIDTH + wall.x] = TILE_WALL;
+    }
 
     return new Grid(tiles, LEVEL_WIDTH);
+}
+
+function createTilesWithWall(wallX: number, wallY: number): Grid<number> {
+    return createTilesWithWalls([{ x: wallX, y: wallY }]);
 }
 
 function dynamicState(game: SokobanGame) {
@@ -176,8 +183,66 @@ describe("validateLevel", () => {
         );
     });
 
-    it("allows a player and box to share one coordinate", () => {
-        expect(validateLevel(createLevel({ player: { x: 4, y: 0 } }))).toEqual([]);
+    it("allows a player and goal to share one coordinate", () => {
+        expect(validateLevel(createLevel({ player: { x: 0, y: 4 } }))).toEqual([]);
+    });
+
+    describe("reachability", () => {
+        const verticalBarrierWithBottomGap: Position[] = [
+            { x: 2, y: 0 },
+            { x: 2, y: 1 },
+            { x: 2, y: 2 },
+            { x: 2, y: 3 },
+        ];
+        const verticalBarrier: Position[] = [...verticalBarrierWithBottomGap, { x: 2, y: 4 }];
+
+        it("accepts targets reachable by navigating around walls", () => {
+            const level = createLevel({
+                tiles: createTilesWithWalls(verticalBarrierWithBottomGap),
+                player: { x: 0, y: 0 },
+                boxes: [{ x: 1, y: 1 }],
+                goals: [{ x: 4, y: 0 }],
+            });
+
+            expect(validateLevel(level)).toEqual([]);
+        });
+
+        it("rejects an unreachable goal without reporting a reachable box", () => {
+            const level = createLevel({
+                tiles: createTilesWithWalls(verticalBarrier),
+                player: { x: 0, y: 0 },
+                boxes: [{ x: 1, y: 1 }],
+                goals: [{ x: 4, y: 0 }],
+            });
+
+            expect(validateLevel(level)).toEqual([
+                "all goals must be reachable (visited 0 of 1 total)",
+            ]);
+        });
+
+        it("rejects an unreachable box without reporting a reachable goal", () => {
+            const level = createLevel({
+                tiles: createTilesWithWalls(verticalBarrier),
+                player: { x: 0, y: 0 },
+                boxes: [{ x: 4, y: 0 }],
+                goals: [{ x: 1, y: 1 }],
+            });
+
+            expect(validateLevel(level)).toEqual([
+                "all boxes must be reachable (visited 0 of 1 total)",
+            ]);
+        });
+
+        it("does not treat boxes as obstacles during reachability analysis", () => {
+            const level = createLevel({
+                tiles: new Grid([FLOOR, FLOOR, FLOOR], 3),
+                player: { x: 0, y: 0 },
+                boxes: [{ x: 1, y: 0 }],
+                goals: [{ x: 2, y: 0 }],
+            });
+
+            expect(validateLevel(level)).toEqual([]);
+        });
     });
 
     it("includes each validation error on its own line when construction fails", () => {
