@@ -1,11 +1,11 @@
 import { Input } from "./input.ts";
 import { LevelPack } from "./level_manager.ts";
-import { Scene } from "./scene_manager.ts";
+import { Screen } from "./screen_manager.ts";
 import { TILE_WALL, SokobanGame } from "./sokoban-game.ts";
 
 type GameModal = { kind: "level-complete" } | { kind: "pack-complete" };
 
-export class SokobanGameScene implements Scene {
+export class SokobanGameScreen implements Screen {
     private _levelPack: LevelPack;
     private _gameState: SokobanGame;
     private _activeModal: GameModal | null;
@@ -16,7 +16,7 @@ export class SokobanGameScene implements Scene {
         this._activeModal = null;
     }
 
-    update(_deltaTime: number, input: Input): Scene | null {
+    update(_deltaTime: number, input: Input): Screen | null {
         // Perform player's requested action.
         if (this._activeModal == null) {
             if (input.isKeyPressed("r")) {

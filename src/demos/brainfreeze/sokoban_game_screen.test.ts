@@ -4,7 +4,7 @@ import type { Input } from "./input.ts";
 import type { Level } from "./level.ts";
 import { LevelPack } from "./level_manager.ts";
 import { SokobanGame } from "./sokoban-game.ts";
-import { SokobanGameScene } from "./sokoban_game_scene.ts";
+import { SokobanGameScreen } from "./sokoban_game_screen.ts";
 import { Grid } from "./tilemap.ts";
 
 function createLevel(row = 1): Level {
@@ -36,15 +36,15 @@ function createCanvasContext(): CanvasRenderingContext2D {
     } as unknown as CanvasRenderingContext2D;
 }
 
-function completeLevel(scene: SokobanGameScene) {
-    scene.update(0, createInput("d"));
+function completeLevel(screen: SokobanGameScreen) {
+    screen.update(0, createInput("d"));
 }
 
 afterEach(() => {
     vi.restoreAllMocks();
 });
 
-describe("SokobanGameScene.update", () => {
+describe("SokobanGameScreen.update", () => {
     it.each([
         { key: "w", expectedDx: 0, expectedDy: -1 },
         { key: "s", expectedDx: 0, expectedDy: 1 },
@@ -52,9 +52,9 @@ describe("SokobanGameScene.update", () => {
         { key: "d", expectedDx: 1, expectedDy: 0 },
     ])("maps $key to its movement direction", ({ key, expectedDx, expectedDy }) => {
         const move = vi.spyOn(SokobanGame.prototype, "move").mockReturnValue(true);
-        const scene = new SokobanGameScene(new LevelPack([createLevel()]));
+        const screen = new SokobanGameScreen(new LevelPack([createLevel()]));
 
-        scene.update(0, createInput(key));
+        screen.update(0, createInput(key));
 
         expect(move).toHaveBeenCalledOnce();
         expect(move).toHaveBeenCalledWith(expectedDx, expectedDy);
@@ -63,9 +63,9 @@ describe("SokobanGameScene.update", () => {
     it("maps r to restart", () => {
         const restart = vi.spyOn(SokobanGame.prototype, "restart");
         const move = vi.spyOn(SokobanGame.prototype, "move");
-        const scene = new SokobanGameScene(new LevelPack([createLevel()]));
+        const screen = new SokobanGameScreen(new LevelPack([createLevel()]));
 
-        scene.update(0, createInput("r"));
+        screen.update(0, createInput("r"));
 
         expect(restart).toHaveBeenCalledOnce();
         expect(move).not.toHaveBeenCalled();
@@ -74,9 +74,9 @@ describe("SokobanGameScene.update", () => {
     it("maps z to undo", () => {
         const undo = vi.spyOn(SokobanGame.prototype, "undo");
         const move = vi.spyOn(SokobanGame.prototype, "move");
-        const scene = new SokobanGameScene(new LevelPack([createLevel()]));
+        const screen = new SokobanGameScreen(new LevelPack([createLevel()]));
 
-        scene.update(0, createInput("z"));
+        screen.update(0, createInput("z"));
 
         expect(undo).toHaveBeenCalledOnce();
         expect(move).not.toHaveBeenCalled();
@@ -86,9 +86,9 @@ describe("SokobanGameScene.update", () => {
         const restart = vi.spyOn(SokobanGame.prototype, "restart");
         const undo = vi.spyOn(SokobanGame.prototype, "undo");
         const move = vi.spyOn(SokobanGame.prototype, "move");
-        const scene = new SokobanGameScene(new LevelPack([createLevel()]));
+        const screen = new SokobanGameScreen(new LevelPack([createLevel()]));
 
-        scene.update(0, createInput("r", "z", "w"));
+        screen.update(0, createInput("r", "z", "w"));
 
         expect(restart).toHaveBeenCalledOnce();
         expect(undo).not.toHaveBeenCalled();
@@ -98,9 +98,9 @@ describe("SokobanGameScene.update", () => {
     it("does not advance before the current level is complete", () => {
         const firstLevel = createLevel();
         const levelPack = new LevelPack([firstLevel, createLevel(2)]);
-        const scene = new SokobanGameScene(levelPack);
+        const screen = new SokobanGameScreen(levelPack);
 
-        scene.update(0, createInput("Enter"));
+        screen.update(0, createInput("Enter"));
 
         expect(levelPack.currentLevel).toBe(firstLevel);
     });
@@ -108,13 +108,13 @@ describe("SokobanGameScene.update", () => {
     it("advances from a completed level and starts the next level", () => {
         const secondLevel = createLevel(2);
         const levelPack = new LevelPack([createLevel(), secondLevel]);
-        const scene = new SokobanGameScene(levelPack);
+        const screen = new SokobanGameScreen(levelPack);
 
-        completeLevel(scene);
-        scene.update(0, createInput("Enter"));
+        completeLevel(screen);
+        screen.update(0, createInput("Enter"));
 
         const context = createCanvasContext();
-        scene.render(context);
+        screen.render(context);
 
         expect(levelPack.currentLevel).toBe(secondLevel);
         expect(context.fillRect).toHaveBeenCalledWith(68, 132, 56, 56);
@@ -124,33 +124,33 @@ describe("SokobanGameScene.update", () => {
     it("does not advance past the final completed level", () => {
         const onlyLevel = createLevel();
         const levelPack = new LevelPack([onlyLevel]);
-        const scene = new SokobanGameScene(levelPack);
+        const screen = new SokobanGameScreen(levelPack);
 
-        completeLevel(scene);
-        scene.update(0, createInput("Enter"));
+        completeLevel(screen);
+        screen.update(0, createInput("Enter"));
 
         expect(levelPack.currentLevel).toBe(onlyLevel);
     });
 
     it.each(["w", "s", "a", "d"])("blocks %s movement while a modal is active", (key) => {
         const move = vi.spyOn(SokobanGame.prototype, "move");
-        const scene = new SokobanGameScene(new LevelPack([createLevel(), createLevel(2)]));
-        completeLevel(scene);
+        const screen = new SokobanGameScreen(new LevelPack([createLevel(), createLevel(2)]));
+        completeLevel(screen);
         move.mockClear();
 
-        scene.update(0, createInput(key));
+        screen.update(0, createInput(key));
 
         expect(move).not.toHaveBeenCalled();
     });
 
     it("allows restart from a completion modal and dismisses it", () => {
         const restart = vi.spyOn(SokobanGame.prototype, "restart");
-        const scene = new SokobanGameScene(new LevelPack([createLevel(), createLevel(2)]));
-        completeLevel(scene);
+        const screen = new SokobanGameScreen(new LevelPack([createLevel(), createLevel(2)]));
+        completeLevel(screen);
 
-        scene.update(0, createInput("r"));
+        screen.update(0, createInput("r"));
         const context = createCanvasContext();
-        scene.render(context);
+        screen.render(context);
 
         expect(restart).toHaveBeenCalledOnce();
         expect(context.fillText).not.toHaveBeenCalled();
@@ -158,12 +158,12 @@ describe("SokobanGameScene.update", () => {
 
     it("allows undo from the final completion modal and dismisses it", () => {
         const undo = vi.spyOn(SokobanGame.prototype, "undo");
-        const scene = new SokobanGameScene(new LevelPack([createLevel()]));
-        completeLevel(scene);
+        const screen = new SokobanGameScreen(new LevelPack([createLevel()]));
+        completeLevel(screen);
 
-        scene.update(0, createInput("z"));
+        screen.update(0, createInput("z"));
         const context = createCanvasContext();
-        scene.render(context);
+        screen.render(context);
 
         expect(undo).toHaveBeenCalledOnce();
         expect(context.fillText).not.toHaveBeenCalled();
@@ -172,28 +172,28 @@ describe("SokobanGameScene.update", () => {
     it("does not advance when restart and Enter are pressed together on a completion modal", () => {
         const firstLevel = createLevel();
         const levelPack = new LevelPack([firstLevel, createLevel(2)]);
-        const scene = new SokobanGameScene(levelPack);
-        completeLevel(scene);
+        const screen = new SokobanGameScreen(levelPack);
+        completeLevel(screen);
 
-        scene.update(0, createInput("r", "Enter"));
+        screen.update(0, createInput("r", "Enter"));
 
         expect(levelPack.currentLevel).toBe(firstLevel);
     });
 
-    it("returns no scene transition while gameplay remains active", () => {
-        const scene = new SokobanGameScene(new LevelPack([createLevel()]));
+    it("returns no screen transition while gameplay remains active", () => {
+        const screen = new SokobanGameScreen(new LevelPack([createLevel()]));
 
-        expect(scene.update(0, createInput())).toBeNull();
+        expect(screen.update(0, createInput())).toBeNull();
     });
 });
 
-describe("SokobanGameScene.render", () => {
+describe("SokobanGameScreen.render", () => {
     it("draws the final completion message when the last level is solved", () => {
         const context = createCanvasContext();
-        const scene = new SokobanGameScene(new LevelPack([createLevel()]));
-        completeLevel(scene);
+        const screen = new SokobanGameScreen(new LevelPack([createLevel()]));
+        completeLevel(screen);
 
-        scene.render(context);
+        screen.render(context);
 
         expect(context.fillText).toHaveBeenCalledOnce();
         expect(context.fillText).toHaveBeenCalledWith("YOU ARE WINNER", 50, 100);
@@ -201,10 +201,10 @@ describe("SokobanGameScene.render", () => {
 
     it("draws the next-level prompt when a non-final level is solved", () => {
         const context = createCanvasContext();
-        const scene = new SokobanGameScene(new LevelPack([createLevel(), createLevel(2)]));
-        completeLevel(scene);
+        const screen = new SokobanGameScreen(new LevelPack([createLevel(), createLevel(2)]));
+        completeLevel(screen);
 
-        scene.render(context);
+        screen.render(context);
 
         expect(context.fillText).toHaveBeenCalledTimes(2);
         expect(context.fillText).toHaveBeenNthCalledWith(1, "Level complete!", 80, 80);
@@ -218,9 +218,9 @@ describe("SokobanGameScene.render", () => {
 
     it("does not draw a completion message before the level is solved", () => {
         const context = createCanvasContext();
-        const scene = new SokobanGameScene(new LevelPack([createLevel()]));
+        const screen = new SokobanGameScreen(new LevelPack([createLevel()]));
 
-        scene.render(context);
+        screen.render(context);
 
         expect(context.fillText).not.toHaveBeenCalled();
     });

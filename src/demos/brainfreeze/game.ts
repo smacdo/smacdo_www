@@ -1,17 +1,17 @@
 import { Input } from "./input.ts";
-import { Scene, SceneManager } from "./scene_manager.ts";
+import { Screen, ScreenManager } from "./screen_manager.ts";
 
 export class Game {
     canvasContext: CanvasRenderingContext2D;
     input: Input;
     previousTimestamp: number | null;
-    sceneManager: SceneManager;
+    screenManager: ScreenManager;
 
-    constructor(canvasContext: CanvasRenderingContext2D, input: Input, initialScene: Scene) {
+    constructor(canvasContext: CanvasRenderingContext2D, input: Input, initialScreen: Screen) {
         this.canvasContext = canvasContext;
         this.input = input;
         this.previousTimestamp = null;
-        this.sceneManager = new SceneManager(initialScene);
+        this.screenManager = new ScreenManager(initialScreen);
     }
 
     /** Starts the game. */
@@ -34,8 +34,8 @@ export class Game {
 
         // Advance game simulation and render.
         // TODO: fixed step accumulator.
-        this.sceneManager.update(deltaTime, this.input);
-        this.sceneManager.render(this.canvasContext);
+        this.screenManager.update(deltaTime, this.input);
+        this.screenManager.render(this.canvasContext);
 
         // Post frame clean up.
         this.input.endFrame();
