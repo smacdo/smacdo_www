@@ -87,6 +87,9 @@ export class Game {
         const GOAL_EMPTY_COLOR = "red";
         const GOAL_FULL_COLOR = "pink";
 
+        const MESSAGE_BG_COLOR = "yellow";
+        const MESSAGE_FG_COLOR = "black";
+
         // Tile map configuration.
         const tileWidth = 64;
         const tileHeight = 64;
@@ -185,23 +188,22 @@ export class Game {
 
         // Show a message to the player when they beat the level.
         if (this.gameState.isComplete()) {
+            this.canvasContext.fillStyle = MESSAGE_BG_COLOR;
+            this.canvasContext.fillRect(40, 30, 450, 100);
+
             if (this.levelPack.hasNextLevel()) {
                 // The player has beaten the current level in the pack, but there are more levels.
-                this.canvasContext.fillRect(40, 30, 450, 100);
-
                 this.canvasContext.font = "48px Arial";
-                this.canvasContext.fillStyle = "black";
+                this.canvasContext.fillStyle = MESSAGE_FG_COLOR;
                 this.canvasContext.fillText("Level complete!", 80, 80);
 
                 this.canvasContext.font = "18px Arial";
-                this.canvasContext.fillStyle = "black";
+                this.canvasContext.fillStyle = MESSAGE_FG_COLOR;
                 this.canvasContext.fillText("Press enter to go to the next level", 100, 110);
             } else {
                 // The player has beaten all of the levels in the pack!
-                this.canvasContext.fillRect(40, 30, 450, 100);
-
                 this.canvasContext.font = "bold 48px Arial";
-                this.canvasContext.fillStyle = "black";
+                this.canvasContext.fillStyle = MESSAGE_FG_COLOR;
                 this.canvasContext.fillText("YOU ARE WINNER", 50, 100);
             }
         }
