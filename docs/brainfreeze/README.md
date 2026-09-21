@@ -10,17 +10,18 @@ and which decisions are locked.
 
 ## Current state
 
-One hardcoded level supports grid movement, crate pushing, goal highlighting, completion
-detection, restart, and snapshot undo. Controls: WASD to move, R to restart, Z to undo. The game
-uses a continuous frame loop with discrete input actions; `sokoban-game.ts` owns browser-independent
-rules and state.
+Three hardcoded levels support grid movement, crate pushing, goal highlighting, completion
+detection, restart, snapshot undo, and progression through a `LevelPack`. Controls: WASD to move,
+R to restart, Z to undo, and Enter to advance after completing a non-final level. The game uses a
+continuous frame loop with discrete input actions; `sokoban-game.ts` owns browser-independent rules
+and the live state for one level at a time.
 
 The TypeScript conversion is complete. The level types and data, browser-independent rules,
 browser-facing entry point, loop/rendering, and input modules are all TypeScript.
 
 Typecheck, lint, formatting, and the esbuild bundle all pass. Automated tests cover the
-browser-independent rules and level validation, keyboard state, game-loop coordination, completion
-overlay, and demo bootstrap. See [TASKS.md](TASKS.md).
+browser-independent rules and level validation, keyboard state, level-pack progression, game-loop
+coordination, completion overlays, and demo bootstrap. See [TASKS.md](TASKS.md).
 
 ## Working on it
 
@@ -46,10 +47,11 @@ All paths relative to `src/demos/brainfreeze/`:
 
 - `demo.ts`: entry point — finds the canvas the page template provides, sizes it, starts the game.
 - `game.ts`: frame loop, input-to-action mapping, and Canvas rendering.
+- `level_manager.ts`: ordered level-pack state and progression.
 - `sokoban-game.ts`: movement rules, completion, restart, and undo. No browser APIs.
 - `input.ts`: held/pressed keyboard state and focus-loss handling.
 - `level.ts`: shared level types.
-- `levels/level1.ts`: the hardcoded level definition.
+- `levels/`: the three hardcoded level definitions.
 
 Outside that directory:
 

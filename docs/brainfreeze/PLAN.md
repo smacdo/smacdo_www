@@ -77,8 +77,10 @@ game rules.
 
 ### 3. Complete the Brainfreeze MVP
 
-- Multiple hardcoded TypeScript levels and progression through a small LevelManager.
-- Simple title, gameplay, and level-complete flow.
+- Multiple hardcoded TypeScript levels and progression through a small `LevelPack` — complete
+  2026-09-20, with three levels and focused progression tests.
+- Simple title, gameplay, and level-complete flow. The level-complete prompt and final completion
+  state are implemented; the title remains.
 - Lightweight SceneManager with replace(); add push()/pop() only if needed.
 - Small debug overlay: start with useful values such as frame time, player tile
   position, canvas dimensions, and tile size. Add grid/coordinate toggles as useful.
@@ -100,7 +102,7 @@ These are candidate responsibilities, not required classes to create immediately
 | GameScene    | Translate input into Sokoban actions and render its state |
 | SokobanGame  | Pure game rules and live dynamic state                    |
 | TileMap      | Static terrain queries and bounds                         |
-| LevelManager | Level selection and progression, not live gameplay state  |
+| LevelPack    | Level selection and progression, not live gameplay state  |
 | DebugOverlay | Small, useful development readouts                        |
 | GameUI       | Minimal Canvas HUD, menus, and reusable buttons as needed |
 

@@ -1,20 +1,22 @@
 import { Input } from "./input.ts";
-import DEFAULT_LEVEL from "./levels/level1.ts";
+import { LevelPack } from "./level_manager.ts";
 import { TILE_WALL, SokobanGame } from "./sokoban-game.ts";
 
 export class Game {
     canvasContext: CanvasRenderingContext2D;
     input: Input;
+    levelPack: LevelPack;
     gameState: SokobanGame;
     previousTimestamp: number | null;
 
-    constructor(canvasContext: CanvasRenderingContext2D, input: Input) {
+    constructor(canvasContext: CanvasRenderingContext2D, input: Input, levelPack: LevelPack) {
         this.canvasContext = canvasContext;
         this.input = input;
         this.previousTimestamp = null;
 
         // Gameplay state.
-        this.gameState = new SokobanGame(DEFAULT_LEVEL);
+        this.levelPack = levelPack;
+        this.gameState = new SokobanGame(this.levelPack.currentLevel);
     }
 
     /** Starts the game. */
@@ -50,8 +52,15 @@ export class Game {
         // TODO: use deltaTime and perform movement animation.
 
         // Perform player's requested action.
-        if (this.input.isKeyPressed("r")) {
-            // TODO: Ask confirmation.
+        const canGoToNextLevel = this.gameState.isComplete() && this.levelPack.hasNextLevel();
+
+        if (this.input.isKeyPressed("Enter") && canGoToNextLevel) {
+            // Advance to the next level when `enter` is pressed.
+            this.levelPack.advance();
+            this.gameState = new SokobanGame(this.levelPack.currentLevel);
+        } else if (this.input.isKeyPressed("r")) {
+            // Reset the level when `r` is pressed.
+            // TODO: Consider asking for confirmation.
             this.gameState.restart();
         } else if (this.input.isKeyPressed("z")) {
             this.gameState.undo();
@@ -174,13 +183,27 @@ export class Game {
             goalHeight,
         );
 
-        // Show a message to the player if they've completed the level.
+        // Show a message to the player when they beat the level.
         if (this.gameState.isComplete()) {
-            this.canvasContext.fillRect(40, 30, 450, 100);
+            if (this.levelPack.hasNextLevel()) {
+                // The player has beaten the current level in the pack, but there are more levels.
+                this.canvasContext.fillRect(40, 30, 450, 100);
 
-            this.canvasContext.font = "bold 48px Arial";
-            this.canvasContext.fillStyle = "black";
-            this.canvasContext.fillText("YOU ARE WINNER", 50, 100);
+                this.canvasContext.font = "48px Arial";
+                this.canvasContext.fillStyle = "black";
+                this.canvasContext.fillText("Level complete!", 80, 80);
+
+                this.canvasContext.font = "18px Arial";
+                this.canvasContext.fillStyle = "black";
+                this.canvasContext.fillText("Press enter to go to the next level", 100, 110);
+            } else {
+                // The player has beaten all of the levels in the pack!
+                this.canvasContext.fillRect(40, 30, 450, 100);
+
+                this.canvasContext.font = "bold 48px Arial";
+                this.canvasContext.fillStyle = "black";
+                this.canvasContext.fillText("YOU ARE WINNER", 50, 100);
+            }
         }
     }
 }

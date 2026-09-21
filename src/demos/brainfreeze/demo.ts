@@ -1,5 +1,10 @@
 import { Game } from "./game.ts";
 import { Input } from "./input.ts";
+import { LevelPack } from "./level_manager.ts";
+
+import LEVEL1 from "./levels/level1.ts";
+import LEVEL2 from "./levels/level2.ts";
+import LEVEL3 from "./levels/level3.ts";
 
 const canvas = document.querySelector("#game-canvas");
 
@@ -21,5 +26,5 @@ if (canvasContext == null) {
     throw new Error("could not get game canvas 2d context");
 }
 
-const game = new Game(canvasContext, new Input());
+const game = new Game(canvasContext, new Input(), new LevelPack([LEVEL1, LEVEL2, LEVEL3]));
 game.start();

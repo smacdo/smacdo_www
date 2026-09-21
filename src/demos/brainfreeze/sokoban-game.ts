@@ -1,3 +1,4 @@
+// TODO: rename file to sokoban_game.ts.
 import { not_null } from "../../lib/utils.ts";
 import { Box, cloneLevel, Level, Player, Position } from "./level.ts";
 import { Grid } from "./tilemap.ts";
@@ -21,6 +22,11 @@ export class SokobanGame {
     _level: Level;
     _stateSnapshots: LevelState[];
 
+    /**
+     * Create a new gameplay controller for a Sokoban level.
+     *
+     * NOTE: The level passed as an argument is cloned rather than shared.
+     */
     constructor(level: Level) {
         this._stateSnapshots = [];
         const validateResults = validateLevel(level);

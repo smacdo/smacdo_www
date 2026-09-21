@@ -2,6 +2,18 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { Game } from "./game.ts";
 import type { Input } from "./input.ts";
+import type { Level } from "./level.ts";
+import { LevelPack } from "./level_manager.ts";
+import { Grid } from "./tilemap.ts";
+
+function createLevel(row = 1): Level {
+    return {
+        tiles: new Grid(Array<number>(20).fill(0), 5),
+        player: { kind: "player", x: 1, y: row },
+        boxes: [{ kind: "box", x: 2, y: row }],
+        goals: [{ kind: "goal", x: 3, y: row }],
+    };
+}
 
 function createInput(...pressedKeys: string[]): Input {
     const pressed = new Set(pressedKeys);
@@ -24,8 +36,8 @@ function createCanvasContext(): CanvasRenderingContext2D {
     } as unknown as CanvasRenderingContext2D;
 }
 
-function createGame(input = createInput()) {
-    return new Game(createCanvasContext(), input);
+function createGame(input = createInput(), levels: Level[] = [createLevel()]) {
+    return new Game(createCanvasContext(), input, new LevelPack(levels));
 }
 
 afterEach(() => {
@@ -83,6 +95,43 @@ describe("Game.update", () => {
         expect(undo).not.toHaveBeenCalled();
         expect(move).not.toHaveBeenCalled();
     });
+
+    it("does not advance before the current level is complete", () => {
+        const firstLevel = createLevel();
+        const secondLevel = createLevel(2);
+        const game = createGame(createInput("Enter"), [firstLevel, secondLevel]);
+        const initialGameState = game.gameState;
+
+        game.update(0);
+
+        expect(game.levelPack.currentLevel).toBe(firstLevel);
+        expect(game.gameState).toBe(initialGameState);
+    });
+
+    it("replaces the completed game state with the next level when Enter is pressed", () => {
+        const firstLevel = createLevel();
+        const secondLevel = createLevel(2);
+        const game = createGame(createInput("Enter"), [firstLevel, secondLevel]);
+        const completedGameState = game.gameState;
+        vi.spyOn(completedGameState, "isComplete").mockReturnValue(true);
+
+        game.update(0);
+
+        expect(game.levelPack.currentLevel).toBe(secondLevel);
+        expect(game.gameState).not.toBe(completedGameState);
+        expect(game.gameState.player).toEqual(secondLevel.player);
+    });
+
+    it("does not advance past the final completed level", () => {
+        const game = createGame(createInput("Enter"));
+        const finalGameState = game.gameState;
+        vi.spyOn(finalGameState, "isComplete").mockReturnValue(true);
+
+        game.update(0);
+
+        expect(game.gameState).toBe(finalGameState);
+        expect(game.levelPack.hasNextLevel()).toBe(false);
+    });
 });
 
 describe("Game.frame", () => {
@@ -108,9 +157,9 @@ describe("Game.frame", () => {
 });
 
 describe("Game.render", () => {
-    it("draws the completion message when the level is solved", () => {
+    it("draws the final completion message when the last level is solved", () => {
         const context = createCanvasContext();
-        const game = new Game(context, createInput());
+        const game = new Game(context, createInput(), new LevelPack([createLevel()]));
         vi.spyOn(game.gameState, "isComplete").mockReturnValue(true);
 
         game.render();
@@ -119,9 +168,30 @@ describe("Game.render", () => {
         expect(context.fillText).toHaveBeenCalledWith("YOU ARE WINNER", 50, 100);
     });
 
+    it("draws the next-level prompt when a non-final level is solved", () => {
+        const context = createCanvasContext();
+        const game = new Game(
+            context,
+            createInput(),
+            new LevelPack([createLevel(), createLevel(2)]),
+        );
+        vi.spyOn(game.gameState, "isComplete").mockReturnValue(true);
+
+        game.render();
+
+        expect(context.fillText).toHaveBeenCalledTimes(2);
+        expect(context.fillText).toHaveBeenNthCalledWith(1, "Level complete!", 80, 80);
+        expect(context.fillText).toHaveBeenNthCalledWith(
+            2,
+            "Press enter to go to the next level",
+            100,
+            110,
+        );
+    });
+
     it("does not draw the completion message before the level is solved", () => {
         const context = createCanvasContext();
-        const game = new Game(context, createInput());
+        const game = new Game(context, createInput(), new LevelPack([createLevel()]));
         vi.spyOn(game.gameState, "isComplete").mockReturnValue(false);
 
         game.render();
