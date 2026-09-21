@@ -13,15 +13,17 @@ and which decisions are locked.
 Three hardcoded levels support grid movement, crate pushing, goal highlighting, completion
 detection, restart, snapshot undo, and progression through a `LevelPack`. Controls: WASD to move,
 R to restart, Z to undo, and Enter to advance after completing a non-final level. The game uses a
-continuous frame loop with discrete input actions; `sokoban-game.ts` owns browser-independent rules
-and the live state for one level at a time.
+continuous frame loop with discrete input actions. `SceneManager` owns the active scene;
+`SokobanGameScene` owns gameplay input, rendering, level progression, and completion modals; and
+`sokoban-game.ts` owns browser-independent rules and the live state for one level at a time.
 
 The TypeScript conversion is complete. The level types and data, browser-independent rules,
 browser-facing entry point, loop/rendering, and input modules are all TypeScript.
 
 Typecheck, lint, formatting, and the esbuild bundle all pass. Automated tests cover the
 browser-independent rules and level validation, keyboard state, level-pack progression, game-loop
-coordination, completion overlays, and demo bootstrap. See [TASKS.md](TASKS.md).
+coordination, scene replacement, gameplay input routing, completion overlays, and demo bootstrap.
+See [TASKS.md](TASKS.md).
 
 ## Working on it
 
@@ -38,15 +40,17 @@ Editing anything under `src/demos/brainfreeze/` rebuilds the bundle and reloads 
 automatically. `npm run build` does the whole site at once, and `npm run build:brainfreeze`
 just this demo.
 
-Checks, all from the repository root: `npm run typecheck`, `npm run lint`, and
-`npm run format:check` (or `npm run format` to apply).
+Run `npm run check` from the repository root for typechecking, linting, formatting, and unit tests.
+Use `npm run format` to apply formatting fixes.
 
 ## Files to know
 
 All paths relative to `src/demos/brainfreeze/`:
 
 - `demo.ts`: entry point — finds the canvas the page template provides, sizes it, starts the game.
-- `game.ts`: frame loop, input-to-action mapping, and Canvas rendering.
+- `game.ts`: frame loop and coordination between input, updates, and rendering.
+- `scene_manager.ts`: active-scene ownership, replacement, update, and rendering delegation.
+- `sokoban_game_scene.ts`: gameplay input mapping, Canvas rendering, level progression, and modals.
 - `level_manager.ts`: ordered level-pack state and progression.
 - `sokoban-game.ts`: movement rules, completion, restart, and undo. No browser APIs.
 - `input.ts`: held/pressed keyboard state and focus-loss handling.

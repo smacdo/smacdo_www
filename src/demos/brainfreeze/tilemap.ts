@@ -1,5 +1,6 @@
 // TODO: Implement a Tilemap as an abstraction on top of Grid. Tilemaps add additional features
 //       like tile size (width, height), chunking etc.
+// TODO: Move this to shared code.
 export class Tilemap {}
 
 export class Grid<T> {

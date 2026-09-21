@@ -43,8 +43,8 @@ and browser-facing boundaries have permanent Vitest coverage. Folding this into 
 
 Implemented and reviewed: frame loop, delta time, held/pressed keyboard input,
 hardcoded level, tile/entity rendering, and grid movement with wall/bounds checks.
-Rendering remains in Game; a separate Renderer is deferred. The board's bottom
-row is still partly clipped by the canvas (TASKS.md).
+Rendering later moved from `Game` into `SokobanGameScene`; a separate Renderer remains deferred.
+The earlier canvas clipping issue is fixed (TASKS.md).
 
 Suggested learning sequence:
 
@@ -81,7 +81,7 @@ game rules.
   2026-09-20, with three levels and focused progression tests.
 - Simple title, gameplay, and level-complete flow. The level-complete prompt and final completion
   state are implemented; the title remains.
-- Lightweight SceneManager with replace(); add push()/pop() only if needed.
+- Lightweight `SceneManager` with replacement — complete 2026-09-20; add push/pop only if needed.
 - Small debug overlay: start with useful values such as frame time, player tile
   position, canvas dimensions, and tile size. Add grid/coordinate toggles as useful.
 - Primitive rendering remains sufficient.
@@ -95,18 +95,19 @@ Treat scenes and gameplay modals as related but distinct state. A scene replaces
 screen; a modal renders over the gameplay scene and temporarily captures its input. Implement them
 as adjacent checkpoints so the current playable behavior remains easy to verify:
 
-1. Add a minimal scene contract and `SceneManager.replace()`, then extract the current gameplay
-   into `GameScene` without changing behavior. `Game` keeps the animation loop, input frame cleanup,
-   Canvas context, and active scene manager. `GameScene` owns the `LevelPack`, active `SokobanGame`,
-   gameplay input mapping, and gameplay rendering.
-2. Give `GameScene` one optional, game-specific modal state. Start with a discriminated union for
-   level completion and pack completion; add restart confirmation when that feature is implemented.
-   When a modal exists, route its permitted actions before gameplay input and render it after the
-   board. Enter advances from level completion, while undo and restart remain available and ordinary
-   movement stays blocked.
-3. Add `TitleScene` and use scene replacement to enter gameplay. Decide later whether pack
-   completion remains a gameplay modal or becomes a separate results scene once the desired final
-   flow is clearer.
+1. [x] Add a minimal scene contract and `SceneManager.replace()`, then extract the current gameplay
+       into `SokobanGameScene` without changing behavior. `Game` keeps the animation loop, input frame
+       cleanup, Canvas context, and active scene manager. `SokobanGameScene` owns the `LevelPack`, active
+       `SokobanGame`, gameplay input mapping, and gameplay rendering. Completed 2026-09-20 with focused
+       manager, loop-integration, input-routing, transition, and rendering tests.
+2. [x] Give `SokobanGameScene` one optional, game-specific modal state. Start with a discriminated union for
+       level completion and pack completion; add restart confirmation when that feature is implemented.
+       When a modal exists, route its permitted actions before gameplay input and render it after the
+       board. Enter advances from level completion, while undo and restart remain available and ordinary
+       movement stays blocked. Completed 2026-09-20.
+3. [ ] Add `TitleScene` and use scene replacement to enter gameplay. Decide later whether pack
+       completion remains a gameplay modal or becomes a separate results scene once the desired final
+       flow is clearer.
 
 Keep the first modal implementation deliberately narrow: one nullable modal, no modal stack, no
 base class, and no generic state-machine or UI framework. Extract shared panel drawing only when a
@@ -117,22 +118,23 @@ focused transition, input-routing, and rendering tests at each checkpoint.
 
 These are candidate responsibilities, not required classes to create immediately.
 
-| Area         | Responsibility                                            |
-| ------------ | --------------------------------------------------------- |
-| Game         | Browser loop and overall lifecycle                        |
-| Input        | Browser events and input state; mouse support when needed |
-| Renderer     | Canvas drawing, viewport fitting, DPI, and coordinates    |
-| SceneManager | Active scene lifecycle and replacement                    |
-| GameScene    | Translate input into Sokoban actions and render its state |
-| GameModal    | Explicit overlay state owned and routed by `GameScene`    |
-| SokobanGame  | Pure game rules and live dynamic state                    |
-| TileMap      | Static terrain queries and bounds                         |
-| LevelPack    | Level selection and progression, not live gameplay state  |
-| DebugOverlay | Small, useful development readouts                        |
-| GameUI       | Minimal Canvas HUD, menus, and reusable buttons as needed |
+| Area             | Responsibility                                                |
+| ---------------- | ------------------------------------------------------------- |
+| Game             | Browser loop and overall lifecycle                            |
+| Input            | Browser events and input state; mouse support when needed     |
+| Renderer         | Canvas drawing, viewport fitting, DPI, and coordinates        |
+| SceneManager     | Active scene lifecycle and replacement                        |
+| SokobanGameScene | Translate input into Sokoban actions and render its state     |
+| GameModal        | Explicit overlay state owned and routed by `SokobanGameScene` |
+| SokobanGame      | Pure game rules and live dynamic state                        |
+| TileMap          | Static terrain queries and bounds                             |
+| LevelPack        | Level selection and progression, not live gameplay state      |
+| DebugOverlay     | Small, useful development readouts                            |
+| GameUI           | Minimal Canvas HUD, menus, and reusable buttons as needed     |
 
-Scenes may expose enter(), exit(), update(dt), and render(renderer); no base class
-is required. Player and crate data remain plain state until behavior justifies classes. Store
+Scenes currently expose `update(dt, input)` and `render(context)`; lifecycle hooks can be added when
+a concrete transition needs them, and no base class is required. Player and crate data remain plain
+state until behavior justifies classes. Store
 player coordinates directly on the live game state and crate/goal coordinates directly on their
 records. Do not introduce nested `Position` or `Vector` wrappers solely to group `x` and `y`.
 
