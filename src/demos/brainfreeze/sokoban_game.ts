@@ -7,7 +7,7 @@ export const TILE_WALL = 1;
 export const TILE_FLOOR = 0;
 
 /** Captures mutable level state to perform undo. */
-class LevelState {
+class LevelSnapshot {
     player: Player;
     boxes: Box[];
 
@@ -20,7 +20,7 @@ class LevelState {
 export class SokobanGame {
     _initialLevel: Level;
     _level: Level;
-    _stateSnapshots: LevelState[];
+    _stateSnapshots: LevelSnapshot[];
 
     /**
      * Create a new gameplay controller for a Sokoban level.
@@ -122,7 +122,7 @@ export class SokobanGame {
     /** Snapshot the game state for undoing moves. */
     #snapshot() {
         this._stateSnapshots.push(
-            new LevelState(
+            new LevelSnapshot(
                 { ...this._level.player },
                 this._level.boxes.map((box) => ({ ...box })),
             ),
