@@ -1,7 +1,7 @@
 // TODO: rename file to sokoban_game.ts.
 import { not_null } from "../../lib/utils.ts";
 import { Box, cloneLevel, Level, Player, Position } from "./level.ts";
-import { Grid } from "./tilemap.ts";
+import { Grid } from "./grid.ts";
 
 export const TILE_WALL = 1;
 export const TILE_FLOOR = 0;

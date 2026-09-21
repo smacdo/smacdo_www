@@ -5,7 +5,7 @@ import type { Level } from "./level.ts";
 import { LevelPack } from "./level_pack.ts";
 import { SokobanGame } from "./sokoban_game.ts";
 import { SokobanGameScreen } from "./sokoban_game_screen.ts";
-import { Grid } from "./tilemap.ts";
+import { Grid } from "./grid.ts";
 
 function createLevel(row = 1): Level {
     return {

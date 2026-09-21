@@ -1,4 +1,4 @@
-import { Grid } from "./tilemap.ts";
+import { Grid } from "./grid.ts";
 
 /// An object that can be located on a grid with integer coordinates.
 export interface Position {

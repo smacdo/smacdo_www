@@ -1,5 +1,5 @@
 import { Level } from "../level.ts";
-import { Grid } from "../tilemap.ts";
+import { Grid } from "../grid.ts";
 
 const level: Level = {
     tiles: new Grid<number>(

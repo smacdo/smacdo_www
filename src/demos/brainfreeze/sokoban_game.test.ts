@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { Level, Position } from "./level.ts";
 import { SokobanGame, TILE_WALL, validateLevel } from "./sokoban_game.js";
-import { Grid } from "./tilemap.ts";
+import { Grid } from "./grid.ts";
 
 const LEVEL_WIDTH = 5;
 const LEVEL_HEIGHT = 5;

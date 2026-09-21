@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { Grid } from "./tilemap.ts";
+import { Grid } from "./grid.ts";
 
 describe("Grid", () => {
     describe("construction", () => {
