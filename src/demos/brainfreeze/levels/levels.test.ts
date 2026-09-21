@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { validateLevel } from "../sokoban-game.ts";
+import { validateLevel } from "../sokoban_game.ts";
 import LEVEL1 from "./level1.ts";
 import LEVEL2 from "./level2.ts";
 import LEVEL3 from "./level3.ts";

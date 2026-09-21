@@ -1,7 +1,7 @@
 import { Input } from "./input.ts";
 import { LevelPack } from "./level_manager.ts";
 import { Screen } from "./screen_manager.ts";
-import { TILE_WALL, SokobanGame } from "./sokoban-game.ts";
+import { TILE_WALL, SokobanGame } from "./sokoban_game.ts";
 
 type GameModal = { kind: "level-complete" } | { kind: "pack-complete" };
 
