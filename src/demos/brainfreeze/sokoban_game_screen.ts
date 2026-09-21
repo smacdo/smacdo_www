@@ -7,12 +7,12 @@ type GameModal = { kind: "level-complete" } | { kind: "pack-complete" };
 
 export class SokobanGameScreen implements Screen {
     private _levelPack: LevelPack;
-    private _gameState: SokobanGame;
+    private _game: SokobanGame;
     private _activeModal: GameModal | null;
 
     constructor(levelPack: LevelPack) {
         this._levelPack = levelPack;
-        this._gameState = new SokobanGame(this._levelPack.currentLevel);
+        this._game = new SokobanGame(this._levelPack.currentLevel);
         this._activeModal = null;
     }
 
@@ -21,33 +21,33 @@ export class SokobanGameScreen implements Screen {
         if (this._activeModal == null) {
             if (input.isKeyPressed("r")) {
                 // TODO: Consider asking for confirmation when restarting level.
-                this._gameState.restart();
+                this._game.restart();
             } else if (input.isKeyPressed("z")) {
-                this._gameState.undo();
+                this._game.undo();
             } else if (input.isKeyPressed("w")) {
-                this._gameState.move(0, -1);
+                this._game.move(0, -1);
             } else if (input.isKeyPressed("s")) {
-                this._gameState.move(0, 1);
+                this._game.move(0, 1);
             } else if (input.isKeyPressed("a")) {
-                this._gameState.move(-1, 0);
+                this._game.move(-1, 0);
             } else if (input.isKeyPressed("d")) {
-                this._gameState.move(1, 0);
+                this._game.move(1, 0);
             }
         } else {
             let exitModal = false;
 
             if (input.isKeyPressed("r")) {
-                this._gameState.restart();
+                this._game.restart();
                 exitModal = true;
             } else if (input.isKeyPressed("z")) {
-                this._gameState.undo();
+                this._game.undo();
                 exitModal = true;
             } else {
                 switch (this._activeModal.kind) {
                     case "level-complete":
                         if (input.isKeyPressed("Enter")) {
                             this._levelPack.advance();
-                            this._gameState = new SokobanGame(this._levelPack.currentLevel);
+                            this._game = new SokobanGame(this._levelPack.currentLevel);
                             exitModal = true;
                         }
 
@@ -63,7 +63,7 @@ export class SokobanGameScreen implements Screen {
         }
 
         // Trigger level or pack victory modals when the player has completed a level.
-        if (this._activeModal == null && this._gameState.isComplete()) {
+        if (this._activeModal == null && this._game.isComplete()) {
             if (this._levelPack.hasNextLevel()) {
                 this._activeModal = { kind: "level-complete" };
             } else {
@@ -100,12 +100,12 @@ export class SokobanGameScreen implements Screen {
         }
 
         // Draw the tile map.
-        const colCount = this._gameState.tilemap.cols;
-        const rowCount = this._gameState.tilemap.rows;
+        const colCount = this._game.tilemap.cols;
+        const rowCount = this._game.tilemap.rows;
 
         for (let y = 0; y < rowCount; y++) {
             for (let x = 0; x < colCount; x++) {
-                const tile = this._gameState.tilemap.get(x, y);
+                const tile = this._game.tilemap.get(x, y);
                 canvasContext.fillStyle = tile === TILE_WALL ? WALL_COLOR : FLOOR_COLOR;
 
                 canvasContext.fillRect(x * tileWidth, y * tileHeight, tileWidth, tileHeight);
@@ -126,14 +126,14 @@ export class SokobanGameScreen implements Screen {
         const goalOffsetX = (tileWidth - goalWidth) / 2;
         const goalOffsetY = (tileHeight - goalHeight) / 2;
 
-        const goals = this._gameState.goals;
+        const goals = this._game.goals;
         const goal_count = goals.length;
 
         for (let i = 0; i < goal_count; i++) {
             const goalX = goals[i].x;
             const goalY = goals[i].y;
 
-            canvasContext.fillStyle = this._gameState.isBoxAt(goalX, goalY)
+            canvasContext.fillStyle = this._game.isBoxAt(goalX, goalY)
                 ? GOAL_FULL_COLOR
                 : GOAL_EMPTY_COLOR;
             canvasContext.fillRect(
@@ -150,7 +150,7 @@ export class SokobanGameScreen implements Screen {
         const boxOffsetX = (tileWidth - boxWidth) / 2;
         const boxOffsetY = (tileHeight - boxHeight) / 2;
 
-        const boxes = this._gameState.boxes;
+        const boxes = this._game.boxes;
         const box_count = boxes.length;
 
         for (let i = 0; i < box_count; i++) {
@@ -167,7 +167,7 @@ export class SokobanGameScreen implements Screen {
         }
 
         // Draw the player.
-        const player = this._gameState.player;
+        const player = this._game.player;
         const playerX = player.x;
         const playerY = player.y;
 
