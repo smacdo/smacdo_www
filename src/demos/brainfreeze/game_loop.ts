@@ -1,7 +1,7 @@
 import { Input } from "./input.ts";
 import { Screen, ScreenManager } from "./screen_manager.ts";
 
-export class Game {
+export class GameLoop {
     canvasContext: CanvasRenderingContext2D;
     input: Input;
     previousTimestamp: number | null;
@@ -14,7 +14,7 @@ export class Game {
         this.screenManager = new ScreenManager(initialScreen);
     }
 
-    /** Starts the game. */
+    /** Starts the game loop. */
     start() {
         console.log("game started");
         requestAnimationFrame((timestamp) => this.frame(timestamp));

@@ -1,4 +1,4 @@
-import { Game } from "./game.ts";
+import { GameLoop } from "./game_loop.ts";
 import { Input } from "./input.ts";
 import { LevelPack } from "./level_manager.ts";
 import { SokobanGameScreen } from "./sokoban_game_screen.ts";
@@ -27,7 +27,7 @@ if (canvasContext == null) {
     throw new Error("could not get game canvas 2d context");
 }
 
-const game = new Game(
+const game = new GameLoop(
     canvasContext,
     new Input(),
     new SokobanGameScreen(new LevelPack([LEVEL1, LEVEL2, LEVEL3])),

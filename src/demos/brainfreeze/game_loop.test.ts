@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { Game } from "./game.ts";
+import { GameLoop } from "./game_loop.ts";
 import type { Input } from "./input.ts";
 import type { Screen } from "./screen_manager.ts";
 
@@ -30,7 +30,7 @@ describe("Game", () => {
     it("passes elapsed time and input to the active screen", () => {
         const input = createInput();
         const screen = createScreen();
-        const game = new Game(createCanvasContext(), input, screen);
+        const game = new GameLoop(createCanvasContext(), input, screen);
         vi.stubGlobal("requestAnimationFrame", vi.fn().mockReturnValue(1));
         game.previousTimestamp = 0;
 
@@ -43,7 +43,7 @@ describe("Game", () => {
     it("renders the active screen with the canvas context", () => {
         const context = createCanvasContext();
         const screen = createScreen();
-        const game = new Game(context, createInput(), screen);
+        const game = new GameLoop(context, createInput(), screen);
         vi.stubGlobal("requestAnimationFrame", vi.fn().mockReturnValue(1));
 
         game.frame(0);
@@ -55,7 +55,7 @@ describe("Game", () => {
     it("renders a replacement returned by the previous screen", () => {
         const nextScreen = createScreen();
         const initialScreen = createScreen(nextScreen);
-        const game = new Game(createCanvasContext(), createInput(), initialScreen);
+        const game = new GameLoop(createCanvasContext(), createInput(), initialScreen);
         vi.stubGlobal("requestAnimationFrame", vi.fn().mockReturnValue(1));
 
         game.frame(0);
@@ -68,7 +68,7 @@ describe("Game", () => {
 describe("Game.frame", () => {
     it("uses zero for the first delta, measures later frames, and caps long gaps", () => {
         const input = createInput();
-        const game = new Game(createCanvasContext(), input, createScreen());
+        const game = new GameLoop(createCanvasContext(), input, createScreen());
         const update = vi.spyOn(game.screenManager, "update").mockImplementation(() => {});
         const render = vi.spyOn(game.screenManager, "render").mockImplementation(() => {});
         const requestFrame = vi.fn().mockReturnValue(1);
