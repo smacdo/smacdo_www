@@ -1,4 +1,3 @@
-// TODO: rename file to sokoban_game.ts.
 import { not_null } from "../../lib/utils.ts";
 import { Box, cloneLevel, Level, Player, Position } from "./level.ts";
 import { Grid } from "./grid.ts";
@@ -20,7 +19,7 @@ class LevelSnapshot {
 export class SokobanGame {
     _initialLevel: Level;
     _level: Level;
-    _stateSnapshots: LevelSnapshot[];
+    _undoStack: LevelSnapshot[];
 
     /**
      * Create a new gameplay controller for a Sokoban level.
@@ -28,13 +27,13 @@ export class SokobanGame {
      * NOTE: The level passed as an argument is cloned rather than shared.
      */
     constructor(level: Level) {
-        this._stateSnapshots = [];
-        const validateResults = validateLevel(level);
+        this._undoStack = [];
+        const validationErrors = validateLevel(level);
 
-        if (validateResults.length != 0) {
+        if (validationErrors.length != 0) {
             throw new Error(
                 "Failed to load level due to the following errors:\n" +
-                    validateResults.map((message) => ` - ${message}\n`).join(""),
+                    validationErrors.map((message) => ` - ${message}\n`).join(""),
             );
         }
 
@@ -121,7 +120,7 @@ export class SokobanGame {
 
     /** Snapshot the game state for undoing moves. */
     #snapshot() {
-        this._stateSnapshots.push(
+        this._undoStack.push(
             new LevelSnapshot(
                 { ...this._level.player },
                 this._level.boxes.map((box) => ({ ...box })),
@@ -131,8 +130,8 @@ export class SokobanGame {
 
     /** Undo the last move. */
     undo() {
-        if (this._stateSnapshots.length > 0) {
-            const snapshot = this._stateSnapshots.pop();
+        if (this._undoStack.length > 0) {
+            const snapshot = this._undoStack.pop();
 
             if (snapshot) {
                 this._level.player = snapshot.player;
@@ -148,7 +147,7 @@ export class SokobanGame {
     /** Reset the level to its starting state. */
     restart() {
         this._level = cloneLevel(this._initialLevel);
-        this._stateSnapshots = [];
+        this._undoStack = [];
     }
 
     /** Check if the player has completed the level succesfully. */
@@ -182,8 +181,8 @@ export class SokobanGame {
         return true;
     }
 
-    /** Get the tilemap for the level. */
-    get tilemap() {
+    /** Get the tile grid for the level. */
+    get tiles() {
         return this._level.tiles;
     }
 

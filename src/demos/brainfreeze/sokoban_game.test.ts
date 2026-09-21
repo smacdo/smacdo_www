@@ -412,7 +412,7 @@ describe("SokobanGame board queries", () => {
     ])("reports whether ($x, $y) is in bounds", ({ x, y, expected }) => {
         const game = new SokobanGame(createLevel());
 
-        expect(game.tilemap.isInBounds(x, y)).toBe(expected);
+        expect(game.tiles.isInBounds(x, y)).toBe(expected);
     });
 
     it("distinguishes open, wall, box, and out-of-bounds destinations", () => {
@@ -453,7 +453,7 @@ describe("SokobanGame state ownership", () => {
         original.boxes[0].x = 4;
         original.goals[0].x = 4;
 
-        expect(game.tilemap.get(0, 0)).toBe(FLOOR);
+        expect(game.tiles.get(0, 0)).toBe(FLOOR);
         expect(game.player).toEqual({ kind: "player", x: 1, y: 1 });
         expect(game.boxes).toEqual([{ kind: "box", x: 2, y: 1 }]);
         expect(game.goals).toEqual([{ kind: "goal", x: 3, y: 1 }]);

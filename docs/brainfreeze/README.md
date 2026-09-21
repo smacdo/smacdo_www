@@ -15,7 +15,7 @@ detection, restart, snapshot undo, and progression through a `LevelPack`. Contro
 R to restart, Z to undo, and Enter to advance after completing a non-final level. The game uses a
 continuous frame loop with discrete input actions. `ScreenManager` owns the active screen;
 `SokobanGameScreen` owns gameplay input, rendering, level progression, and completion modals; and
-`sokoban-game.ts` owns browser-independent rules and the live state for one level at a time.
+`sokoban_game.ts` owns browser-independent rules and the live state for one level at a time.
 
 The TypeScript conversion is complete. The level types and data, browser-independent rules,
 browser-facing entry point, loop/rendering, and input modules are all TypeScript.
@@ -48,11 +48,11 @@ Use `npm run format` to apply formatting fixes.
 All paths relative to `src/demos/brainfreeze/`:
 
 - `demo.ts`: entry point — finds the canvas the page template provides, sizes it, starts the game.
-- `game.ts`: frame loop and coordination between input, updates, and rendering.
+- `game_loop.ts`: frame loop and coordination between input, updates, and rendering.
 - `screen_manager.ts`: active-screen ownership, replacement, update, and rendering delegation.
 - `sokoban_game_screen.ts`: gameplay input mapping, Canvas rendering, level progression, and modals.
-- `level_manager.ts`: ordered level-pack state and progression.
-- `sokoban-game.ts`: movement rules, completion, restart, and undo. No browser APIs.
+- `level_pack.ts`: ordered level-pack state and progression.
+- `sokoban_game.ts`: movement rules, completion, restart, and undo. No browser APIs.
 - `input.ts`: held/pressed keyboard state and focus-loss handling.
 - `level.ts`: shared level types.
 - `levels/`: the three hardcoded level definitions.

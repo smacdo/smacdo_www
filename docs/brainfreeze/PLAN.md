@@ -43,7 +43,7 @@ and browser-facing boundaries have permanent Vitest coverage. Folding this into 
 
 Implemented and reviewed: frame loop, delta time, held/pressed keyboard input,
 hardcoded level, tile/entity rendering, and grid movement with wall/bounds checks.
-Rendering later moved from `Game` into `SokobanGameScreen`; a separate Renderer remains deferred.
+Rendering later moved from `GameLoop` into `SokobanGameScreen`; a separate Renderer remains deferred.
 The earlier canvas clipping issue is fixed (TASKS.md).
 
 Suggested learning sequence:
@@ -96,7 +96,7 @@ screen; a modal renders over the gameplay screen and temporarily captures its in
 as adjacent checkpoints so the current playable behavior remains easy to verify:
 
 1. [x] Add a minimal screen contract and `ScreenManager.replace()`, then extract the current gameplay
-       into `SokobanGameScreen` without changing behavior. `Game` keeps the animation loop, input frame
+       into `SokobanGameScreen` without changing behavior. `GameLoop` keeps the animation loop, input frame
        cleanup, Canvas context, and active screen manager. `SokobanGameScreen` owns the `LevelPack`, active
        `SokobanGame`, gameplay input mapping, and gameplay rendering. Completed 2026-09-20 with focused
        manager, loop-integration, input-routing, transition, and rendering tests.
@@ -120,7 +120,7 @@ These are candidate responsibilities, not required classes to create immediately
 
 | Area              | Responsibility                                                 |
 | ----------------- | -------------------------------------------------------------- |
-| Game              | Browser loop and overall lifecycle                             |
+| GameLoop          | Browser loop and overall lifecycle                             |
 | Input             | Browser events and input state; mouse support when needed      |
 | Renderer          | Canvas drawing, viewport fitting, DPI, and coordinates         |
 | ScreenManager     | Active screen lifecycle and replacement                        |

@@ -15,12 +15,12 @@ migration in favor of it.
   decide which ones deserve to become reusable.
 - **TypeScript ES modules + Canvas 2D**, bundled by esbuild alongside the rest of the site. See
   [MIGRATION.md](MIGRATION.md) for the original integration decision and conversion context.
-- **Game rules stay independent of browser APIs.** `sokoban-game.ts` owns movement, pushing,
+- **Game rules stay independent of browser APIs.** `sokoban_game.ts` owns movement, pushing,
   undo, restart, and completion without touching the DOM, Canvas, or input events.
 - **Static terrain and dynamic entities stay separate**, and gameplay uses grid coordinates.
   Level definitions stay separate from mutable state so restart can reuse initial positions.
 - **Continuous `requestAnimationFrame` loop with discrete moves.** No fixed-timestep accumulator
-  yet, despite the TODO in `game.ts`. Primitive rendering first.
+  yet, despite the TODO in `game_loop.ts`. Primitive rendering first.
 - **Canvas is the long-term home for game-facing UI.** Small plain-HTML controls are allowed as an
   incremental bridge for early mobile and responsive work, and DOM remains appropriate for debug
   controls. Do not add a UI framework.

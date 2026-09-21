@@ -15,7 +15,7 @@ if (canvas == null) {
     throw new Error("expected game canvas HTML element to be HTMLCanvasElement");
 }
 
-// The board is 8x8 tiles at the 64px tile size used by game.ts, so the canvas bitmap needs to
+// The board is 8x8 tiles at the 64px tile size used by sokoban_game_screen.ts, so the bitmap needs to
 // be 512x512. Keep these in step with the tile size and level dimensions until the renderer
 // derives them itself.
 canvas.width = 512;
@@ -27,10 +27,10 @@ if (canvasContext == null) {
     throw new Error("could not get game canvas 2d context");
 }
 
-const game = new GameLoop(
+const gameLoop = new GameLoop(
     canvasContext,
     new Input(),
     new SokobanGameScreen(new LevelPack([LEVEL1, LEVEL2, LEVEL3])),
 );
 
-game.start();
+gameLoop.start();

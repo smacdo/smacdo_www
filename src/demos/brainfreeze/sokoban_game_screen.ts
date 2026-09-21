@@ -100,12 +100,12 @@ export class SokobanGameScreen implements Screen {
         }
 
         // Draw the tile map.
-        const colCount = this._game.tilemap.cols;
-        const rowCount = this._game.tilemap.rows;
+        const colCount = this._game.tiles.cols;
+        const rowCount = this._game.tiles.rows;
 
         for (let y = 0; y < rowCount; y++) {
             for (let x = 0; x < colCount; x++) {
-                const tile = this._game.tilemap.get(x, y);
+                const tile = this._game.tiles.get(x, y);
                 canvasContext.fillStyle = tile === TILE_WALL ? WALL_COLOR : FLOOR_COLOR;
 
                 canvasContext.fillRect(x * tileWidth, y * tileHeight, tileWidth, tileHeight);
@@ -127,9 +127,9 @@ export class SokobanGameScreen implements Screen {
         const goalOffsetY = (tileHeight - goalHeight) / 2;
 
         const goals = this._game.goals;
-        const goal_count = goals.length;
+        const goalCount = goals.length;
 
-        for (let i = 0; i < goal_count; i++) {
+        for (let i = 0; i < goalCount; i++) {
             const goalX = goals[i].x;
             const goalY = goals[i].y;
 
@@ -151,9 +151,9 @@ export class SokobanGameScreen implements Screen {
         const boxOffsetY = (tileHeight - boxHeight) / 2;
 
         const boxes = this._game.boxes;
-        const box_count = boxes.length;
+        const boxCount = boxes.length;
 
-        for (let i = 0; i < box_count; i++) {
+        for (let i = 0; i < boxCount; i++) {
             const boxX = boxes[i].x;
             const boxY = boxes[i].y;
 
