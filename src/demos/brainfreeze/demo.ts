@@ -1,6 +1,6 @@
 import { GameLoop } from "./game_loop.ts";
 import { Input } from "./input.ts";
-import { LevelPack } from "./level_manager.ts";
+import { LevelPack } from "./level_pack.ts";
 import { SokobanGameScreen } from "./sokoban_game_screen.ts";
 
 import LEVEL1 from "./levels/level1.ts";

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { Level } from "./level.ts";
-import { LevelPack } from "./level_manager.ts";
+import { LevelPack } from "./level_pack.ts";
 import { Grid } from "./tilemap.ts";
 
 function createLevel(): Level {

@@ -1,5 +1,5 @@
 import { Input } from "./input.ts";
-import { LevelPack } from "./level_manager.ts";
+import { LevelPack } from "./level_pack.ts";
 import { Screen } from "./screen_manager.ts";
 import { TILE_WALL, SokobanGame } from "./sokoban_game.ts";
 

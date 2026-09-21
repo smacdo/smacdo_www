@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { Input } from "./input.ts";
 import type { Level } from "./level.ts";
-import { LevelPack } from "./level_manager.ts";
+import { LevelPack } from "./level_pack.ts";
 import { SokobanGame } from "./sokoban_game.ts";
 import { SokobanGameScreen } from "./sokoban_game_screen.ts";
 import { Grid } from "./tilemap.ts";
