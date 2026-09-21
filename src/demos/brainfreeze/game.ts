@@ -34,21 +34,11 @@ export class Game {
 
         // Advance game simulation and render.
         // TODO: fixed step accumulator.
-        this.update(deltaTime);
-        this.render();
+        this.sceneManager.update(deltaTime, this.input);
+        this.sceneManager.render(this.canvasContext);
 
         // Post frame clean up.
         this.input.endFrame();
         requestAnimationFrame((timestamp) => this.frame(timestamp));
-    }
-
-    /** Advance game state. */
-    update(deltaTime: number) {
-        this.sceneManager.update(deltaTime, this.input);
-    }
-
-    /** Draw game state. */
-    render() {
-        this.sceneManager.render(this.canvasContext);
     }
 }
