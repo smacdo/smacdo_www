@@ -51,10 +51,13 @@ export class Game {
     update(_deltaTime: number) {
         // TODO: use deltaTime and perform movement animation.
 
-        // Perform player's requested action.
-        const canGoToNextLevel = this.gameState.isComplete() && this.levelPack.hasNextLevel();
+        // Perform player's requested action. Check if the game is showing a modal dialog or if
+        // normal gameplay can happen.
+        const isShowingLevelWin = this.gameState.isComplete() && this.levelPack.hasNextLevel();
+        const isShowingPackWin = this.gameState.isComplete() && !this.levelPack.hasNextLevel();
+        const isShowingModalMessage = isShowingLevelWin || isShowingPackWin;
 
-        if (this.input.isKeyPressed("Enter") && canGoToNextLevel) {
+        if (this.input.isKeyPressed("Enter") && isShowingLevelWin) {
             // Advance to the next level when `enter` is pressed.
             this.levelPack.advance();
             this.gameState = new SokobanGame(this.levelPack.currentLevel);
@@ -63,14 +66,15 @@ export class Game {
             // TODO: Consider asking for confirmation.
             this.gameState.restart();
         } else if (this.input.isKeyPressed("z")) {
+            // Undo the last move when `z` is pushed.
             this.gameState.undo();
-        } else if (this.input.isKeyPressed("w")) {
+        } else if (this.input.isKeyPressed("w") && !isShowingModalMessage) {
             this.gameState.move(0, -1);
-        } else if (this.input.isKeyPressed("s")) {
+        } else if (this.input.isKeyPressed("s") && !isShowingModalMessage) {
             this.gameState.move(0, 1);
-        } else if (this.input.isKeyPressed("a")) {
+        } else if (this.input.isKeyPressed("a") && !isShowingModalMessage) {
             this.gameState.move(-1, 0);
-        } else if (this.input.isKeyPressed("d")) {
+        } else if (this.input.isKeyPressed("d") && !isShowingModalMessage) {
             this.gameState.move(1, 0);
         }
     }

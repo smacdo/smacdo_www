@@ -89,6 +89,30 @@ game rules.
 Done when a player can start, play through multiple levels, undo/restart, and reach
 an understandable completion state.
 
+#### Planned scene and modal sequence
+
+Treat scenes and gameplay modals as related but distinct state. A scene replaces the primary
+screen; a modal renders over the gameplay scene and temporarily captures its input. Implement them
+as adjacent checkpoints so the current playable behavior remains easy to verify:
+
+1. Add a minimal scene contract and `SceneManager.replace()`, then extract the current gameplay
+   into `GameScene` without changing behavior. `Game` keeps the animation loop, input frame cleanup,
+   Canvas context, and active scene manager. `GameScene` owns the `LevelPack`, active `SokobanGame`,
+   gameplay input mapping, and gameplay rendering.
+2. Give `GameScene` one optional, game-specific modal state. Start with a discriminated union for
+   level completion and pack completion; add restart confirmation when that feature is implemented.
+   When a modal exists, route its permitted actions before gameplay input and render it after the
+   board. Enter advances from level completion, while undo and restart remain available and ordinary
+   movement stays blocked.
+3. Add `TitleScene` and use scene replacement to enter gameplay. Decide later whether pack
+   completion remains a gameplay modal or becomes a separate results scene once the desired final
+   flow is clearer.
+
+Keep the first modal implementation deliberately narrow: one nullable modal, no modal stack, no
+base class, and no generic state-machine or UI framework. Extract shared panel drawing only when a
+second modal demonstrates the common layout. Preserve the existing scene and input behavior with
+focused transition, input-routing, and rendering tests at each checkpoint.
+
 ## Architecture direction
 
 These are candidate responsibilities, not required classes to create immediately.
@@ -100,6 +124,7 @@ These are candidate responsibilities, not required classes to create immediately
 | Renderer     | Canvas drawing, viewport fitting, DPI, and coordinates    |
 | SceneManager | Active scene lifecycle and replacement                    |
 | GameScene    | Translate input into Sokoban actions and render its state |
+| GameModal    | Explicit overlay state owned and routed by `GameScene`    |
 | SokobanGame  | Pure game rules and live dynamic state                    |
 | TileMap      | Static terrain queries and bounds                         |
 | LevelPack    | Level selection and progression, not live gameplay state  |

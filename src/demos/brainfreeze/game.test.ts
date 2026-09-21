@@ -132,6 +132,49 @@ describe("Game.update", () => {
         expect(game.gameState).toBe(finalGameState);
         expect(game.levelPack.hasNextLevel()).toBe(false);
     });
+
+    it.each(["w", "s", "a", "d"])(
+        "blocks %s movement while showing the level-complete message",
+        (key) => {
+            const game = createGame(createInput(key), [createLevel(), createLevel(2)]);
+            const move = vi.spyOn(game.gameState, "move");
+            vi.spyOn(game.gameState, "isComplete").mockReturnValue(true);
+
+            game.update(0);
+
+            expect(move).not.toHaveBeenCalled();
+        },
+    );
+
+    it("blocks movement after the final level is complete", () => {
+        const game = createGame(createInput("w"));
+        const move = vi.spyOn(game.gameState, "move");
+        vi.spyOn(game.gameState, "isComplete").mockReturnValue(true);
+
+        game.update(0);
+
+        expect(move).not.toHaveBeenCalled();
+    });
+
+    it("allows restart while showing a completion message", () => {
+        const game = createGame(createInput("r"), [createLevel(), createLevel(2)]);
+        const restart = vi.spyOn(game.gameState, "restart");
+        vi.spyOn(game.gameState, "isComplete").mockReturnValue(true);
+
+        game.update(0);
+
+        expect(restart).toHaveBeenCalledOnce();
+    });
+
+    it("allows undo after the final level is complete", () => {
+        const game = createGame(createInput("z"));
+        const undo = vi.spyOn(game.gameState, "undo");
+        vi.spyOn(game.gameState, "isComplete").mockReturnValue(true);
+
+        game.update(0);
+
+        expect(undo).toHaveBeenCalledOnce();
+    });
 });
 
 describe("Game.frame", () => {
