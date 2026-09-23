@@ -38,6 +38,11 @@ a feature.
 
 ## Gameplay and integration follow-ups
 
+- [ ] Make canvas text sharp at its displayed size. `demo.ts` fixes the backing bitmap at
+      512x512 while `#game-canvas` stretches to its container, so the browser resamples the
+      title and modal text. Size the backing bitmap for the displayed CSS size and device pixel
+      ratio while preserving 512x512 logical drawing coordinates; check narrow/wide layouts
+      and high-DPI screens.
 - [x] Convert the demo to TypeScript progressively, one file at a time. Completed 2026-09-19;
       all Brainfreeze source modules are now TypeScript.
 

@@ -6,6 +6,7 @@ import { SokobanGameScreen } from "./sokoban_game_screen.ts";
 import LEVEL1 from "./levels/level1.ts";
 import LEVEL2 from "./levels/level2.ts";
 import LEVEL3 from "./levels/level3.ts";
+import { SokobanTitleScreen } from "./sokoban_title_screen.ts";
 
 const canvas = document.querySelector("#game-canvas");
 
@@ -30,7 +31,7 @@ if (canvasContext == null) {
 const gameLoop = new GameLoop(
     canvasContext,
     new Input(),
-    new SokobanGameScreen(new LevelPack([LEVEL1, LEVEL2, LEVEL3])),
+    new SokobanTitleScreen(new SokobanGameScreen(new LevelPack([LEVEL1, LEVEL2, LEVEL3]))),
 );
 
 gameLoop.start();

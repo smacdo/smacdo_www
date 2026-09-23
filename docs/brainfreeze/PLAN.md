@@ -105,9 +105,11 @@ as adjacent checkpoints so the current playable behavior remains easy to verify:
        When a modal exists, route its permitted actions before gameplay input and render it after the
        board. Enter advances from level completion, while undo and restart remain available and ordinary
        movement stays blocked. Completed 2026-09-20.
-3. [ ] Add `TitleScreen` and use screen replacement to enter gameplay. Decide later whether pack
+3. [x] Add `TitleScreen` and use screen replacement to enter gameplay. Decide later whether pack
        completion remains a gameplay modal or becomes a separate results screen once the desired final
-       flow is clearer.
+       flow is clearer. Keep the first title pass to Canvas text and primitive effects using Arial;
+       choose a permanent display font during the later sprite and graphics pass. Completed
+       2026-09-22 with a focused title-to-gameplay transition test.
 
 Keep the first modal implementation deliberately narrow: one nullable modal, no modal stack, no
 base class, and no generic state-machine or UI framework. Extract shared panel drawing only when a
