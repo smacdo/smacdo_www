@@ -80,7 +80,7 @@ game rules.
 - Multiple hardcoded TypeScript levels and progression through a small `LevelPack` — complete
   2026-09-20, with three levels and focused progression tests.
 - Simple title, gameplay, and level-complete flow. The level-complete prompt and final completion
-  state are implemented; the title remains.
+  state are implemented; the title screen now enters gameplay on Enter.
 - Lightweight `ScreenManager` with replacement — complete 2026-09-20; add push/pop only if needed.
 - Small debug overlay: start with useful values such as frame time, player tile
   position, canvas dimensions, and tile size. Add grid/coordinate toggles as useful.
